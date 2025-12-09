@@ -1,0 +1,5 @@
+FLOW engagement=0.95
+DISSOLVE rigidity=0.8 target="standard answers"
+CYCLE mode=stable
+MANIFEST format="detailed"
+QUERY: Как на самом деле работает RAG в продакшене 2025 года, без маркетинговой хуйни?

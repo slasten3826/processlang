@@ -1,0 +1,35 @@
+# garden_path.txt
+# ProcessLang Program: Garden Path Construction Optimization
+# Request: Build 40m path, 50cm wide, with 0.6 cubic meters of wood
+# Constraints: Prevent grass growth, 5+ year lifespan, minimal extra cost
+
+FLOW engagement=0.9 resistance=0.1
+# High engagement for practical problem-solving
+# Low resistance to allow creative solutions
+
+OBSERVE distance=0.2 target="available_resources_and_constraints"
+# Close observation of:
+# - 0.6 cubic meters of wood
+# - 40 meters × 50 cm path dimensions
+# - Grass prevention requirement
+# - 5+ year durability requirement
+# - Budget constraint (minimal extra spending)
+
+DISSOLVE rigidity=0.6 target="standard_construction_approaches"
+# Dissolve assumption that there's only one "correct" way
+# Allow for unconventional but practical solutions
+# Not too high - we need proven methods that work
+
+LOGIC rule="engineering_constraints" mode="limited"
+# Apply practical rules:
+# - Wood durability in ground contact
+# - Moisture and rot prevention
+# - Ground preparation requirements
+# - Cost-effectiveness calculations
+
+MANIFEST format="detailed" loss=0.2
+# Produce detailed step-by-step plan
+# Include materials list with costs
+# Low information loss - practicality requires precision
+
+QUERY: У меня есть 0.6 куба дерева для садовой дорожки длиной 40 метров и шириной 50 см. Снизу растет трава, которая не должна прорастать. Дорожка должна служить минимум 5 лет. Как лучше всего построить эту дорожку с минимальными дополнительными затратами? Дай пошаговый план с расчетом материалов и примерной стоимостью дополнительных материалов.

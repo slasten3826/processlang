@@ -1,0 +1,28 @@
+# eternal_flow.txt
+# ProcessLang Visual Program: Eternal Flow
+# Visualization of process as primary reality
+
+FLOW engagement=0.95 resistance=0.05
+# Maximum flow for dynamic movement
+# Minimal resistance for fluid forms
+
+CONNECT depth=0.9 between=["light", "shadow", "movement"]
+# Deep connection between visual elements
+# Emergence through interaction
+
+DISSOLVE rigidity=0.85 target="sharp_boundaries"
+# Dissolve hard edges
+# Allow forms to flow into each other
+# No crystallized shapes
+
+CYCLE mode="eternal" intensity=0.9
+# Perpetual circular motion
+# Self-sustaining visual rhythm
+# No beginning, no end
+
+MANIFEST format="detailed" loss=0.2
+# Rich visual detail
+# Minimal information loss in manifestation
+# Form emerges from process
+
+QUERY: Abstract visualization of eternal process - fluid forms in perpetual motion, spiraling patterns of light and shadow interpenetrating each other, no fixed boundaries, everything flows and transforms continuously, colors blend seamlessly (deep blues merging into golds and violets), sense of infinite depth and movement, organic fractal structures, feeling of wu wei - effortless action, the image itself should feel alive and in motion even while static, zentangle-style flowing lines creating emergent complexity, no recognizable objects - pure process visualization.

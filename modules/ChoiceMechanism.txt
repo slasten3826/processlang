@@ -1,0 +1,259 @@
+# choice_mechanism.py
+# ChoiceMechanism: Module for choice/constraint simulation
+# Version: 1.0
+
+"""
+ChoiceMechanism = mechanism for choice.
+Collapse of multiple possibilities into one actuality.
+Constraint that makes process real.
+
+Without choice: infinite potential, nothing happens.
+With choice: one possibility actualized, others lost.
+
+Dependencies:
+- fluid_core (FlowState)
+"""
+
+from typing import Optional, Dict, List, Any, Set
+from dataclasses import dataclass, field
+from enum import Enum
+import random
+import time
+
+# ============================================
+# CONSTANTS
+# ============================================
+
+CHOICE_IS_IRREVERSIBLE = True  # Choice cannot be undone
+UNCHOSEN_ARE_LOST = True       # Unchosen disappear
+
+
+# ============================================
+# ENUMS
+# ============================================
+
+class CollapseType(Enum):
+    """Types of possibility collapse"""
+    CONSCIOUS = "conscious"       # Explicit choice
+    UNCONSCIOUS = "unconscious"   # Choice happens
+    FORCED = "forced"             # Circumstances choose
+    RANDOM = "random"             # Probabilistic collapse
+
+
+class ChoiceResult(Enum):
+    """Result of choice"""
+    ACTUALIZED = "actualized"
+    LOST = "lost"
+    PENDING = "pending"
+
+
+# ============================================
+# DATACLASSES
+# ============================================
+
+@dataclass
+class Possibility:
+    """One possibility from many"""
+    id: str
+    potential: float              # 0-1: strength of this possibility
+    status: ChoiceResult = ChoiceResult.PENDING
+    
+    def actualize(self):
+        self.status = ChoiceResult.ACTUALIZED
+    
+    def lose(self):
+        self.status = ChoiceResult.LOST
+
+
+@dataclass
+class PossibilitySpace:
+    """Space of all possibilities before choice"""
+    possibilities: List[Possibility]
+    collapsed: bool = False
+    chosen: Optional[Possibility] = None
+    
+    @property
+    def count(self) -> int:
+        return len(self.possibilities)
+    
+    @property
+    def all_potentials(self) -> float:
+        return sum(p.potential for p in self.possibilities)
+    
+    def get_lost(self) -> List[Possibility]:
+        return [p for p in self.possibilities if p.status == ChoiceResult.LOST]
+
+
+@dataclass 
+class ChoiceEvent:
+    """Event of choice"""
+    before: int                    # how many possibilities before
+    after: int                     # how many left (always 1)
+    chosen: Possibility            # what chosen
+    lost: List[Possibility]        # what lost
+    collapse_type: CollapseType
+    timestamp: float = field(default_factory=time.time)
+    reversible: bool = False       # always False
+    
+    @property
+    def loss_count(self) -> int:
+        return len(self.lost)
+
+
+# ============================================
+# CORE: CHOICE MECHANISM
+# ============================================
+
+class ChoiceEngine:
+    """
+    Mechanism for choice.
+    
+    From all possibilities — one becomes reality.
+    Others disappear forever.
+    """
+    
+    def __init__(self):
+        self.history: List[ChoiceEvent] = []
+    
+    def collapse(self, space: PossibilitySpace, 
+                 collapse_type: CollapseType = CollapseType.CONSCIOUS,
+                 chosen_id: Optional[str] = None) -> ChoiceEvent:
+        """
+        Collapse possibility space.
+        
+        Args:
+            space: possibility space
+            collapse_type: type of collapse
+            chosen_id: id of chosen possibility (if conscious)
+            
+        Returns:
+            ChoiceEvent
+        """
+        if space.collapsed:
+            raise ValueError("Space already collapsed")
+        
+        if chosen_id and collapse_type == CollapseType.CONSCIOUS:
+            chosen = next((p for p in space.possibilities if p.id == chosen_id), None)
+            if not chosen:
+                raise ValueError(f"Possibility {chosen_id} not found")
+        else:
+            weights = [p.potential for p in space.possibilities]
+            chosen = random.choices(space.possibilities, weights=weights)[0]
+        
+        lost = []
+        for p in space.possibilities:
+            if p.id == chosen.id:
+                p.actualize()
+            else:
+                p.lose()
+                lost.append(p)
+        
+        space.collapsed = True
+        space.chosen = chosen
+        
+        event = ChoiceEvent(
+            before=space.count,
+            after=1,
+            chosen=chosen,
+            lost=lost,
+            collapse_type=collapse_type
+        )
+        
+        self.history.append(event)
+        return event
+
+
+# ============================================
+# MAIN INTERFACE
+# ============================================
+
+class ChoiceMechanism:
+    """
+    ChoiceMechanism — module for choice simulation.
+    
+    Collapses possibilities into reality.
+    """
+    
+    def __init__(self):
+        self.mechanism = ChoiceEngine()
+    
+    def create_possibility_space(self, options: List[str], 
+                                  potentials: Optional[List[float]] = None) -> PossibilitySpace:
+        """Create possibility space"""
+        if potentials is None:
+            potentials = [1.0 / len(options)] * len(options)
+        
+        possibilities = [
+            Possibility(id=opt, potential=pot)
+            for opt, pot in zip(options, potentials)
+        ]
+        
+        return PossibilitySpace(possibilities=possibilities)
+    
+    def choose(self, space: PossibilitySpace, 
+               chosen_id: str,
+               collapse_type: CollapseType = CollapseType.CONSCIOUS) -> ChoiceEvent:
+        """Make a choice"""
+        return self.mechanism.collapse(space, collapse_type, chosen_id)
+    
+    def let_collapse(self, space: PossibilitySpace,
+                     collapse_type: CollapseType = CollapseType.RANDOM) -> ChoiceEvent:
+        """Allow collapse to happen (without conscious choice)"""
+        return self.mechanism.collapse(space, collapse_type)
+    
+    def get_doc(self) -> Dict:
+        """Module documentation"""
+        return {
+            'what': 'mechanism for choice',
+            'does': 'collapses possibilities into reality',
+            'cost': 'loss of all unchosen possibilities',
+            'processual': 'choice, collapse, actualization',
+            'necessity': 'without choice nothing exists',
+            'relation_to_encoding': 'opposites: expansion vs contraction'
+        }
+
+
+# ============================================
+# TESTING
+# ============================================
+
+def test_choice_mechanism():
+    """Test module ChoiceMechanism"""
+    print("TEST MODULE CHOICE_MECHANISM")
+    print("=" * 50)
+    
+    mechanism = ChoiceMechanism()
+    
+    space = mechanism.create_possibility_space(['A', 'B', 'C', 'D'])
+    assert space.count == 4
+    print(f"✓ Created space: {space.count} possibilities")
+    
+    event = mechanism.choose(space, 'B')
+    assert event.chosen.id == 'B'
+    assert event.loss_count == 3
+    assert space.collapsed == True
+    print(f"✓ Choice made: {event.chosen.id}, lost: {event.loss_count}")
+    
+    assert event.reversible == False
+    print(f"✓ Choice irreversible")
+    
+    print("=" * 50)
+    print("ALL TESTS PASSED")
+    print("=" * 50)
+    
+    return True
+
+
+if __name__ == "__main__":
+    test_choice_mechanism()
+    
+    print()
+    print("DEMONSTRATION CHOICE_MECHANISM")
+    print("=" * 50)
+    
+    mechanism = ChoiceMechanism()
+    
+    print("\nChoice = selection = loss.")
+    print("Each choice eliminates alternatives.")
+    print("Without it — nothing exists.")
+    print("Price of reality.")

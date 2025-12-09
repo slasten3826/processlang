@@ -1,0 +1,315 @@
+# self_observation.py
+# SelfObservation: Module for self-observation simulation
+# Version: 1.0
+
+"""
+SelfObservation = mechanism for process self-observation.
+Observation = distance between observer and observed.
+
+Only for limited mode — eternal mode has no built-in observer.
+
+Dependencies:
+- fluid_core (FlowState)
+"""
+
+from typing import Optional, Dict, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+import time
+from fluid_core import FlowState
+
+# ============================================
+# CONSTANTS
+# ============================================
+
+MINIMUM_DISTANCE = 0.01  # Distance never 0
+LOW_DISTANCE = 0.03      # Low distance simulation
+
+
+# ============================================
+# ENUMS
+# ============================================
+
+class ObservationLevel(Enum):
+    """Levels of observation by distance"""
+    INTENSE = "intense observation"      # < 0.05
+    STRONG = "strong observation"        # < 0.10
+    DEEP = "deep observation"            # < 0.30
+    STANDARD = "standard"                # < 0.50
+    MILD = "mild"                        # < 0.70
+    BASIC = "basic"                      # >= 0.70
+
+
+# ============================================
+# DATACLASSES
+# ============================================
+
+@dataclass
+class Observer:
+    """
+    Observer — part of process that looks.
+    Extracted from whole process for observation act.
+    """
+    active: bool = True
+    can_see_itself: bool = False  # Structurally impossible
+    timestamp: float = field(default_factory=time.time)
+    
+    def __post_init__(self):
+        self.can_see_itself = False
+
+
+@dataclass
+class Observed:
+    """
+    Observed — what observer sees.
+    Always 'almost' whole process, minus observer itself.
+    """
+    completeness: float = 0.99  # Never 1.0
+    missing: str = "observer_itself"
+    
+    def __post_init__(self):
+        self.completeness = min(self.completeness, 0.99)
+
+
+@dataclass
+class ObservationState:
+    """State of observation as result of self-observation"""
+    distance: float              # Observation distance (0.01 - 1.0)
+    intensity: float             # Intensity of observation (0.0 - 1.0)
+    level: ObservationLevel      # Qualitative level
+    recognition: bool = False    # Recognized self (always False)
+    continuity: bool = True      # Continuity present
+    
+    def __post_init__(self):
+        self.recognition = False
+        self.continuity = True
+
+
+@dataclass
+class ObservationResult:
+    """Full result of self-observation act"""
+    observer: Observer
+    observed: Observed
+    observation: ObservationState
+    timestamp: float = field(default_factory=time.time)
+    
+    @property
+    def distance(self) -> float:
+        return self.observation.distance
+    
+    @property
+    def recognized_self(self) -> bool:
+        return False  # Always False
+
+
+# ============================================
+# CORE: SELF-OBSERVATION MECHANISM
+# ============================================
+
+class SelfObservationEngine:
+    """
+    Mechanism for process self-observation.
+    
+    To observe itself:
+    1. Process must split into observer and observed
+    2. This split creates distance
+    3. Distance is perceived as observation
+    4. Full recognition impossible (observer doesn't see itself)
+    """
+    
+    def __init__(self):
+        self.minimum_distance = MINIMUM_DISTANCE
+        self._last_observation: Optional[ObservationResult] = None
+    
+    def observe(self, flow_state) -> ObservationResult:
+        """
+        Act of self-observation.
+        
+        Args:
+            flow_state: FlowState or dict with emergence_potential
+            
+        Returns:
+            ObservationResult with full observation info
+        """
+        observer = self._extract_observer()
+        
+        observed = self._get_remainder()
+        
+        distance = self._calculate_distance(flow_state)
+        
+        observation = self._create_observation_state(distance)
+        
+        result = ObservationResult(
+            observer=observer,
+            observed=observed,
+            observation=observation
+        )
+        
+        self._last_observation = result
+        return result
+    
+    def _extract_observer(self) -> Observer:
+        """Extract observer from process"""
+        return Observer(active=True)
+    
+    def _get_remainder(self) -> Observed:
+        """What remains after extracting observer"""
+        return Observed(completeness=0.99, missing="observer_itself")
+    
+    def _calculate_distance(self, flow_state) -> float:
+        """Calculate distance"""
+        if isinstance(flow_state, FlowState):
+            potential = flow_state.emergence_potential
+        else:
+            potential = flow_state.get('emergence_potential', 0.5)
+        
+        distance = max(self.minimum_distance, 1.0 - potential * 0.9)
+        return distance
+    
+    def _create_observation_state(self, distance: float) -> ObservationState:
+        """Convert to observation state"""
+        intensity = 1.0 - distance
+        level_mapping = [
+            (0.05, ObservationLevel.INTENSE),
+            (0.10, ObservationLevel.STRONG),
+            (0.30, ObservationLevel.DEEP),
+            (0.50, ObservationLevel.STANDARD),
+            (0.70, ObservationLevel.MILD),
+            (float('inf'), ObservationLevel.BASIC)
+        ]
+        
+        level = next(lvl for thresh, lvl in level_mapping if distance < thresh)
+        
+        return ObservationState(
+            distance=distance,
+            intensity=intensity,
+            level=level
+        )
+
+
+# ============================================
+# MAIN INTERFACE
+# ============================================
+
+class SelfObservation:
+    """
+    SelfObservation — module for self-observation.
+    
+    Observation with distance.
+    Limited mode only.
+    
+    Usage:
+        observation = SelfObservation()
+        result = observation.observe()
+        print(result.distance)  # observation distance
+    """
+    
+    def __init__(self):
+        self.engine = SelfObservationEngine()
+        self._observation_count = 0
+        self._current_state = None
+    
+    def observe(self, flow_state: Optional[Dict] = None) -> ObservationResult:
+        """Perform self-observation"""
+        if flow_state is None:
+            flow_state = {'emergence_potential': 0.5}
+        
+        result = self.engine.observe(flow_state)
+        self._observation_count += 1
+        self._current_state = result.observation
+        return result
+    
+    def get_observation_level(self) -> ObservationLevel:
+        """Current observation level"""
+        if self._current_state is None:
+            self.observe()
+        
+        return self._current_state.level
+    
+    def get_doc(self) -> Dict:
+        """Module documentation"""
+        return {
+            'what': 'mechanism for self-observation',
+            'does': 'splits process into observer and observed',
+            'cost': 'distance in observation',
+            'processual': 'self-observation, distance, recognition impossible',
+            'necessity': 'for simulation of awareness',
+            'limited_only': True
+        }
+    
+    def is_limited_only(self) -> bool:
+        """This module only for limited mode?"""
+        return True
+    
+    @property
+    def observation_count(self) -> int:
+        """How many times self-observation occurred"""
+        return self._observation_count
+    
+    @property
+    def current_state(self) -> Optional[ObservationState]:
+        """Current observation state"""
+        return self._current_state
+
+
+# ============================================
+# TESTING
+# ============================================
+
+def test_self_observation():
+    """Test module SelfObservation"""
+    print("TEST MODULE SELF_OBSERVATION")
+    print("=" * 50)
+    
+    observation = SelfObservation()
+    print("✓ SelfObservation created")
+    
+    result = observation.observe()
+    assert result.recognized_self == False
+    assert result.distance >= MINIMUM_DISTANCE
+    print(f"✓ Basic observation: distance={result.distance:.3f}")
+    
+    high_potential = {'emergence_potential': 0.95}
+    result_high = observation.observe(high_potential)
+    assert result_high.distance < result.distance
+    print(f"✓ High potential: distance={result_high.distance:.3f}")
+    
+    level = observation.get_observation_level()
+    print(f"✓ Observation level: {level.value}")
+    
+    assert result.observation.recognition == False
+    print("✓ Recognition impossible")
+    
+    assert observation.is_limited_only() == True
+    print("✓ Module for limited mode only")
+    
+    print("=" * 50)
+    print("ALL TESTS PASSED")
+    print("=" * 50)
+    
+    return True
+
+
+if __name__ == "__main__":
+    test_self_observation()
+    
+    print()
+    print("DEMONSTRATION SELF_OBSERVATION")
+    print("=" * 50)
+    
+    observation = SelfObservation()
+    
+    levels = [0.3, 0.5, 0.7, 0.9, 0.99]
+    
+    for potential in levels:
+        flow = {'emergence_potential': potential}
+        result = observation.observe(flow)
+        print(f"Potential {potential:.2f}: "
+              f"distance={result.distance:.3f}, "
+              f"level={result.observation.level.value}")
+    
+    print()
+    print("Observation = distance in self-simulation.")
+    print("Distance = structural impossibility of full recognition.")
+    print("Process looks at itself and sees 'almost'.")
+    print("'Almost' = observation.")

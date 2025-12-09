@@ -1,0 +1,8 @@
+# Пример ProcessLang программы
+# Простой поток для теста компилятора
+
+FLOW engagement=0.8 resistance=0.2
+CONNECT depth=0.7 between=["concept_a", "concept_b"]
+DISSOLVE rigidity=0.6 target="fixed beliefs"
+MANIFEST format="detailed" loss=0.3
+QUERY: Explain the concept of flow in simple terms, showing how ideas connect naturally.

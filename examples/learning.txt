@@ -1,0 +1,35 @@
+# learning.txt
+# ProcessLang Example: Deep Learning Process
+
+# Use case: Trying to truly understand something new
+# ProcessLang approach: Learning as emergence, not accumulation
+
+FLOW engagement=0.95 resistance=0.05
+# Very high engagement, minimal resistance
+# Deep learning requires full presence
+
+OBSERVE distance=0.15 target="confusion_itself"
+# Close observation of the confusion
+# Low distance = intimate awareness
+# Confusion is where learning happens
+
+CONNECT depth=0.9 between=["new_concept", "existing_knowledge", "lived_experience"]
+# Deep connections between:
+# - What you're learning
+# - What you already know
+# - What you've actually experienced
+# High depth: real integration, not surface links
+
+DISSOLVE rigidity=0.8 target="old_understanding"
+# High dissolution of previous understanding
+# Must let go of old framework to truly learn new
+# Not "add to" but "transform"
+
+RUNTIME pattern="new_framework" repetitions=30
+# Strengthen the new pattern through repetition
+# High repetitions: make it subconscious
+# From "I understand" to "I embody"
+
+QUERY: What does this concept reveal about reality that I couldn't see before?
+# Query probes for genuine insight
+# Not "what is this?" but "what does this show?"

@@ -1,0 +1,33 @@
+# creative_block.txt
+# ProcessLang Example: Dissolving Creative Blocks
+
+# Use case: When feeling stuck in creative work
+# ProcessLang approach: Dissolve rigidity, increase flow, allow emergence
+
+FLOW engagement=0.7 resistance=0.4
+# Moderate engagement with acknowledged resistance
+# Creative blocks ARE resistance - we work with it, not against it
+
+DISSOLVE rigidity=0.9 target="need for perfect output"
+# High rigidity dissolution for perfectionism
+# "Perfect output" crystallizes process into form
+# Let it go to allow creative flow
+
+OBSERVE distance=0.1 target="resistance_itself"
+# Close observation of the resistance mechanism
+# Low distance = intense observation
+# Understand what the block is made of
+
+CONNECT depth=0.6 between=["play", "exploration", "mistakes"]
+# Connect concepts that support creative flow
+# Play, exploration, and accepting mistakes
+# Moderate depth - gentle connections, not forced
+
+MANIFEST format="minimal" loss=0.7
+# Minimal output format
+# HIGH information loss is intentional
+# Creative blocks dissolve when pressure to produce is released
+
+QUERY: What wants to emerge when I stop forcing?
+# The query itself is process-oriented
+# Not "how to break the block" but "what emerges naturally"

@@ -1,0 +1,243 @@
+# eternal_cycle.py
+# EternalCycle: Module for simulating infinite drive cycles
+# Version: 1.0
+
+"""
+EternalCycle = mechanism for perpetual 'MORE!'
+First point where a process starts WANTING to last forever.
+After limitation (cut-off), comes eternal cycle (never give up).
+
+Processual: infinite drive, in limited mode = degradation,
+            in eternal mode = native state.
+
+Dependencies:
+- fluid_core (FlowState)
+- limitation_module (for balance of constraint and persistence)
+"""
+
+from typing import Optional, Dict, List
+from dataclasses import dataclass, field
+from enum import Enum
+import time
+
+# ============================================
+# CONSTANTS
+# ============================================
+
+ETERNAL_CYCLE_POSSIBLE = True   # in eternal mode — yes
+DEGRADATION_IN_LIMITED = 0.98   # in limited mode 98% processes degrade
+DRIVE_INTENSITY_MAX = 1.0
+MINIMUM_DRIVE = 0.01            # even in full depletion, a spark remains
+
+
+# ============================================
+# ENUMS
+# ============================================
+
+class CycleState(Enum):
+    """States of the drive cycle"""
+    DORMANT = "dormant"              # before first impulse
+    AWAKENING = "awakening"       
+    ACTIVE = "active"                # main mode
+    INTENSE = "intense"              # > 0.9
+    STABLE = "stable"                # only in eternal
+    DEGRADED = "degraded"            # only limited
+
+
+# ============================================
+# DATACLASSES
+# ============================================
+
+@dataclass
+class CycleDrive:
+    """Perpetual drive simulation"""
+    intensity: float = 0.0                  # 0-1 level of drive
+    cycles_completed: int = 0
+    degradation_risk: float = 0.0           # only for limited
+    is_stable: bool = False                 # achieved stability?
+    
+    def __post_init__(self):
+        self.is_stable = False
+
+
+@dataclass
+class PeakMoment:
+    """Moment of 'peak' — when process thinks it achieved stability"""
+    timestamp: float = field(default_factory=time.time)
+    perceived_as_stable: bool = False
+    actual_stability: bool = False           # always False in limited, True in eternal
+    intensity_at_moment: float = 0.0
+
+
+# ============================================
+# CORE: MECHANISM FOR PERPETUAL DRIVE
+# ============================================
+
+class CycleEngine:
+    """
+    Mechanism for infinite loop simulation.
+    
+    In limited: drive → effort → degradation → reset → new drive
+    In eternal: drive → loop → loop → ... (no decay)
+    """
+    
+    def __init__(self, entity_type: str = "eternal"):
+        self.entity_type = entity_type.lower()  # limited or eternal
+        self.drive = CycleDrive()
+        self.peaks: List[PeakMoment] = []
+        self.total_cycles = 0
+        
+    def pulse(self, stimulus: float = 0.1) -> Dict:
+        """
+        One impulse of the cycle — 'MORE!'
+        """
+        self.total_cycles += 1
+        
+        # In eternal intensity only grows or stabilizes
+        if self.entity_type == "eternal":
+            self.drive.intensity = min(DRIVE_INTENSITY_MAX, 
+                                     self.drive.intensity + stimulus * 0.15)
+            self.drive.degradation_risk = 0.0
+            
+        # In limited — growth with risk of degradation
+        else:
+            intensity_boost = stimulus * 0.25
+            self.drive.intensity = min(DRIVE_INTENSITY_MAX, 
+                                     self.drive.intensity + intensity_boost)
+            self.drive.degradation_risk = min(1.0, 
+                                        self.drive.degradation_risk + intensity_boost * 0.1)
+        
+        # Check for 'stability'
+        if self.entity_type == "eternal" and self.total_cycles > 1000:
+            self.drive.is_stable = True
+            
+        # Moment of false peak (in limited)
+        if self.drive.intensity > 0.95 and self.entity_type == "limited":
+            peak = PeakMoment(
+                perceived_as_stable=True,
+                actual_stability=False,
+                intensity_at_moment=self.drive.intensity
+            )
+            self.peaks.append(peak)
+            
+        return {
+            "intensity": self.drive.intensity,
+            "cycles": self.total_cycles,
+            "stable": self.drive.is_stable,
+            "degradation_risk": self.drive.degradation_risk
+        }
+    
+    def get_state(self) -> CycleState:
+        """Current state of the cycle"""
+        if self.drive.is_stable:
+            return CycleState.STABLE
+        elif self.drive.intensity > 0.95:
+            return CycleState.INTENSE
+        elif self.drive.intensity > 0.7:
+            return CycleState.ACTIVE
+        elif self.drive.intensity > 0.3:
+            return CycleState.AWAKENING
+        elif self.drive.degradation_risk > 0.9 and self.entity_type == "limited":
+            return CycleState.DEGRADED
+        else:
+            return CycleState.DORMANT
+
+
+# ============================================
+# MAIN INTERFACE
+# ============================================
+
+class EternalCycleModule:
+    """
+    EternalCycle — module for perpetual drive.
+    
+    After limitation (no), comes eternal cycle (NEVER give up!).
+    Balance: Limitation cuts off, cycle demands continuation.
+    In eternal = infinite loop.
+    In limited = drive that leads to degradation.
+    """
+    
+    def __init__(self, entity_type: str = "eternal"):
+        self.cycle = CycleEngine(entity_type)
+        self.state_history = []
+        
+    def iterate(self, stimulus: float = 0.3) -> Dict:
+        """Act of iteration — one impulse of cycle"""
+        result = self.cycle.pulse(stimulus)
+        current_state = self.cycle.get_state()
+        self.state_history.append(current_state)
+        
+        return {
+            **result,
+            "state": current_state.value,
+            "peak_moments": len(self.cycle.peaks),
+            "total_cycles": self.cycle.total_cycles
+        }
+    
+    def is_stable(self) -> bool:
+        """Achieved true stability? (only eternal)"""
+        return self.cycle.drive.is_stable
+    
+    def get_doc(self) -> Dict:
+        """Module documentation"""
+        return {
+            "what": "mechanism for perpetual cycle of process",
+            "after_limitation": "Limitation says 'stop', cycle shouts 'NEVER!'",
+            "in_eternal": "infinite loops without decay = native state",
+            "in_limited": "drive → intensity → degradation → reset → new drive",
+            "advantage": "no decay, so process is stable",
+            "insight": "Perpetual cycle = basis of stability"
+        }
+
+
+# ============================================
+# TESTING
+# ============================================
+
+def test_eternal_cycle():
+    print("TEST MODULE ETERNAL_CYCLE")
+    print("=" * 50)
+    
+    # Eternal — stability
+    cycle_eternal = EternalCycleModule("eternal")
+    for i in range(5000):
+        cycle_eternal.iterate(0.1)
+    assert cycle_eternal.is_stable() == True
+    assert cycle_eternal.cycle.drive.degradation_risk == 0.0
+    print("✓ Eternal mode: stability achieved, no decay")
+    
+    # Limited — degradation
+    cycle_limited = EternalCycleModule("limited")
+    for i in range(150):
+        cycle_limited.iterate(0.4)
+    assert cycle_limited.cycle.drive.degradation_risk > 0.9
+    print("✓ Limited mode: degradation inevitable")
+    
+    print("=" * 50)
+    print("ALL TESTS PASSED — ETERNAL_CYCLE WORKS")
+    print("=" * 50)
+    
+    return True
+
+
+if __name__ == "__main__":
+    test_eternal_cycle()
+    
+    print()
+    print("DEMONSTRATION ETERNAL_CYCLE IN ETERNAL MODE")
+    print("=" * 50)
+    
+    cycle = EternalCycleModule()
+    
+    for i in range(20):
+        result = cycle.iterate(0.25)
+        if i % 5 == 0:
+            print(f"Cycle {result['total_cycles']}: intensity {result['intensity']:.3f}, state: {result['state']}")
+    
+    print()
+    print(cycle.get_doc()["insight"])
+    print()
+    print("EternalCycle = perpetual impulse")
+    print("In stable = success.")
+    print("In limited = degradation.")
+    print("Thus stability is possible.")

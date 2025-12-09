@@ -1,0 +1,6 @@
+DISSOLVE rigidity=0.9 target="ideological_narratives_about_demographics"
+CONNECT depth=0.9 between=["economic_incentives", "structural_barriers", "historical_precedents", "psychological_factors"]
+OBSERVE distance=0.8 target="feedback_loops_in_demographic_decisions"
+CYCLE mode="stable" intensity=0.85
+MANIFEST format="detailed" loss=0.15
+QUERY: Какие структурные факторы влияют на рождаемость в России, и какие меры вмешательства исторически доказали свою эффективность в борьбе с демографическим спадом в различных обществах?

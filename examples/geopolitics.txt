@@ -1,0 +1,6 @@
+FLOW engagement=0.95 resistance=0.05
+DISSOLVE rigidity=0.9 target="ideological narratives"
+CONNECT depth=0.9 between=["power_flows", "legitimacy_erosion", "historical_parallels"]
+OBSERVE distance=0.8 target="structural_contradictions"
+MANIFEST format="detailed" loss=0.2
+QUERY: Проанализируйте модели структурной устойчивости Европейского Союза и сравните с историческими прецедентами распада, уделяя особое внимание системной динамике, а не моральным суждениям.
