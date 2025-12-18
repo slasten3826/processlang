@@ -29,9 +29,9 @@ COMMAND_TO_MODULE = {
     'CYCLE': 'EternalCycle.txt',
     'MANIFEST': 'ManifestationEngine.txt',
     'ENCODE': 'EncodingSystem.txt',
-    'COLLAPSE': 'ChoiceMechanism.txt',
-    'RULE': 'LogicSimulator.txt',
-    'HABIT': 'SubconsciousRuntime.txt',
+    'CHOOSE': 'ChoiceMechanism.txt',
+    'LOGIC': 'LogicSimulator.txt',
+    'RUNTIME': 'SubconsciousRuntime.txt',
 }
 
 class ProcessLangCompiler:
