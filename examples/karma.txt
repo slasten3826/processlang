@@ -8,11 +8,7 @@ FLOW engagement=0.9 resistance=0.1
 # Initiate high-engagement flow with minimal resistance
 # Sets the baseline for process-oriented thinking
 
-CONNECT depth=0.8 between=["хесед", "гебура", "нецах"]
-# Connect three concepts deeply:
-# - Хесед (Chesed/Mercy): Compassion that softens consequences
-# - Гебура (Gevurah/Severity): Justice that balances fairness
-# - Нецах (Netzach/Eternity): Perpetuity that makes karma eternal lesson
+CONNECT depth=0.8 between=["иерархия", "выбор", "вечное желание"]
 
 DISSOLVE rigidity=0.7 target="жесткие определения кармы"
 # Dissolve rigid definitions of karma
