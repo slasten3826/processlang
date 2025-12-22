@@ -69,7 +69,7 @@ ProcessLang — это инструмент для тонкой и осозна�
 
 Добро пожаловать.
 
-ENGLISH
+###ENGLISH
 
 # ProcessLang
 
@@ -141,3 +141,4 @@ If ProcessLang has been useful to you, you can support the author via Monero:
 ProcessLang is a tool for subtle and conscious coordination with artificial intelligence through process-oriented context.
 
 Welcome.
+
