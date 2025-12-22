@@ -68,3 +68,76 @@ ProcessLang опирается на 10 концептуальных модуле
 ProcessLang — это инструмент для тонкой и осознанной координации с искусственным интеллектом через процесс-ориентированный контекст.
 
 Добро пожаловать.
+
+ENGLISH
+
+# ProcessLang
+
+**ProcessLang — a language that cannot be executed without understanding.**
+
+This is a declarative DSL for coordinating AI systems, but not an ordinary one. ProcessLang contains no instructions for mechanical execution — its commands are not compiled into runtime and are not executed by a processor. Instead, they create a conceptual context through which AI perceives the request.
+
+Each program in ProcessLang is unique because it reflects the author's individual vision — an intention that lies deeper than words. The language's commands work as lenses of perception: FLOW sets the fluidity of thinking, CONNECT creates unexpected links between concepts, DISSOLVE dissolves rigid categories. AI interprets these commands not syntactically, but conceptually — understanding what you mean, not what is written.
+
+This makes ProcessLang unrepeatable for each user. The same code will work differently depending on who wrote it and how the AI understood the intention. The language requires not learning rules, but developing the ability to convey what cannot be described in words.
+
+ProcessLang is not a way to give AI instructions. It is a way to coordinate with AI through process, not through form.
+
+---
+
+## Core Principles
+
+- **Declarative style**: Describes the desired process context, not imperative steps
+- **Process-oriented**: Focus on flows, connections, and dynamics, not static objects
+- **AI-native execution**: Code is interpreted by AI conceptually; mechanical execution without understanding is impossible
+- **Individual interpretation**: Each user writes ProcessLang in their own way, reflecting their own vision
+
+---
+
+## Structure
+
+A program consists of a maximum of 5 commands and one mandatory QUERY at the end.
+
+```processlang
+COMMAND parameters...
+COMMAND parameters...
+...
+QUERY: Your request or question
+```
+
+Each command adds a layer of context that affects the interpretation of the final request.
+
+---
+
+## Usage
+
+ProcessLang is used through AI systems of any type:
+
+1. Write a program in ProcessLang
+2. Compile the program through compiler.py
+3. Pass it to AI with an instruction to interpret commands sequentially
+
+Detailed syntax description: `/docs/SYNTAX.md`  
+Example programs: `/examples/`
+
+---
+
+## Modules
+
+ProcessLang relies on 10 conceptual modules. These modules are not implemented as code, but exist as common interpretation patterns.
+
+Language commands activate corresponding patterns in AI interpretation.
+
+---
+
+## Support
+
+If ProcessLang has been useful to you, you can support the author via Monero:
+
+`42tXPEuCmvmhYpkxGDTeSHKL6ZQcjqbA368sqx8y87BhddaQWYLGLHnT393augRm3hbwwXynD4XA3hWk2Vvh34y3RNqtgxc`
+
+---
+
+ProcessLang is a tool for subtle and conscious coordination with artificial intelligence through process-oriented context.
+
+Welcome.
