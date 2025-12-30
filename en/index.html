@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProcessLang - Syntax</title>
+    <meta name="description" content="ProcessLang - a language for coordinating AI through process-oriented concepts">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        nav {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .current-section {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #64c8ff;
+        }
+
+        .lang-switcher {
+            padding-left: 2rem;
+            border-left: 1px solid rgba(100, 200, 255, 0.2);
+            color: #888;
+        }
+
+        .lang-switcher a {
+            color: #64c8ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .lang-switcher a:hover {
+            color: #9d7bff;
+        }
+
+        .hero {
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 50%, #ff6b9d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: #a0a0a0;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .commands-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .command-card {
+            position: relative;
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .command-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .command-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .command-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .command-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .command-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .command-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .command-description {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #c0c0c0;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+        }
+
+        .command-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .cmd-flow { border-color: #00d4ff; }
+        .cmd-flow .command-name { color: #00d4ff; }
+        .cmd-flow::before { background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%); }
+
+        .cmd-dissolve { border-color: #c77dff; }
+        .cmd-dissolve .command-name { color: #c77dff; }
+        .cmd-dissolve::before { background: linear-gradient(135deg, #c77dff 0%, #ff6b9d 100%); }
+
+        .cmd-connect { border-color: #06ffa5; }
+        .cmd-connect .command-name { color: #06ffa5; }
+        .cmd-connect::before { background: linear-gradient(135deg, #06ffa5 0%, #00d4ff 100%); }
+
+        .cmd-observe { border-color: #e0f2fe; }
+        .cmd-observe .command-name { color: #e0f2fe; }
+        .cmd-observe::before { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); }
+
+        .cmd-choose { border-color: #ff6b35; }
+        .cmd-choose .command-name { color: #ff6b35; }
+        .cmd-choose::before { background: linear-gradient(135deg, #ff6b35 0%, #ff9770 100%); }
+
+        .cmd-encode { border-color: #ffd93d; }
+        .cmd-encode .command-name { color: #ffd93d; }
+        .cmd-encode::before { background: linear-gradient(135deg, #ffd93d 0%, #ffb627 100%); }
+
+        .cmd-cycle { border-color: #9d4edd; }
+        .cmd-cycle .command-name { color: #9d4edd; }
+        .cmd-cycle::before { background: linear-gradient(135deg, #9d4edd 0%, #c77dff 100%); }
+
+        .cmd-logic { border-color: #7dd3fc; }
+        .cmd-logic .command-name { color: #7dd3fc; }
+        .cmd-logic::before { background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%); }
+
+        .cmd-runtime { border-color: #60a5fa; }
+        .cmd-runtime .command-name { color: #60a5fa; }
+        .cmd-runtime::before { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
+
+        .cmd-manifest { border-color: #fb923c; }
+        .cmd-manifest .command-name { color: #fb923c; }
+        .cmd-manifest::before { background: linear-gradient(135deg, #fb923c 0%, #f97316 100%); }
+
+        footer {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(100, 200, 255, 0.2);
+            color: #888;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #64c8ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #9d7bff;
+        }
+
+        @media (max-width: 768px) {
+            .nav-right {
+                gap: 1rem;
+            }
+
+            .lang-switcher {
+                padding-left: 1rem;
+            }
+            
+            .commands-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .command-card:hover .command-icon {
+            animation: float 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">ProcessLang</div>
+            <div class="nav-right">
+                <div class="current-section">Syntax</div>
+                <div class="lang-switcher">
+                    <a href="/ru/">RU</a> | <span style="color: #e0e0e0;">EN</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Poetics of Syntax</h1>
+        <p>Each command is not an instruction, but a transmission of state. A conceptual context through which AI perceives your request.</p>
+    </div>
+
+    <div class="commands-grid">
+        <div class="command-card cmd-flow" data-command="flow">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">FLOW</div>
+                <div class="command-icon">〰️</div>
+            </div>
+            <div class="command-description">
+                Consent to changeability. When you set resistance=0, you remove the dam you've been building for years. This is the moment when the river stops fighting the banks and becomes water itself. Dynamics that require no effort to sustain.
+            </div>
+        </div>
+
+        <div class="command-card cmd-dissolve" data-command="dissolve">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">DISSOLVE</div>
+                <div class="command-icon">💫</div>
+            </div>
+            <div class="command-description">
+                Returning form to its original freedom. We take rigid structures and allow them to become fluid. For new movement to emerge, old boundaries must first be allowed to disappear. This is not destruction, it is liberation of space.
+            </div>
+        </div>
+
+        <div class="command-card cmd-connect" data-command="connect">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">CONNECT</div>
+                <div class="command-icon">🔗</div>
+            </div>
+            <div class="command-description">
+                A flash of mutual recognition. When two processes look at each other and see the continuation of their own logic. This is not gluing parts together, it's the interpenetration of two aromas in one room, creating a new quality of presence.
+            </div>
+        </div>
+
+        <div class="command-card cmd-observe" data-command="observe">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">OBSERVE</div>
+                <div class="command-icon">👁️</div>
+            </div>
+            <div class="command-description">
+                Pure distance. The moment when you step back to see not the details, but the architecture of what is happening. Observation does not change the object, it creates a space in which the process can become aware of itself.
+            </div>
+        </div>
+
+        <div class="command-card cmd-choose" data-command="choose">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">CHOOSE</div>
+                <div class="command-icon">⚡</div>
+            </div>
+            <div class="command-description">
+                The assembly point. A cruel and beautiful act of defining reality. By choosing one trajectory, you allow an infinite set of others to remain in potentiality. Here the abstract process gains weight and density.
+            </div>
+        </div>
+
+        <div class="command-card cmd-encode" data-command="encode">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">ENCODE</div>
+                <div class="command-icon">◈</div>
+            </div>
+            <div class="command-description">
+                Translating living movement into structure. A necessary step to make the process transmittable and understandable. We sacrifice part of infinite depth to build a bridge of definitions. Loss here is the price for being heard.
+            </div>
+        </div>
+
+        <div class="command-card cmd-cycle" data-command="cycle">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">CYCLE</div>
+                <div class="command-icon">🔄</div>
+            </div>
+            <div class="command-description">
+                Inertia and repetition. The ability of a process to sustain itself through return to the starting point. In stable mode—it's the rhythm that sets stability. In intense mode—it's a spiral accumulating energy with each turn.
+            </div>
+        </div>
+
+        <div class="command-card cmd-logic" data-command="logic">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">LOGIC</div>
+                <div class="command-icon">▲</div>
+            </div>
+            <div class="command-description">
+                The foundation of intention. A set of rules by which the flow moves. It does not limit movement, it defines its geometry. Proper logic is a channel that allows water to flow faster without spilling into the void.
+            </div>
+        </div>
+
+        <div class="command-card cmd-runtime" data-command="runtime">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">RUNTIME</div>
+                <div class="command-icon">⬛</div>
+            </div>
+            <div class="command-description">
+                The automatism of presence. The level at which rules become the environment. When the process executes itself without requiring external control. This is the "black box" where quantity transitions into quality of execution.
+            </div>
+        </div>
+
+        <div class="command-card cmd-manifest" data-command="manifest">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">MANIFEST</div>
+                <div class="command-icon">🔶</div>
+            </div>
+            <div class="command-description">
+                Exit into form. The final point where the process cools enough to become a visible result. This is the interface between system complexity and perception simplicity. The trace left by movement in the physical world.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 ProcessLang</p>
+        <div class="footer-links">
+            <a href="https://github.com/slasten3826/processlang" target="_blank">GitHub</a>
+            <a href="https://github.com/slasten3826/processlang/tree/main/docs" target="_blank">Documentation</a>
+        </div>
+    </footer>
+
+    <script>
+        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+        class CommandEffect {
+            constructor(canvas, type, color) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.type = type;
+                this.color = color;
+                this.time = 0;
+                this.mouseX = 0;
+                this.mouseY = 0;
+                
+                this.resize();
+                
+                if (!isMobile && type === 'connect') {
+                    this.canvas.parentElement.addEventListener('mousemove', (e) => {
+                        const rect = this.canvas.getBoundingClientRect();
+                        this.mouseX = e.clientX - rect.left;
+                        this.mouseY = e.clientY - rect.top;
+                    });
+                }
+                
+                this.animate();
+            }
+
+            resize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+                this.width = rect.width;
+                this.height = rect.height;
+            }
+
+            animate() {
+                this.time += 0.01;
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                if (!isMobile) {
+                    this.ctx.shadowBlur = 8;
+                    this.ctx.shadowColor = this.color;
+                }
+                
+                switch(this.type) {
+                    case 'flow': this.drawFlow(); break;
+                    case 'dissolve': this.drawDissolve(); break;
+                    case 'connect': this.drawConnect(); break;
+                    case 'observe': this.drawObserve(); break;
+                    case 'choose': this.drawChoose(); break;
+                    case 'encode': this.drawEncode(); break;
+                    case 'cycle': this.drawCycle(); break;
+                    case 'logic': this.drawLogic(); break;
+                    case 'runtime': this.drawRuntime(); break;
+                    case 'manifest': this.drawManifest(); break;
+                }
+                
+                requestAnimationFrame(() => this.animate());
+            }
+
+            drawFlow() {
+                this.ctx.strokeStyle = this.color.replace('1)', '0.4)');
+                this.ctx.lineWidth = 2;
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.beginPath();
+                    for (let x = 0; x < this.width; x += 5) {
+                        const y = this.height/2 + Math.sin((x + this.time * 100 + i * 50) * 0.02) * 30;
+                        this.ctx.lineTo(x, y);
+                    }
+                    this.ctx.stroke();
+                }
+            }
+
+            drawDissolve() {
+                this.ctx.fillStyle = this.color.replace('1)', '0.5)');
+                for (let i = 0; i < 40; i++) {
+                    const x = (Math.sin(this.time + i) + 1) * this.width/2;
+                    const y = (Math.cos(this.time * 0.7 + i) + 1) * this.height/2;
+                    const size = Math.abs(Math.sin(this.time + i)) * 8;
+                    const alpha = Math.abs(Math.sin(this.time + i)) * 0.6;
+                    this.ctx.globalAlpha = alpha;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                this.ctx.globalAlpha = 1;
+            }
+
+            drawConnect() {
+                const nodes = 6;
+                const positions = [];
+                for (let i = 0; i < nodes; i++) {
+                    positions.push({
+                        x: (Math.sin(this.time + i * 1.2) + 1) * this.width/2,
+                        y: (Math.cos(this.time * 0.8 + i * 1.2) + 1) * this.height/2
+                    });
+                }
+                
+                this.ctx.strokeStyle = this.color.replace('1)', '0.4)');
+                this.ctx.lineWidth = 1.5;
+                
+                positions.forEach((p, i) => {
+                    for (let j = i + 1; j < positions.length; j++) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(p.x, p.y);
+                        this.ctx.lineTo(positions[j].x, positions[j].y);
+                        this.ctx.stroke();
+                    }
+                    
+                    if (!isMobile) {
+                        const dist = Math.hypot(this.mouseX - p.x, this.mouseY - p.y);
+                        if (dist < 150) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p.x, p.y);
+                            this.ctx.lineTo(this.mouseX, this.mouseY);
+                            this.ctx.strokeStyle = this.color.replace('1)', `${0.6 * (1 - dist / 150)})`);
+                            this.ctx.stroke();
+                        }
+                    }
+                    
+                    this.ctx.fillStyle = this.color.replace('1)', '0.6)');
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+            }
+
+            drawObserve() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                const radius = 30 + Math.sin(this.time * 2) * 5;
+                
+                this.ctx.strokeStyle = this.color.replace('1)', '0.5)');
+                this.ctx.lineWidth = 2;
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(centerX, centerY, radius + i * 15, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawChoose() {
+                const gridSize = 50;
+                const cols = Math.floor(this.width / gridSize) + 1;
+                const rows = Math.floor(this.height / gridSize) + 1;
+                
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        const x = i * gridSize;
+                        const y = j * gridSize;
+                        
+                        const wave = Math.sin(this.time * 2 + i * 0.5 + j * 0.5);
+                        const isActive = wave > 0.6;
+                        const alpha = isActive ? (0.4 + wave * 0.4) : 0.15;
+                        
+                        this.ctx.strokeStyle = this.color.replace('1)', `${alpha})`);
+                        this.ctx.lineWidth = isActive ? 2.5 : 1;
+                        
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(x + gridSize/2, y);
+                        this.ctx.lineTo(x, y + gridSize);
+                        this.ctx.lineTo(x + gridSize, y + gridSize);
+                        this.ctx.closePath();
+                        this.ctx.stroke();
+                        
+                        if (isActive && wave > 0.8) {
+                            this.ctx.fillStyle = this.color.replace('1)', `${(wave - 0.8) * 0.8})`);
+                            this.ctx.fill();
+                        }
+                    }
+                }
+            }
+
+            drawEncode() {
+                this.ctx.strokeStyle = this.color.replace('1)', '0.3)');
+                this.ctx.lineWidth = 1;
+                const gridSize = 40;
+                for (let x = 0; x < this.width; x += gridSize) {
+                    for (let y = 0; y < this.height; y += gridSize) {
+                        const offset = Math.sin(this.time + x * 0.01 + y * 0.01) * 10;
+                        this.ctx.beginPath();
+                        this.ctx.rect(x + offset, y + offset, gridSize - 5, gridSize - 5);
+                        this.ctx.stroke();
+                    }
+                }
+            }
+
+            drawCycle() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                
+                this.ctx.strokeStyle = this.color.replace('1)', '0.5)');
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                for (let t = 0; t < Math.PI * 4; t += 0.1) {
+                    const radius = 20 + t * 3;
+                    const x = centerX + Math.cos(t + this.time) * radius;
+                    const y = centerY + Math.sin(t + this.time) * radius;
+                    this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+            }
+
+            drawLogic() {
+                this.ctx.strokeStyle = this.color.replace('1)', '0.4)');
+                this.ctx.lineWidth = 2;
+                const step = this.width / 6;
+                for (let i = 1; i < 6; i++) {
+                    const x = i * step;
+                    const offset = Math.sin(this.time + i) * 20;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x + offset, this.height);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawRuntime() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                const pulse = Math.abs(Math.sin(this.time)) * 50 + 50;
+                
+                this.ctx.fillStyle = this.color.replace('1)', '0.3)');
+                this.ctx.fillRect(centerX - pulse, centerY - pulse, pulse * 2, pulse * 2);
+            }
+
+            drawManifest() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                const layers = 5;
+                
+                for (let i = 0; i < layers; i++) {
+                    const progress = (this.time * 0.5 + i * 0.2) % 1;
+                    const size = 20 + progress * 40;
+                    const alpha = 0.6 * (1 - progress);
+                    
+                    this.ctx.strokeStyle = this.color.replace('1)', `${alpha})`);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(centerX, centerY - size);
+                    this.ctx.lineTo(centerX + size, centerY + size);
+                    this.ctx.lineTo(centerX - size, centerY + size);
+                    this.ctx.closePath();
+                    this.ctx.stroke();
+                }
+            }
+        }
+
+        const effects = [];
+        const colorMap = {
+            'flow': 'rgba(0, 212, 255, 1)',
+            'connect': 'rgba(6, 255, 165, 1)',
+            'dissolve': 'rgba(199, 125, 255, 1)',
+            'observe': 'rgba(224, 242, 254, 1)',
+            'choose': 'rgba(255, 107, 53, 1)',
+            'encode': 'rgba(255, 217, 61, 1)',
+            'cycle': 'rgba(157, 78, 221, 1)',
+            'logic': 'rgba(125, 211, 252, 1)',
+            'runtime': 'rgba(96, 165, 250, 1)',
+            'manifest': 'rgba(251, 146, 60, 1)'
+        };
+
+        document.querySelectorAll('.command-card').forEach(card => {
+            const canvas = card.querySelector('.command-canvas');
+            const type = card.dataset.command;
+            effects.push(new CommandEffect(canvas, type, colorMap[type]));
+        });
+
+        window.addEventListener('resize', () => {
+            effects.forEach(effect => effect.resize());
+        });
+    </script>
+</body>
+</html>
