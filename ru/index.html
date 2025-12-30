@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProcessLang - Поэтика синтаксиса</title>
+    <title>ProcessLang - Синтаксис</title>
     <meta name="description" content="ProcessLang - язык координации AI через процесс-ориентированные концепции">
     <style>
         * {
@@ -50,21 +50,15 @@
             background-clip: text;
         }
 
-        .nav-links {
+        .nav-right {
             display: flex;
-            list-style: none;
-            gap: 2rem;
             align-items: center;
+            gap: 2rem;
         }
 
-        nav a {
-            color: #e0e0e0;
-            text-decoration: none;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        nav a:hover {
+        .current-section {
+            font-size: 1.1rem;
+            font-weight: 600;
             color: #64c8ff;
         }
 
@@ -76,6 +70,12 @@
 
         .lang-switcher a {
             color: #64c8ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .lang-switcher a:hover {
+            color: #9d7bff;
         }
 
         .hero {
@@ -183,7 +183,6 @@
             opacity: 0.3;
         }
 
-        /* Command Colors */
         .cmd-flow { border-color: #00d4ff; }
         .cmd-flow .command-name { color: #00d4ff; }
         .cmd-flow::before { background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%); }
@@ -251,9 +250,8 @@
         }
 
         @media (max-width: 768px) {
-            .nav-links {
+            .nav-right {
                 gap: 1rem;
-                font-size: 0.9rem;
             }
 
             .lang-switcher {
@@ -279,16 +277,12 @@
     <nav>
         <div class="container">
             <div class="logo">ProcessLang</div>
-            <ul class="nav-links">
-                <li><a href="index.html">Главная</a></li>
-                <li><a href="examples.html">Примеры</a></li>
-                <li><a href="compiler.html">Компилятор</a></li>
-                <li><a href="about.html">О проекте</a></li>
-                <li><a href="https://github.com/slasten3826/processlang" target="_blank">GitHub</a></li>
-                <li class="lang-switcher">
+            <div class="nav-right">
+                <div class="current-section">Синтаксис</div>
+                <div class="lang-switcher">
                     <span style="color: #e0e0e0;">RU</span> | <a href="/en/">EN</a>
-                </li>
-            </ul>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -298,7 +292,6 @@
     </div>
 
     <div class="commands-grid">
-        <!-- FLOW -->
         <div class="command-card cmd-flow" data-command="flow">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -310,7 +303,6 @@
             </div>
         </div>
 
-        <!-- DISSOLVE -->
         <div class="command-card cmd-dissolve" data-command="dissolve">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -322,7 +314,6 @@
             </div>
         </div>
 
-        <!-- CONNECT -->
         <div class="command-card cmd-connect" data-command="connect">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -334,7 +325,6 @@
             </div>
         </div>
 
-        <!-- OBSERVE -->
         <div class="command-card cmd-observe" data-command="observe">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -346,7 +336,6 @@
             </div>
         </div>
 
-        <!-- CHOOSE -->
         <div class="command-card cmd-choose" data-command="choose">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -358,7 +347,6 @@
             </div>
         </div>
 
-        <!-- ENCODE -->
         <div class="command-card cmd-encode" data-command="encode">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -370,7 +358,6 @@
             </div>
         </div>
 
-        <!-- CYCLE -->
         <div class="command-card cmd-cycle" data-command="cycle">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -382,7 +369,6 @@
             </div>
         </div>
 
-        <!-- LOGIC -->
         <div class="command-card cmd-logic" data-command="logic">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -394,7 +380,6 @@
             </div>
         </div>
 
-        <!-- RUNTIME -->
         <div class="command-card cmd-runtime" data-command="runtime">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -406,7 +391,6 @@
             </div>
         </div>
 
-        <!-- MANIFEST -->
         <div class="command-card cmd-manifest" data-command="manifest">
             <canvas class="command-canvas"></canvas>
             <div class="command-header">
@@ -423,10 +407,8 @@
         <p>&copy; 2025 ProcessLang</p>
         <div class="footer-links">
             <a href="https://github.com/slasten3826/processlang" target="_blank">GitHub</a>
-            <a href="https://github.com/slasten3826/processlang/blob/main/docs/SYNTAX.md" target="_blank">Документация</a>
-            <a href="about.html">О проекте</a>
+            <a href="https://github.com/slasten3826/processlang/tree/main/docs" target="_blank">Документация</a>
         </div>
-        <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Design by Claude</p>
     </footer>
 
     <script>
