@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProcessLang</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .loader {
+            font-size: 1.2rem;
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="logo">ProcessLang</div>
+        <div class="loader">Loading...</div>
+        <p style="margin-top: 2rem; color: #666;">
+            <a href="/ru/" style="color: #64c8ff; text-decoration: none;">Русский</a> | 
+            <a href="/en/" style="color: #64c8ff; text-decoration: none;">English</a>
+        </p>
+    </div>
+
+    <script>
+        // Автоопределение языка браузера
+        const userLang = navigator.language || navigator.userLanguage;
+        const lang = userLang.startsWith('ru') ? 'ru' : 'en';
+        
+        // Редирект на соответствующую версию
+        window.location.href = `/${lang}/`;
+    </script>
+</body>
+</html>
