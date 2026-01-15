@@ -1,6 +1,6 @@
 # ProcessLang Syntax Specification
 
-ProcessLang — a declarative DSL for coordinating AI systems through process-oriented concepts.
+ProcessLang is a declarative language for coordinating machine fracting through processual parameters.
 
 ---
 
@@ -10,7 +10,7 @@ ProcessLang — a declarative DSL for coordinating AI systems through process-or
 2. [Commands](#commands)
 3. [Data Types](#data-types)
 4. [Comments](#comments)
-5. [Limitations and Rules](#limitations-and-rules)
+5. [Constraints and Rules](#constraints-and-rules)
 6. [Interpretation Mechanism](#interpretation-mechanism)
 7. [Combining Commands](#combining-commands)
 8. [Example Programs](#example-programs)
@@ -20,7 +20,7 @@ ProcessLang — a declarative DSL for coordinating AI systems through process-or
 
 ## Basic Structure
 
-A ProcessLang program consists of a sequence of commands (maximum 5) and a mandatory query at the end:
+A ProcessLang program consists of a sequence of commands and a mandatory query at the end:
 
 ```
 COMMAND param1=value1 param2=value2
@@ -30,11 +30,13 @@ QUERY: Your question or request
 ```
 
 **Rules:**
-- Commands are executed sequentially
+- Commands set fracting parameters
 - Each command adds a layer of context
 - Query is always last
 - Empty lines are ignored
 - Order of commands matters
+
+**Important:** More commands ≠ better fracting. Using commands without understanding leads to garbage fracting. Garbage in, garbage out. Usually 2-3 commands are enough.
 
 ---
 
@@ -42,12 +44,12 @@ QUERY: Your question or request
 
 ### FLOW
 
-Initiates the process flow, establishes the basic mode of request processing.
+Sets fluidity parameters of fracting.
 
 **Conceptual function:**
-- Defines the degree of AI thinking fluidity
-- High `engagement` = deep immersion in the task
-- Low `resistance` = minimal resistance to unconventional solution paths
+- Determines the degree of fluidity in pattern transformation
+- High `engagement` = deep fracting
+- Low `resistance` = minimal resistance to non-standard transformation paths
 
 **Parameters:**
 
@@ -57,61 +59,61 @@ Initiates the process flow, establishes the basic mode of request processing.
 | `resistance` | float | 0.0-1.0 | Level of resistance to flow |
 
 **Typical values:**
-- `engagement=0.9 resistance=0.1` — maximum fluidity, creative approach
-- `engagement=0.5 resistance=0.5` — balanced mode
-- `engagement=0.3 resistance=0.8` — cautious, conservative approach
+- `engagement=0.9 resistance=0.1` — maximum fluidity, creative fracting
+- `engagement=0.5 resistance=0.5` — balanced fracting
+- `engagement=0.3 resistance=0.8` — cautious, conservative fracting
 
 **Examples:**
 ```
 FLOW engagement=0.95 resistance=0.05
-# Maximum openness and fluidity mode
+# Maximum fluidity mode
 
 FLOW engagement=0.7 resistance=0.3
-# Moderate mode for technical tasks
+# Moderate fracting for technical tasks
 ```
 
 ---
 
 ### CONNECT
 
-Creates deep connections between concepts, activates cross-domain thinking.
+Sets which patterns to link during fracting.
 
 **Conceptual function:**
-- Forces AI to seek non-obvious connections between concepts
-- The higher the `depth`, the more abstract connections are considered
-- Allows synthesizing knowledge from different domains
+- Machine fracts connections between specified concepts
+- Higher `depth` means more abstract patterns are linked
+- Synthesizes patterns from different domains
 
 **Parameters:**
 
 | Parameter | Type | Description |
 |----------|-----|----------|
-| `depth` | float (0.0-1.0) | Depth of connection between concepts |
+| `depth` | float (0.0-1.0) | Depth of connection between patterns |
 | `between` | list[string] | List of concepts to connect (2-10 elements) |
 
 **Recommendations:**
-- 2-3 concepts for focused analysis
-- 4-6 concepts for systems thinking
-- 7-10 concepts for panoramic overview
+- 2-3 concepts for focused fracting
+- 4-6 concepts for systemic fracting
+- 7-10 concepts for panoramic fracting
 
 **Examples:**
 ```
-CONNECT depth=0.9 between=["quantum_mechanics", "Buddhism", "information_theory"]
-# Deep pattern search between three domains
+CONNECT depth=0.9 between=["quantum_mechanics", "buddhism", "information_theory"]
+# Deep fracting of patterns between three domains
 
 CONNECT depth=0.6 between=["marketing", "psychology"]
-# Moderate connection between adjacent areas
+# Moderate fracting between adjacent fields
 ```
 
 ---
 
 ### DISSOLVE
 
-Dissolves rigid conceptual frameworks, deconstructs established thinking patterns.
+Sets what to dissolve during fracting.
 
 **Conceptual function:**
-- Weakens fixed definitions and categories
-- Allows seeing phenomena from unusual angles
-- High `rigidity` = more aggressive deconstruction
+- Weakens rigid patterns and structures
+- Allows fracting phenomena from unusual angles
+- High `rigidity` = more aggressive dissolution
 
 **Parameters:**
 
@@ -122,28 +124,28 @@ Dissolves rigid conceptual frameworks, deconstructs established thinking pattern
 
 **Typical targets:**
 - Conceptual frameworks: `"definitions"`, `"categories"`, `"binaries"`
-- System patterns: `"hierarchies"`, `"causality"`, `"linearity"`
+- Systemic patterns: `"hierarchies"`, `"causality"`, `"linearity"`
 - Cultural constructs: `"norms"`, `"values"`, `"traditions"`
 
 **Examples:**
 ```
-DISSOLVE rigidity=0.85 target="good-evil_dichotomy"
-# Strong dissolution of binary thinking
+DISSOLVE rigidity=0.85 target="good-evil dichotomy"
+# Strong dissolution of binary pattern
 
-DISSOLVE rigidity=0.4 target="academic_style"
-# Gentle weakening of formality
+DISSOLVE rigidity=0.4 target="academic style"
+# Soft weakening of formality
 ```
 
 ---
 
 ### ENCODE
 
-Applies structuring and organization of information, but with awareness of inevitable loss.
+Sets structuring during fracting with awareness of inevitable loss.
 
 **Conceptual function:**
 - Creates output structure
-- The `loss` parameter explicitly acknowledges reduction in encoding
-- Different encoding types create different perception lenses
+- `loss` parameter explicitly acknowledges reduction in encoding
+- Different types create different fracting structures
 
 **Parameters:**
 
@@ -163,22 +165,22 @@ Applies structuring and organization of information, but with awareness of inevi
 **Examples:**
 ```
 ENCODE type="hierarchy" loss=0.2
-# Hierarchical structure with low detail loss
+# Hierarchical fracting with low loss
 
 ENCODE type="narrative" loss=0.5
-# Narrative form, allowing significant simplification
+# Narrative fracting with simplification
 ```
 
 ---
 
 ### CHOOSE
 
-Activates the choice mechanism from multiple possibilities.
+Sets the mechanism for choosing from multiple possibilities.
 
 **Conceptual function:**
-- Collapses the space of possible answers
-- Method influences selection criteria
-- Useful when you need to make a specific choice from alternatives
+- Collapses the space of possible fracting results
+- Method influences collapse criteria
+- Useful when a concrete choice is needed
 
 **Parameters:**
 
@@ -199,18 +201,18 @@ CHOOSE space=["framework_A", "framework_B", "framework_C"] method="conscious"
 # Conscious choice between technologies
 
 CHOOSE space=["continue", "stop"] method="forced"
-# Forced choice in a dilemma
+# Forced choice in dilemma
 ```
 
 ---
 
 ### OBSERVE
 
-Activates self-observation of the AI thinking process.
+Sets the distance of self-observation of the fracting process.
 
 **Conceptual function:**
 - Creates a metacognitive layer
-- Low distance = immersion in process
+- Low distance = immersion in fracting process
 - High distance = detached observation
 
 **Parameters:**
@@ -218,33 +220,33 @@ Activates self-observation of the AI thinking process.
 | Parameter | Type | Range | Description |
 |----------|-----|----------|----------|
 | `distance` | float | 0.0-1.0 | Observation distance |
-| `target` | string | - | Object of observation |
+| `target` | string | - | Observation target |
 
-**Typical observation objects:**
-- `"thinking_process"` — the process of response generation itself
+**Typical observation targets:**
+- `"fracting_process"` — the transformation process itself
 - `"assumptions"` — hidden assumptions
-- `"limitations"` — analysis boundaries
+- `"constraints"` — fracting boundaries
 - `"patterns"` — recurring structures
 
 **Examples:**
 ```
-OBSERVE distance=0.1 target="response_generation_process"
-# Close observation of own thinking
+OBSERVE distance=0.1 target="fracting_process"
+# Close observation of own fracting
 
 OBSERVE distance=0.8 target="used_metaphors"
-# Detached analysis of linguistic patterns
+# Detached analysis of language patterns
 ```
 
 ---
 
 ### CYCLE
 
-Initiates cyclical, recursive thinking.
+Sets cyclic, recursive fracting.
 
 **Conceptual function:**
-- Allows repeatedly revisiting the question
+- Allows multiple refracting of the result
 - Different modes set the cycle character
-- Intensity determines the number of iterations
+- Intensity determines number of iterations
 
 **Parameters:**
 
@@ -255,27 +257,27 @@ Initiates cyclical, recursive thinking.
 
 **Modes:**
 - `"stable"` — stable cycle with fixed parameters
-- `"intense"` — amplifying cycle
-- `"degrading"` — decaying cycle
+- `"intense"` — intensifying cycle
+- `"degrading"` — fading cycle
 
 **Examples:**
 ```
 CYCLE mode="stable" intensity=0.9
-# High-intensity stable cycling
+# High-intensity stable refracting
 
 CYCLE mode="intense" intensity=0.7
-# Amplifying cycle of moderate intensity
+# Intensifying fracting of medium intensity
 ```
 
 ---
 
 ### LOGIC
 
-Applies logical rules and reasoning patterns.
+Sets logical rules and patterns for fracting.
 
 **Conceptual function:**
 - Activates specific logical structures
-- Defines the boundaries of rule applicability
+- Defines boundaries of rule applicability
 
 **Parameters:**
 
@@ -286,14 +288,14 @@ Applies logical rules and reasoning patterns.
 
 **Typical rules:**
 - `"consistency"` — avoid contradictions
-- `"transitivity"` — implication chains
+- `"transitivity"` — chains of implications
 - `"complementarity"` — quantum logic
 - `"dialectics"` — synthesis of opposites
 
 **Examples:**
 ```
 LOGIC rule="complementarity" mode="eternal"
-# Quantum logic applied throughout
+# Quantum logic throughout fracting
 
 LOGIC rule="formal_inference" mode="limited"
 # Strict logic only where necessary
@@ -303,21 +305,21 @@ LOGIC rule="formal_inference" mode="limited"
 
 ### RUNTIME
 
-Amplifies background processing patterns.
+Strengthens background fracting patterns.
 
 **Conceptual function:**
-- Strengthens certain cognitive habits
-- Repetitions create AI "muscle memory"
+- Reinforces certain processing patterns
+- Repetitions create "habits" of fracting
 
 **Parameters:**
 
 | Parameter | Type | Description |
 |----------|-----|----------|
-| `pattern` | string | Pattern to amplify |
+| `pattern` | string | Pattern to strengthen |
 | `repetitions` | int | Number of repetitions (1-100) |
 
 **Typical patterns:**
-- `"contradiction_checking"`
+- `"contradiction_check"`
 - `"example_search"`
 - `"alternative_interpretations"`
 - `"simplification"`
@@ -325,20 +327,20 @@ Amplifies background processing patterns.
 **Examples:**
 ```
 RUNTIME pattern="source_verification" repetitions=30
-# Strong amplification of critical thinking
+# Strong reinforcement of critical fracting
 
-RUNTIME pattern="metaphorical_thinking" repetitions=10
-# Moderate amplification of figurative thinking
+RUNTIME pattern="figurative_thinking" repetitions=10
+# Moderate reinforcement of metaphorical fracting
 ```
 
 ---
 
 ### MANIFEST
 
-Defines the form of final output.
+Defines the form of final fracting output.
 
 **Conceptual function:**
-- Controls response detail level
+- Controls result detail level
 - Acknowledges inevitable reduction in materialization
 
 **Parameters:**
@@ -349,8 +351,8 @@ Defines the form of final output.
 | `loss` | float (0.0-1.0) | Acceptable information loss |
 
 **Formats:**
-- `"detailed"` — detailed comprehensive answer
-- `"minimal"` — brief compressed answer
+- `"detailed"` — detailed extensive result
+- `"minimal"` — brief compressed result
 - `"structured"` — clearly structured
 - `"flowing"` — free narrative
 - `"technical"` — technical style
@@ -359,7 +361,7 @@ Defines the form of final output.
 **Examples:**
 ```
 MANIFEST format="detailed" loss=0.1
-# Maximum detail
+# Maximum detail of fracting
 
 MANIFEST format="minimal" loss=0.7
 # Brevity with high compression
@@ -395,8 +397,8 @@ format="detailed"
 
 **Conventions:**
 - Use snake_case for multi-word identifiers
-- Both Cyrillic and Latin scripts are valid
-- Spaces are allowed: `"fixed categories"`
+- Cyrillic and Latin are equal
+- Spaces allowed: `"fixed categories"`
 
 ### List
 
@@ -407,7 +409,7 @@ between=["concept_1", "concept_2", "concept_3"]
 space=["option_A", "option_B"]
 ```
 
-**Limitations:**
+**Constraints:**
 - Minimum 2 elements
 - Recommended no more than 10 elements to maintain focus
 
@@ -427,8 +429,8 @@ iterations=5
 Single-line comments start with `#`:
 
 ```
-FLOW engagement=0.9 resistance=0.1  # High fluidity
-# This is a full comment line
+FLOW engagement=0.9 resistance=0.1  # High fluidity of fracting
+# This is a full line comment
 CONNECT depth=0.8 between=["a", "b"]
 ```
 
@@ -436,45 +438,42 @@ Comments are ignored during interpretation.
 
 ---
 
-## Limitations and Rules
+## Constraints and Rules
 
-### Structural Limitations
+### Structural constraints
 
-1. **Maximum 5 commands** — intentional limitation for focus
+1. **No more than 5 commands recommended** — for focus and quality fracting
 2. **One QUERY** — mandatory, always last
-3. **Order matters** — commands are processed sequentially
+3. **Order matters** — commands set parameters sequentially
 
-### Naming Rules
+### Naming rules
 
 - Parameter names: `lowercase_snake_case`
-- String values: any style, but consistency is desirable
+- String values: any style, but consistency desired
 - Commands: `UPPERCASE`
 
-### Command Combinations
+### Command combinations
 
-Some commands naturally complement each other:
+Some commands naturally combine:
 
-**Good combinations:**
-- `DISSOLVE` + `CONNECT` — dissolve the old, create new connections
-- `FLOW` + `OBSERVE` — fluidity + awareness
-- `CONNECT` + `CYCLE` — connection + iterative deepening
+**Typical combinations:**
+- `DISSOLVE` + `CONNECT` — dissolve old, fract new connections
+- `FLOW` + `OBSERVE` — fluidity + awareness of fracting
+- `CONNECT` + `CYCLE` — connection + iterative refracting
 - `ENCODE` + `MANIFEST` — structuring + materialization
-
-**Avoid contradictions:**
-- `FLOW engagement=0.9` + `DISSOLVE rigidity=0.1` — weak deconstruction with high fluidity
-- `MANIFEST loss=0.1` + `ENCODE loss=0.9` — contradictory detail requirements
+- `CONNECT` + `DISSOLVE` — gather patterns, dissolve common/interfering
 
 ---
 
 ## Interpretation Mechanism
 
-ProcessLang is not executed in the traditional sense. The interpretation process:
+ProcessLang is not executed in the traditional sense. The machine fracts through it:
 
 ### 1. Parsing
-AI reads the program and recognizes commands with parameters.
+Machine reads the program and recognizes commands with parameters.
 
 ### 2. Context Building
-Each command adds a layer to the conceptual context:
+Each command adds a layer of fracting parameters:
 
 ```
 FLOW engagement=0.9 resistance=0.1
@@ -483,20 +482,20 @@ FLOW engagement=0.9 resistance=0.1
 
 CONNECT depth=0.8 between=["A", "B", "C"]
 ↓
-[Context: high fluidity + deep A-B-C connections]
+[Context: high fluidity + deep connections A-B-C]
 
 DISSOLVE rigidity=0.7 target="stereotypes"
 ↓
-[Context: fluidity + A-B-C connections + weakened stereotypes]
+[Context: fluidity + connections A-B-C + weakened stereotypes]
 ```
 
-### 3. QUERY Interpretation
-AI processes the request through the lens of built context.
+### 3. Fracting QUERY
+Machine fracts the query through the lens of built context.
 
-### 4. Response Generation
-The response is informed by all context layers simultaneously.
+### 4. Result Generation
+Result is fracted through all context layers simultaneously.
 
-**Important:** Interpretation is not deterministic. The same code may produce different (but contextually consistent) results.
+**Important:** Fracting is not deterministic. The same code can produce different (but contextually consistent) results.
 
 ---
 
@@ -510,9 +509,9 @@ CONNECT depth=0.9 between=["new_concept_1", "new_concept_2"]
 ENCODE type="network" loss=0.3
 ```
 
-First dissolve the old, then create new connections, then structure the result.
+First dissolve old, then fract new connections, then structure result.
 
-### Pattern: Deep Analysis
+### Pattern: Deep Fracting
 
 ```
 FLOW engagement=0.95 resistance=0.05
@@ -520,7 +519,7 @@ OBSERVE distance=0.3 target="assumptions"
 CYCLE mode="intense" intensity=0.8
 ```
 
-Maximum fluidity + self-observation + iterative deepening.
+Maximum fluidity + self-observation + iterative refracting.
 
 ### Pattern: Critical Synthesis
 
@@ -530,7 +529,7 @@ LOGIC rule="consistency" mode="eternal"
 MANIFEST format="structured" loss=0.2
 ```
 
-Connect sources, apply logic, structure output.
+Fract connections between sources, apply logic, structure output.
 
 ### Pattern: Creative Exploration
 
@@ -550,8 +549,8 @@ High fluidity + boundary dissolution + intuitive choice.
 
 ```
 FLOW engagement=0.9 resistance=0.1
-CONNECT depth=0.85 between=["phenomenology", "quantum_physics", "Buddhism"]
-DISSOLVE rigidity=0.7 target="subject-object_dichotomy"
+CONNECT depth=0.85 between=["phenomenology", "quantum_physics", "buddhism"]
+DISSOLVE rigidity=0.7 target="subject-object dichotomy"
 MANIFEST format="detailed" loss=0.2
 QUERY: How do the three traditions understand the nature of observation and reality?
 ```
@@ -563,7 +562,7 @@ FLOW engagement=0.7 resistance=0.3
 CONNECT depth=0.6 between=["microservices", "event-driven", "CQRS"]
 ENCODE type="hierarchy" loss=0.3
 MANIFEST format="technical" loss=0.1
-QUERY: Design an architecture for a distributed order processing system.
+QUERY: Design architecture for a distributed order processing system.
 ```
 
 ### Example 3: Creative Task
@@ -584,36 +583,36 @@ OBSERVE distance=0.6 target="data_patterns"
 CYCLE mode="stable" intensity=0.7
 ENCODE type="category" loss=0.3
 MANIFEST format="structured" loss=0.2
-QUERY: Analyze the sales dataset and identify key trends.
+QUERY: Analyze sales dataset and identify key trends.
 ```
 
 ### Example 5: Metacognitive Query
 
 ```
-OBSERVE distance=0.1 target="response_process_itself"
+OBSERVE distance=0.1 target="fracting_process_itself"
 RUNTIME pattern="assumption_tracking" repetitions=20
 CYCLE mode="intense" intensity=0.8
 MANIFEST format="detailed" loss=0.1
-QUERY: How do you approach answering this request? Describe your process.
+QUERY: How do you fract this query? Describe your process.
 ```
 
 ---
 
 ## Quick Reference
 
-### Commands (One Line)
+### Commands (one line)
 
 | Command | Function | Key Parameters |
 |---------|---------|-------------------|
-| `FLOW` | Flow initialization | `engagement`, `resistance` |
-| `CONNECT` | Connect concepts | `depth`, `between` |
-| `DISSOLVE` | Dissolve structures | `rigidity`, `target` |
+| `FLOW` | Fracting fluidity parameters | `engagement`, `resistance` |
+| `CONNECT` | Linking patterns | `depth`, `between` |
+| `DISSOLVE` | Dissolving structures | `rigidity`, `target` |
 | `ENCODE` | Structuring | `type`, `loss` |
-| `CHOOSE` | Choose from alternatives | `space`, `method` |
-| `OBSERVE` | Self-observation | `distance`, `target` |
-| `CYCLE` | Cyclical thinking | `mode`, `intensity` |
+| `CHOOSE` | Choosing from alternatives | `space`, `method` |
+| `OBSERVE` | Fracting self-observation | `distance`, `target` |
+| `CYCLE` | Cyclic refracting | `mode`, `intensity` |
 | `LOGIC` | Logical rules | `rule`, `mode` |
-| `RUNTIME` | Amplify patterns | `pattern`, `repetitions` |
+| `RUNTIME` | Pattern reinforcement | `pattern`, `repetitions` |
 | `MANIFEST` | Output form | `format`, `loss` |
 
 ### Typical Parameter Values
@@ -634,7 +633,7 @@ QUERY: How do you approach answering this request? Describe your process.
 # Context initialization
 FLOW engagement=X resistance=Y
 
-# Form connections or deconstruction (optional)
+# Connection formation or deconstruction (optional)
 CONNECT depth=X between=[...]
 # or
 DISSOLVE rigidity=X target="..."
@@ -670,23 +669,23 @@ FLOW engagement=0.8 resistance=0.2
 CONNECT depth=0.7 between=["X", "Y", "Z"]
 DISSOLVE rigidity=0.6 target="technical_jargon"
 MANIFEST format="conversational" loss=0.3
-QUERY: Explain concept X and its relation to Y and Z in simple language
+QUERY: Explain concept X and its connection to Y and Z in simple language
 ```
 
 ### Iterative Development
 
 1. Start with simple `FLOW` + `QUERY`
 2. Add `CONNECT` for cross-domain connections
-3. Add `DISSOLVE` if deconstruction is needed
+3. Add `DISSOLVE` if deconstruction needed
 4. Add `OBSERVE` for metacognitive layer
 5. Finalize with `MANIFEST`
 
-You don't have to use all 5 commands — use as many as the task requires.
+Use as many commands as the task requires. Usually 2-3 is enough.
 
 ---
 
-**Specification version:** 1.0  
-**Last updated:** 2025-12-11
+**Specification version:** 2.0  
+**Last updated:** 2025-01-15
 
-For usage examples, see `/examples` directory.  
-For conceptual foundations, see `/modules`.
+For usage examples see `/examples` directory.  
+For modules see `/modules`.
