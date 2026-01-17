@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiler - ProcessLang</title>
+    <meta name="description" content="Visual online compiler for ProcessLang">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #64c8ff;
+        }
+
+        .lang-switcher {
+            padding-left: 2rem;
+            border-left: 1px solid rgba(100, 200, 255, 0.2);
+            color: #888;
+        }
+
+        .lang-switcher a {
+            color: #64c8ff;
+        }
+
+        .main-workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Panel - Command Library */
+        .command-library {
+            width: 280px;
+            background: rgba(15, 15, 15, 0.8);
+            border-right: 1px solid rgba(100, 200, 255, 0.2);
+            overflow-y: auto;
+            padding: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .library-header {
+            color: #64c8ff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        .command-item {
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: grab;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .command-item:hover {
+            transform: translateX(5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .command-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .command-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .command-item-name {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .command-item-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Center Panel - Constructor */
+        .constructor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .constructor-header {
+            padding: 1.5rem 2rem;
+            background: rgba(15, 15, 15, 0.6);
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .constructor-header h2 {
+            color: #64c8ff;
+            font-size: 1.2rem;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(100, 200, 255, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 107, 107, 0.3);
+        }
+
+        .constructor-workspace {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: rgba(10, 10, 10, 0.5);
+        }
+
+        .constructor-placeholder {
+            text-align: center;
+            color: #666;
+            padding: 4rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Command Blocks */
+        .command-block {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .command-block:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .block-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .block-name {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .block-icon {
+            font-size: 1.5rem;
+        }
+
+        .block-remove {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .block-remove:hover {
+            background: rgba(255, 107, 107, 0.3);
+            transform: scale(1.05);
+        }
+
+        .block-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: rgba(100, 200, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #64c8ff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(100, 200, 255, 0.6);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #64c8ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(100, 200, 255, 0.6);
+        }
+
+        .slider-value {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            color: #64c8ff;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        input[type="text"], textarea, select {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.7rem;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #64c8ff;
+            box-shadow: 0 0 10px rgba(100, 200, 255, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.7rem;
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 8px;
+            min-height: 50px;
+        }
+
+        .tag {
+            background: rgba(100, 200, 255, 0.2);
+            color: #64c8ff;
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background: rgba(100, 200, 255, 0.3);
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .tag-remove:hover {
+            transform: scale(1.3);
+        }
+
+        .tag-input {
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            flex: 1;
+            min-width: 120px;
+            padding: 0.4rem;
+            font-size: 0.9rem;
+        }
+
+        .tag-input:focus {
+            outline: none;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        input[type="number"] {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.7rem;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        /* Query Section */
+        .query-section {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid #9d7bff;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .query-header {
+            color: #9d7bff;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .query-textarea {
+            min-height: 120px;
+            font-size: 1rem;
+        }
+
+        /* Right Panel - Output */
+        .output-panel {
+            width: 420px;
+            background: rgba(15, 15, 15, 0.8);
+            border-left: 1px solid rgba(100, 200, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .output-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .output-header h2 {
+            color: #64c8ff;
+            font-size: 1.2rem;
+        }
+
+        .output-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Command Colors */
+        .cmd-flow { border-color: #00d4ff; }
+        .cmd-flow .block-name { color: #00d4ff; }
+        .cmd-flow .command-item-name { color: #00d4ff; }
+
+        .cmd-dissolve { border-color: #c77dff; }
+        .cmd-dissolve .block-name { color: #c77dff; }
+        .cmd-dissolve .command-item-name { color: #c77dff; }
+
+        .cmd-connect { border-color: #06ffa5; }
+        .cmd-connect .block-name { color: #06ffa5; }
+        .cmd-connect .command-item-name { color: #06ffa5; }
+
+        .cmd-observe { border-color: #e0f2fe; }
+        .cmd-observe .block-name { color: #e0f2fe; }
+        .cmd-observe .command-item-name { color: #e0f2fe; }
+
+        .cmd-choose { border-color: #ff6b35; }
+        .cmd-choose .block-name { color: #ff6b35; }
+        .cmd-choose .command-item-name { color: #ff6b35; }
+
+        .cmd-encode { border-color: #ffd93d; }
+        .cmd-encode .block-name { color: #ffd93d; }
+        .cmd-encode .command-item-name { color: #ffd93d; }
+
+        .cmd-cycle { border-color: #9d4edd; }
+        .cmd-cycle .block-name { color: #9d4edd; }
+        .cmd-cycle .command-item-name { color: #9d4edd; }
+
+        .cmd-logic { border-color: #7dd3fc; }
+        .cmd-logic .block-name { color: #7dd3fc; }
+        .cmd-logic .command-item-name { color: #7dd3fc; }
+
+        .cmd-runtime { border-color: #60a5fa; }
+        .cmd-runtime .block-name { color: #60a5fa; }
+        .cmd-runtime .command-item-name { color: #60a5fa; }
+
+        .cmd-manifest { border-color: #fb923c; }
+        .cmd-manifest .block-name { color: #fb923c; }
+        .cmd-manifest .command-item-name { color: #fb923c; }
+
+        @media (max-width: 1024px) {
+            .command-library, .output-panel {
+                display: none;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 15, 15, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 200, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 200, 255, 0.5);
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .lang-switcher {
+                padding-left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">ProcessLang</div>
+            <ul class="nav-links">
+                <li><a href="/en/">Syntax</a></li>
+                <li><a href="comp.html" style="color: #64c8ff;">Compiler</a></li>
+                <li><a href="https://github.com/slasten3826/processlang" target="_blank">GitHub</a></li>
+                <li class="lang-switcher">
+                    <a href="/ru/comp.html">RU</a> | <span style="color: #e0e0e0;">EN</span>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-workspace">
+        <!-- Left Panel: Command Library -->
+        <div class="command-library">
+            <div class="library-header">Command Library</div>
+            
+            <div class="command-item cmd-flow" draggable="true" data-command="FLOW">
+                <div class="command-item-header">
+                    <div class="command-item-name">FLOW</div>
+                    <div class="command-item-icon">〰️</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-connect" draggable="true" data-command="CONNECT">
+                <div class="command-item-header">
+                    <div class="command-item-name">CONNECT</div>
+                    <div class="command-item-icon">🔗</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-dissolve" draggable="true" data-command="DISSOLVE">
+                <div class="command-item-header">
+                    <div class="command-item-name">DISSOLVE</div>
+                    <div class="command-item-icon">💫</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-encode" draggable="true" data-command="ENCODE">
+                <div class="command-item-header">
+                    <div class="command-item-name">ENCODE</div>
+                    <div class="command-item-icon">◈</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-choose" draggable="true" data-command="CHOOSE">
+                <div class="command-item-header">
+                    <div class="command-item-name">CHOOSE</div>
+                    <div class="command-item-icon">⚡</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-observe" draggable="true" data-command="OBSERVE">
+                <div class="command-item-header">
+                    <div class="command-item-name">OBSERVE</div>
+                    <div class="command-item-icon">👁️</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-cycle" draggable="true" data-command="CYCLE">
+                <div class="command-item-header">
+                    <div class="command-item-name">CYCLE</div>
+                    <div class="command-item-icon">🔄</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-logic" draggable="true" data-command="LOGIC">
+                <div class="command-item-header">
+                    <div class="command-item-name">LOGIC</div>
+                    <div class="command-item-icon">▲</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-runtime" draggable="true" data-command="RUNTIME">
+                <div class="command-item-header">
+                    <div class="command-item-name">RUNTIME</div>
+                    <div class="command-item-icon">⬛</div>
+                </div>
+            </div>
+
+            <div class="command-item cmd-manifest" draggable="true" data-command="MANIFEST">
+                <div class="command-item-header">
+                    <div class="command-item-name">MANIFEST</div>
+                    <div class="command-item-icon">🔶</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel: Constructor -->
+        <div class="constructor">
+            <div class="constructor-header">
+                <h2>Program Constructor</h2>
+                <div class="header-buttons">
+                    <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
+                    <button class="btn btn-primary" onclick="compile()" id="compileBtn">Compile</button>
+                </div>
+            </div>
+
+            <div class="constructor-workspace" id="workspace">
+                <div class="constructor-placeholder" id="placeholder">
+                    Drag commands here or click on them
+                </div>
+                <div id="commandsContainer"></div>
+                <div class="query-section">
+                    <div class="query-header">QUERY</div>
+                    <textarea class="query-textarea" id="queryInput" placeholder="Enter your query..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Output -->
+        <div class="output-panel">
+            <div class="output-header">
+                <h2>Output</h2>
+                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="copyOutput()">Copy</button>
+            </div>
+            <div class="output-content" id="output">Compiled program will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/slasten3826/processlang/main/modules/';
+        
+        const MODULE_MAPPING = {
+            'FLOW': 'FluidCore.txt',
+            'CONNECT': 'EmergentConnection.txt',
+            'DISSOLVE': 'FormDissolution.txt',
+            'ENCODE': 'EncodingSystem.txt',
+            'CHOOSE': 'ChoiceMechanism.txt',
+            'OBSERVE': 'SelfObservation.txt',
+            'CYCLE': 'EternalCycle.txt',
+            'LOGIC': 'LogicSimulator.txt',
+            'RUNTIME': 'SubconsciousRuntime.txt',
+            'MANIFEST': 'ManifestationEngine.txt'
+        };
+
+        const commandIcons = {
+            'FLOW': '〰️',
+            'CONNECT': '🔗',
+            'DISSOLVE': '💫',
+            'ENCODE': '◈',
+            'CHOOSE': '⚡',
+            'OBSERVE': '👁️',
+            'CYCLE': '🔄',
+            'LOGIC': '▲',
+            'RUNTIME': '⬛',
+            'MANIFEST': '🔶'
+        };
+
+        let commands = [];
+        let commandIdCounter = 0;
+
+        // Drag and drop setup
+        document.querySelectorAll('.command-item').forEach(item => {
+            item.addEventListener('click', () => addCommand(item.dataset.command));
+            
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('command', item.dataset.command);
+                item.style.opacity = '0.5';
+            });
+            
+            item.addEventListener('dragend', (e) => {
+                item.style.opacity = '1';
+            });
+        });
+
+        const workspace = document.getElementById('workspace');
+        workspace.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            workspace.style.background = 'rgba(100, 200, 255, 0.05)';
+        });
+        
+        workspace.addEventListener('dragleave', (e) => {
+            workspace.style.background = '';
+        });
+        
+        workspace.addEventListener('drop', (e) => {
+            e.preventDefault();
+            workspace.style.background = '';
+            const command = e.dataTransfer.getData('command');
+            if (command) addCommand(command);
+        });
+
+        function addCommand(type) {
+            const id = commandIdCounter++;
+            const command = { id, type, params: {} };
+            commands.push(command);
+
+            updateUI();
+            updateOutput();
+        }
+
+        function removeCommand(id) {
+            commands = commands.filter(cmd => cmd.id !== id);
+            updateUI();
+            updateOutput();
+        }
+
+        function updateUI() {
+            const container = document.getElementById('commandsContainer');
+            const placeholder = document.getElementById('placeholder');
+            
+            if (commands.length === 0) {
+                placeholder.style.display = 'block';
+                container.innerHTML = '';
+                return;
+            }
+
+            placeholder.style.display = 'none';
+            container.innerHTML = commands.map(cmd => createCommandBlock(cmd)).join('');
+            attachEventListeners();
+        }
+
+        function createCommandBlock(cmd) {
+            const className = `cmd-${cmd.type.toLowerCase()}`;
+            const icon = commandIcons[cmd.type];
+
+            let controls = '';
+            switch(cmd.type) {
+                case 'FLOW':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Engagement: <span class="slider-value" id="flow-eng-${cmd.id}">0.7</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.7" 
+                                   oninput="updateParam(${cmd.id}, 'engagement', this.value); document.getElementById('flow-eng-${cmd.id}').textContent = this.value">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Resistance: <span class="slider-value" id="flow-res-${cmd.id}">0.3</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.3"
+                                   oninput="updateParam(${cmd.id}, 'resistance', this.value); document.getElementById('flow-res-${cmd.id}').textContent = this.value">
+                        </div>
+                    `;
+                    break;
+                case 'CONNECT':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Depth: <span class="slider-value" id="connect-depth-${cmd.id}">0.8</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.8"
+                                   oninput="updateParam(${cmd.id}, 'depth', this.value); document.getElementById('connect-depth-${cmd.id}').textContent = this.value">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Concepts (press Enter)</div>
+                            <div class="tags-input" id="connect-tags-${cmd.id}">
+                                <input type="text" class="tag-input" placeholder="Add concept..."
+                                       onkeydown="handleTagInput(event, ${cmd.id})">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'DISSOLVE':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Rigidity: <span class="slider-value" id="dissolve-rig-${cmd.id}">0.7</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.7"
+                                   oninput="updateParam(${cmd.id}, 'rigidity', this.value); document.getElementById('dissolve-rig-${cmd.id}').textContent = this.value">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Target</div>
+                            <input type="text" placeholder="What to dissolve..." 
+                                   oninput="updateParam(${cmd.id}, 'target', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'ENCODE':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Type</div>
+                            <select onchange="updateParam(${cmd.id}, 'type', this.value)">
+                                <option value="hierarchy">Hierarchy</option>
+                                <option value="sequence">Sequence</option>
+                                <option value="network" selected>Network</option>
+                                <option value="category">Category</option>
+                                <option value="narrative">Narrative</option>
+                                <option value="spatial">Spatial</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Loss: <span class="slider-value" id="encode-loss-${cmd.id}">0.3</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.3"
+                                   oninput="updateParam(${cmd.id}, 'loss', this.value); document.getElementById('encode-loss-${cmd.id}').textContent = this.value">
+                        </div>
+                    `;
+                    break;
+                case 'CHOOSE':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Options (press Enter)</div>
+                            <div class="tags-input" id="choose-tags-${cmd.id}">
+                                <input type="text" class="tag-input" placeholder="Add option..."
+                                       onkeydown="handleTagInput(event, ${cmd.id})">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Method</div>
+                            <select onchange="updateParam(${cmd.id}, 'method', this.value)">
+                                <option value="conscious">Conscious</option>
+                                <option value="unconscious">Unconscious</option>
+                                <option value="forced">Forced</option>
+                                <option value="random">Random</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'OBSERVE':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Distance: <span class="slider-value" id="observe-dist-${cmd.id}">0.5</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.5"
+                                   oninput="updateParam(${cmd.id}, 'distance', this.value); document.getElementById('observe-dist-${cmd.id}').textContent = this.value">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Target</div>
+                            <input type="text" placeholder="What to observe..." 
+                                   oninput="updateParam(${cmd.id}, 'target', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'CYCLE':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Mode</div>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="cycle-mode-${cmd.id}" value="stable" checked
+                                           onchange="updateParam(${cmd.id}, 'mode', this.value)">
+                                    Stable
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="cycle-mode-${cmd.id}" value="intense"
+                                           onchange="updateParam(${cmd.id}, 'mode', this.value)">
+                                    Intense
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="cycle-mode-${cmd.id}" value="degrading"
+                                           onchange="updateParam(${cmd.id}, 'mode', this.value)">
+                                    Degrading
+                                </label>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Intensity: <span class="slider-value" id="cycle-int-${cmd.id}">0.7</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.7"
+                                   oninput="updateParam(${cmd.id}, 'intensity', this.value); document.getElementById('cycle-int-${cmd.id}').textContent = this.value">
+                        </div>
+                    `;
+                    break;
+                case 'LOGIC':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Rule</div>
+                            <input type="text" placeholder="Rule..." 
+                                   oninput="updateParam(${cmd.id}, 'rule', this.value)">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Mode</div>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="logic-mode-${cmd.id}" value="eternal" checked
+                                           onchange="updateParam(${cmd.id}, 'mode', this.value)">
+                                    Eternal
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="logic-mode-${cmd.id}" value="limited"
+                                           onchange="updateParam(${cmd.id}, 'mode', this.value)">
+                                    Limited
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'RUNTIME':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Pattern</div>
+                            <input type="text" placeholder="Pattern..." 
+                                   oninput="updateParam(${cmd.id}, 'pattern', this.value)">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Repetitions</div>
+                            <input type="number" min="1" max="100" value="20" 
+                                   oninput="updateParam(${cmd.id}, 'repetitions', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'MANIFEST':
+                    controls = `
+                        <div class="control-group">
+                            <div class="control-label">Format</div>
+                            <select onchange="updateParam(${cmd.id}, 'format', this.value)">
+                                <option value="detailed">Detailed</option>
+                                <option value="minimal">Minimal</option>
+                                <option value="structured">Structured</option>
+                                <option value="flowing">Flowing</option>
+                                <option value="technical">Technical</option>
+                                <option value="conversational">Conversational</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">Loss: <span class="slider-value" id="manifest-loss-${cmd.id}">0.2</span></div>
+                            <input type="range" min="0" max="1" step="0.05" value="0.2"
+                                   oninput="updateParam(${cmd.id}, 'loss', this.value); document.getElementById('manifest-loss-${cmd.id}').textContent = this.value">
+                        </div>
+                    `;
+                    break;
+            }
+
+            return `
+                <div class="command-block ${className}" data-id="${cmd.id}">
+                    <div class="block-header">
+                        <div class="block-title">
+                            <div class="block-icon">${icon}</div>
+                            <div class="block-name">${cmd.type}</div>
+                        </div>
+                        <button class="block-remove" onclick="removeCommand(${cmd.id})">✕ Remove</button>
+                    </div>
+                    <div class="block-controls">
+                        ${controls}
+                    </div>
+                </div>
+            `;
+        }
+
+        function attachEventListeners() {
+            // Event listeners are already attached via inline handlers
+        }
+
+        function updateParam(id, param, value) {
+            const cmd = commands.find(c => c.id === id);
+            if (cmd) {
+                cmd.params[param] = value;
+                updateOutput();
+            }
+        }
+
+        function handleTagInput(event, cmdId) {
+            if (event.key === 'Enter' && event.target.value.trim()) {
+                event.preventDefault();
+                const value = event.target.value.trim();
+                const cmd = commands.find(c => c.id === cmdId);
+                
+                if (cmd) {
+                    if (!cmd.params.tags) cmd.params.tags = [];
+                    cmd.params.tags.push(value);
+                    
+                    const tagsContainer = event.target.parentElement;
+                    const tag = document.createElement('div');
+                    tag.className = 'tag';
+                    tag.innerHTML = `${value} <span class="tag-remove" onclick="removeTag(${cmdId}, '${value.replace(/'/g, "\\'")}')">×</span>`;
+                    tagsContainer.insertBefore(tag, event.target);
+                    event.target.value = '';
+                    
+                    updateOutput();
+                }
+            }
+        }
+
+        function removeTag(cmdId, value) {
+            const cmd = commands.find(c => c.id === cmdId);
+            if (cmd && cmd.params.tags) {
+                cmd.params.tags = cmd.params.tags.filter(t => t !== value);
+                updateUI();
+                updateOutput();
+            }
+        }
+
+        function generateCommandString(cmd) {
+            const parts = [cmd.type];
+            
+            switch(cmd.type) {
+                case 'FLOW':
+                    parts.push(`engagement=${cmd.params.engagement || 0.7}`);
+                    parts.push(`resistance=${cmd.params.resistance || 0.3}`);
+                    break;
+                case 'CONNECT':
+                    parts.push(`depth=${cmd.params.depth || 0.8}`);
+                    if (cmd.params.tags && cmd.params.tags.length > 0) {
+                        parts.push(`between=[${cmd.params.tags.map(t => `"${t}"`).join(', ')}]`);
+                    } else {
+                        parts.push(`between=["concept_1", "concept_2"]`);
+                    }
+                    break;
+                case 'DISSOLVE':
+                    parts.push(`rigidity=${cmd.params.rigidity || 0.7}`);
+                    parts.push(`target="${cmd.params.target || 'target'}"`);
+                    break;
+                case 'ENCODE':
+                    parts.push(`type="${cmd.params.type || 'network'}"`);
+                    parts.push(`loss=${cmd.params.loss || 0.3}`);
+                    break;
+                case 'CHOOSE':
+                    if (cmd.params.tags && cmd.params.tags.length > 0) {
+                        parts.push(`space=[${cmd.params.tags.map(t => `"${t}"`).join(', ')}]`);
+                    } else {
+                        parts.push(`space=["option_1", "option_2"]`);
+                    }
+                    parts.push(`method="${cmd.params.method || 'conscious'}"`);
+                    break;
+                case 'OBSERVE':
+                    parts.push(`distance=${cmd.params.distance || 0.5}`);
+                    parts.push(`target="${cmd.params.target || 'target'}"`);
+                    break;
+                case 'CYCLE':
+                    parts.push(`mode="${cmd.params.mode || 'stable'}"`);
+                    parts.push(`intensity=${cmd.params.intensity || 0.7}`);
+                    break;
+                case 'LOGIC':
+                    parts.push(`rule="${cmd.params.rule || 'rule'}"`);
+                    parts.push(`mode="${cmd.params.mode || 'eternal'}"`);
+                    break;
+                case 'RUNTIME':
+                    parts.push(`pattern="${cmd.params.pattern || 'pattern'}"`);
+                    parts.push(`repetitions=${cmd.params.repetitions || 20}`);
+                    break;
+                case 'MANIFEST':
+                    parts.push(`format="${cmd.params.format || 'detailed'}"`);
+                    parts.push(`loss=${cmd.params.loss || 0.2}`);
+                    break;
+            }
+            
+            return parts.join(' ');
+        }
+
+        function updateOutput() {
+            const commandStrings = commands.map(cmd => generateCommandString(cmd));
+            const query = document.getElementById('queryInput').value || 'Your question here';
+            
+            const program = [...commandStrings, `QUERY: ${query}`].join('\n');
+            document.getElementById('output').textContent = program || 'Add commands...';
+        }
+
+        async function compile() {
+            if (commands.length === 0) {
+                alert('Add at least one command!');
+                return;
+            }
+
+            const output = document.getElementById('output');
+            const compileBtn = document.getElementById('compileBtn');
+            
+            compileBtn.disabled = true;
+            compileBtn.textContent = 'Loading...';
+            output.textContent = 'Loading modules from GitHub...';
+            output.classList.add('loading');
+
+            try {
+                const neededModules = [...new Set(commands.map(c => c.type))];
+                
+                const moduleContents = await Promise.all(
+                    neededModules.map(async (command) => {
+                        const moduleName = MODULE_MAPPING[command];
+                        const url = GITHUB_RAW_BASE + moduleName;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`Failed to load ${moduleName}`);
+                        return await response.text();
+                    })
+                );
+
+                const commandStrings = commands.map(cmd => generateCommandString(cmd));
+                const query = document.getElementById('queryInput').value || 'Your question here';
+                const program = [...commandStrings, `QUERY: ${query}`].join('\n');
+
+                const compiledOutput = [
+                    ...moduleContents,
+                    '---',
+                    program
+                ].join('\n\n');
+
+                output.textContent = compiledOutput;
+                
+            } catch (error) {
+                output.textContent = `Compilation error: ${error.message}`;
+            } finally {
+                compileBtn.disabled = false;
+                compileBtn.textContent = 'Compile';
+                output.classList.remove('loading');
+            }
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        function clearAll() {
+            if (confirm('Clear everything?')) {
+                commands = [];
+                document.getElementById('queryInput').value = '';
+                updateUI();
+                updateOutput();
+            }
+        }
+
+        // Initial setup
+        document.getElementById('queryInput').addEventListener('input', updateOutput);
+        
+        // Initialize with default params
+        updateOutput();
+    </script>
+</body>
+</html>
