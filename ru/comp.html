@@ -220,13 +220,6 @@
             font-size: 1.1rem;
         }
 
-        .constructor-placeholder small {
-            color: #555;
-            font-size: 0.9rem;
-            display: block;
-            margin-top: 0.5rem;
-        }
-
         /* Command Blocks */
         .command-block {
             background: rgba(20, 20, 20, 0.9);
@@ -697,7 +690,6 @@
             <div class="constructor-workspace" id="workspace">
                 <div class="constructor-placeholder" id="placeholder">
                     Перетащите команды сюда или кликните на них
-                    <small>Максимум 5 команд</small>
                 </div>
                 <div id="commandsContainer"></div>
                 <div class="query-section">
@@ -781,11 +773,6 @@
         });
 
         function addCommand(type) {
-            if (commands.length >= 5) {
-                alert('Максимум 5 команд!');
-                return;
-            }
-
             const id = commandIdCounter++;
             const command = { id, type, params: {} };
             commands.push(command);
@@ -860,7 +847,7 @@
                         </div>
                         <div class="control-group">
                             <div class="control-label">Target</div>
-                            <input type="text" placeholder="Что растворять..." 
+                            <input type="text" placeholder="Что растворить..." 
                                    oninput="updateParam(${cmd.id}, 'target', this.value)">
                         </div>
                     `;
