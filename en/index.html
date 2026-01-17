@@ -50,15 +50,21 @@
             background-clip: text;
         }
 
-        .nav-right {
+        .nav-links {
             display: flex;
-            align-items: center;
+            list-style: none;
             gap: 2rem;
+            align-items: center;
         }
 
-        .current-section {
-            font-size: 1.1rem;
-            font-weight: 600;
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
             color: #64c8ff;
         }
 
@@ -70,12 +76,6 @@
 
         .lang-switcher a {
             color: #64c8ff;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .lang-switcher a:hover {
-            color: #9d7bff;
         }
 
         .hero {
@@ -250,8 +250,9 @@
         }
 
         @media (max-width: 768px) {
-            .nav-right {
+            .nav-links {
                 gap: 1rem;
+                font-size: 0.9rem;
             }
 
             .lang-switcher {
@@ -277,12 +278,14 @@
     <nav>
         <div class="container">
             <div class="logo">ProcessLang</div>
-            <div class="nav-right">
-                <div class="current-section">Syntax</div>
-                <div class="lang-switcher">
+            <ul class="nav-links">
+                <li><a href="/en/" style="color: #64c8ff;">Syntax</a></li>
+                <li><a href="comp.html">Compiler</a></li>
+                <li><a href="https://github.com/slasten3826/processlang" target="_blank">GitHub</a></li>
+                <li class="lang-switcher">
                     <a href="/ru/">RU</a> | <span style="color: #e0e0e0;">EN</span>
-                </div>
-            </div>
+                </li>
+            </ul>
         </div>
     </nav>
 
