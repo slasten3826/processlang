@@ -58,7 +58,6 @@ QUERY: your request
 **CONNECT** — какие паттерны связывать в процессе  
 **DISSOLVE** — что растворять  
 **OBSERVE** — дистанция самонаблюдения  
-**ITERATE** — глубина циклов
 
 Полный синтаксис: `/docs/SYNTAX.md`
 
@@ -189,7 +188,6 @@ Most often 2-3 commands are enough. Using all 10 modules in one program is exces
 **CONNECT** — which patterns to link in the process  
 **DISSOLVE** — what to dissolve  
 **OBSERVE** — distance of self-observation  
-**ITERATE** — depth of cycles
 
 Full syntax: `/docs/SYNTAX.md`
 
@@ -257,4 +255,5 @@ Monero: `42tXPEuCmvmhYpkxGDTeSHKL6ZQcjqbA368sqx8y87BhddaQWYLGLHnT393augRm3hbwwXy
 ProcessLang is a tool for coordinating machine fracting through processual context.
 
 The machine fracts. You coordinate. The result emerges.
+
 
