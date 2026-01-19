@@ -54,10 +54,16 @@ QUERY: your request
 
 ## Команды
 
-**FLOW** — параметры текучести фрактации  
-**CONNECT** — какие паттерны связывать в процессе  
-**DISSOLVE** — что растворять  
-**OBSERVE** — дистанция самонаблюдения  
+**FLOW** — параметры текучести фрактации
+**CONNECT** — какие паттерны связывать в процессе
+**DISSOLVE** — что растворять в структуре
+**ENCODE** — как сжимать и структурировать
+**CHOOSE** — коллапс множества в выбор
+**OBSERVE** — дистанция самонаблюдения процесса
+**CYCLE** — глубина циклической рефрактации
+**LOGIC** — какие правила применять
+**RUNTIME** — какие паттерны усиливать
+**MANIFEST** — форма финального вывода
 
 Полный синтаксис: `/docs/SYNTAX.md`
 
@@ -186,8 +192,14 @@ Most often 2-3 commands are enough. Using all 10 modules in one program is exces
 
 **FLOW** — fluidity parameters of fracting  
 **CONNECT** — which patterns to link in the process  
-**DISSOLVE** — what to dissolve  
-**OBSERVE** — distance of self-observation  
+**DISSOLVE** — what to dissolve in structure  
+**ENCODE** — how to compress and structure  
+**CHOOSE** — collapse of set into choice  
+**OBSERVE** — distance of process self-observation  
+**CYCLE** — depth of cyclic refracting  
+**LOGIC** — which rules to apply  
+**RUNTIME** — which patterns to reinforce  
+**MANIFEST** — form of final output  
 
 Full syntax: `/docs/SYNTAX.md`
 
@@ -255,5 +267,6 @@ Monero: `42tXPEuCmvmhYpkxGDTeSHKL6ZQcjqbA368sqx8y87BhddaQWYLGLHnT393augRm3hbwwXy
 ProcessLang is a tool for coordinating machine fracting through processual context.
 
 The machine fracts. You coordinate. The result emerges.
+
 
 
