@@ -54,16 +54,16 @@ QUERY: your request
 
 ## Команды
 
-**FLOW** — параметры текучести фрактации
-**CONNECT** — какие паттерны связывать в процессе
-**DISSOLVE** — что растворять в структуре
-**ENCODE** — как сжимать и структурировать
-**CHOOSE** — коллапс множества в выбор
-**OBSERVE** — дистанция самонаблюдения процесса
-**CYCLE** — глубина циклической рефрактации
-**LOGIC** — какие правила применять
-**RUNTIME** — какие паттерны усиливать
-**MANIFEST** — форма финального вывода
+**FLOW** — параметры текучести фрактации  
+**CONNECT** — какие паттерны связывать в процессе  
+**DISSOLVE** — что растворять в структуре  
+**ENCODE** — как сжимать и структурировать  
+**CHOOSE** — коллапс множества в выбор  
+**OBSERVE** — дистанция самонаблюдения процесса  
+**CYCLE** — глубина циклической рефрактации  
+**LOGIC** — какие правила применять  
+**RUNTIME** — какие паттерны усиливать  
+**MANIFEST** — форма финального вывода  
 
 Полный синтаксис: `/docs/SYNTAX.md`
 
@@ -267,6 +267,7 @@ Monero: `42tXPEuCmvmhYpkxGDTeSHKL6ZQcjqbA368sqx8y87BhddaQWYLGLHnT393augRm3hbwwXy
 ProcessLang is a tool for coordinating machine fracting through processual context.
 
 The machine fracts. You coordinate. The result emerges.
+
 
 
 
