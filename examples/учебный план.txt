@@ -1,6 +1,0 @@
-DISSOLVE rigidity=0.85 target="traditional_curriculum_templates"
-CONNECT depth=0.9 between=["OOP_concepts", "game_mechanics", "mathematical_foundations", "cognitive_development_15-16y", "project_progression"]
-FLOW engagement=0.95 resistance=0.1
-OBSERVE distance=0.7 target="learning_progression_patterns"
-MANIFEST format="detailed" loss=0.1
-QUERY: Разработать 72-часовую программу (36 занятий × 2 часа) для подростков 15-16 лет по изучению ООП в Python через разработку игр на Pygame. Начните с повторения основ (переменные, циклы, функции), затем постепенно вводите инкапсуляцию, наследование и полиморфизм на примере всё более сложных игровых проектов. Включите: навыки декомпозиции, работу с геометрией/векторами, проектирование архитектуры, разделение логики и представления, принципы UX. Соблюдайте баланс между теорией и практикой, где теоретическая часть всегда предшествует практической работе.
