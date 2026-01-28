@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Библия Вайбкодинга</title>
+    <meta name="description" content="Как создавать софт быстро и не сойти с ума. Написано за 2 часа практики с машиной.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        nav {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #64c8ff;
+        }
+
+        .hero {
+            position: relative;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.4;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            padding: 3rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            background: linear-gradient(135deg, #00d4ff 0%, #06ffa5 50%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #a0a0a0;
+            margin-bottom: 1rem;
+        }
+
+        .hero-context {
+            display: inline-block;
+            background: rgba(100, 200, 255, 0.1);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        .content-section {
+            position: relative;
+            padding: 4rem 2rem;
+            overflow: hidden;
+        }
+
+        .section-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .section-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-intro {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-intro h2 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .section-intro p {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+        }
+
+        .rule-card {
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rule-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .rule-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .rule-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .rule-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .rule-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .rule-card p {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            margin-bottom: 1rem;
+            color: #c0c0c0;
+        }
+
+        .rule-card ul {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .rule-card li {
+            margin-bottom: 0.8rem;
+            color: #c0c0c0;
+        }
+
+        .example-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .example-block strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        code {
+            background: rgba(100, 200, 255, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Rule color schemes */
+        .rule-core { border-color: #00d4ff; }
+        .rule-core h3 { color: #00d4ff; }
+        .rule-core::before { background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%); }
+        .rule-core .example-block { border-color: #00d4ff; }
+
+        .rule-structure { border-color: #06ffa5; }
+        .rule-structure h3 { color: #06ffa5; }
+        .rule-structure::before { background: linear-gradient(135deg, #06ffa5 0%, #00d4ff 100%); }
+        .rule-structure .example-block { border-color: #06ffa5; }
+
+        .rule-workflow { border-color: #c77dff; }
+        .rule-workflow h3 { color: #c77dff; }
+        .rule-workflow::before { background: linear-gradient(135deg, #c77dff 0%, #ff6b9d 100%); }
+        .rule-workflow .example-block { border-color: #c77dff; }
+
+        .rule-tooling { border-color: #ffd93d; }
+        .rule-tooling h3 { color: #ffd93d; }
+        .rule-tooling::before { background: linear-gradient(135deg, #ffd93d 0%, #ffb627 100%); }
+        .rule-tooling .example-block { border-color: #ffd93d; }
+
+        .rule-team { border-color: #ff6b35; }
+        .rule-team h3 { color: #ff6b35; }
+        .rule-team::before { background: linear-gradient(135deg, #ff6b35 0%, #ff9770 100%); }
+        .rule-team .example-block { border-color: #ff6b35; }
+
+        .antipatterns {
+            background: linear-gradient(180deg,
+                rgba(20, 20, 20, 0.3) 0%,
+                rgba(255, 107, 53, 0.08) 30%,
+                rgba(199, 125, 255, 0.08) 50%,
+                rgba(255, 107, 53, 0.08) 70%,
+                rgba(20, 20, 20, 0.3) 100%
+            );
+            border-top: 2px solid rgba(255, 107, 53, 0.3);
+            border-bottom: 2px solid rgba(199, 125, 255, 0.3);
+        }
+
+        .antipattern-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .antipattern-item {
+            background: rgba(255, 0, 0, 0.05);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .antipattern-item:hover {
+            border-color: rgba(255, 107, 53, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .antipattern-item strong {
+            color: #ff6b35;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .cycle-section {
+            background: rgba(20, 20, 30, 0.6);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            margin: 3rem 0;
+        }
+
+        .cycle-steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin-top: 2rem;
+        }
+
+        .cycle-steps li {
+            counter-increment: step;
+            position: relative;
+            padding: 1.5rem 1.5rem 1.5rem 4rem;
+            margin-bottom: 1rem;
+            background: rgba(100, 200, 255, 0.05);
+            border-radius: 12px;
+            border-left: 3px solid #64c8ff;
+        }
+
+        .cycle-steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .final-section {
+            text-align: center;
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg,
+                rgba(10, 10, 10, 0) 0%,
+                rgba(100, 200, 255, 0.05) 50%,
+                rgba(10, 10, 10, 0) 100%
+            );
+        }
+
+        .final-quote {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #00d4ff 0%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 2rem 0;
+            font-weight: 700;
+        }
+
+        footer {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        footer p {
+            color: #888;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #64c8ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #9d7bff;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .rule-card {
+                padding: 1.5rem;
+            }
+
+            .antipattern-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">Вайбкодинг</div>
+            <ul class="nav-links">
+                <li><a href="#principles">Принципы</a></li>
+                <li><a href="#rules">Правила</a></li>
+                <li><a href="#cycle">Цикл</a></li>
+                <li><a href="#antipatterns">Антипаттерны</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+        <div class="hero-content">
+            <h1>Библия Вайбкодинга</h1>
+            <p class="hero-subtitle">Как создавать софт быстро и не сойти с ума</p>
+            <div class="hero-context">
+                Написано человеком, который не умеет программировать,<br>
+                за ~2 часа практики с машиной
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section" id="intro">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="section-intro">
+                <h2>Что такое вайбкодинг?</h2>
+                <p>Быстрые итерации без хаоса</p>
+            </div>
+
+            <p style="font-size: 1.2rem; line-height: 2;">
+                Вайбкодинг — это когда ты создаёшь программы быстрыми итерациями: <strong style="color: #64c8ff;">сделал → проверил → улучшил</strong>.
+                Вместо того чтобы полгода планировать "идеальную архитектуру", ты за неделю делаешь рабочий прототип с помощью машины.
+            </p>
+
+            <p style="font-size: 1.2rem; line-height: 2;">
+                Но есть проблема: <strong style="color: #ff6b35;">без правил скорость превращается в хаос</strong>.
+                Сегодня добавил фичу за час, завтра полдня ищешь, почему всё сломалось.
+            </p>
+        </div>
+    </div>
+
+    <div class="content-section" id="principles">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="section-intro">
+                <h2>Главный принцип</h2>
+            </div>
+
+            <div class="rule-card rule-core">
+                <h3>
+                    <span class="rule-icon">⚡</span>
+                    Скорость = быстро откатываться
+                </h3>
+                <p>
+                    Скорость — это не "писать быстро", а <strong>"быстро откатываться и быстро проверять"</strong>.
+                </p>
+
+                <div class="example-block">
+                    <strong style="color: #ff6b35;">❌ Это не скорость:</strong>
+                    <ul>
+                        <li>Добавил новую кнопку на сайт</li>
+                        <li>Теперь старая форма не работает</li>
+                        <li>Не помнишь, что именно менял</li>
+                        <li>Откатить изменения не можешь</li>
+                    </ul>
+                </div>
+
+                <div class="example-block" style="border-color: #06ffa5;">
+                    <strong style="color: #06ffa5;">✅ Настоящая скорость:</strong>
+                    <ul>
+                        <li>Понимаешь, что сломалось</li>
+                        <li>За минуту откатываешь к рабочей версии</li>
+                        <li>Пробуешь по-другому</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section" id="rules">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="section-intro">
+                <h2>Правила выживания</h2>
+                <p>Сохраняют скорость и не дают проекту развалиться</p>
+            </div>
+
+            <!-- Rule 1: Small Steps -->
+            <div class="rule-card rule-core">
+                <h3>
+                    <span class="rule-icon">🔹</span>
+                    Правило 1: Маленькие шаги
+                </h3>
+                <p>Каждое изменение должно быть:</p>
+                <ul>
+                    <li><strong>Маленьким</strong> — меняешь одну вещь за раз</li>
+                    <li><strong>Обратимым</strong> — можешь вернуть как было</li>
+                    <li><strong>Проверяемым</strong> — сразу видно, работает или нет</li>
+                </ul>
+
+                <div class="example-block">
+                    <strong>Плохо:</strong>
+                    "Переделал дизайн + добавил регистрацию + поменял базу данных"
+                    <br><br>
+                    <em style="color: #888;">Что-то сломалось. Где именно? Хрен знает.</em>
+                </div>
+
+                <div class="example-block" style="border-color: #06ffa5;">
+                    <strong style="color: #06ffa5;">Хорошо:</strong>
+                    "Добавил кнопку 'Зарегистрироваться'"
+                    <br><br>
+                    <em style="color: #888;">Проверил — работает. Сохранил. Следующий шаг.</em>
+                </div>
+
+                <p style="margin-top: 1.5rem; color: #64c8ff;">
+                    <strong>Золотое правило:</strong> Если шаг кажется слишком большим — раздели на 2-5 шагов поменьше.
+                </p>
+            </div>
+
+            <!-- Rule 2: Always Rollback -->
+            <div class="rule-card rule-tooling">
+                <h3>
+                    <span class="rule-icon">↩️</span>
+                    Правило 2: Всегда можно вернуться назад
+                </h3>
+                <p>
+                    У тебя <strong>всегда</strong> должен быть способ вернуться к рабочей версии <strong>за 30 секунд</strong>.
+                </p>
+
+                <p><strong>Минимум:</strong></p>
+                <ul>
+                    <li>Используй Git (система контроля версий)</li>
+                    <li>Делай короткие коммиты</li>
+                    <li>Пиши понятные комментарии: "добавил кнопку логина"</li>
+                </ul>
+
+                <p><strong>Почему это важно:</strong></p>
+                <p>
+                    Без отката каждое изменение — риск. С откатом ты можешь экспериментировать смело:
+                    не работает — вернул за секунды.
+                </p>
+            </div>
+
+            <!-- Rule 3: Layers -->
+            <div class="rule-card rule-structure">
+                <h3>
+                    <span class="rule-icon">📚</span>
+                    Правило 3: Не смешивай слои
+                </h3>
+                <p>В любой программе есть три слоя:</p>
+
+                <div class="example-block" style="border-color: #00d4ff;">
+                    <strong style="color: #00d4ff;">1. Логика</strong> — правила, что должно происходить
+                    <br>
+                    <em>"Пользователь может купить только если есть деньги на счету"</em>
+                </div>
+
+                <div class="example-block" style="border-color: #06ffa5;">
+                    <strong style="color: #06ffa5;">2. Интерфейс</strong> — как это показывается
+                    <br>
+                    <em>"Кнопка 'Купить' зелёная или серая"</em>
+                </div>
+
+                <div class="example-block" style="border-color: #c77dff;">
+                    <strong style="color: #c77dff;">3. Данные</strong> — что часто меняется
+                    <br>
+                    <em>"Цена товара", "список категорий"</em>
+                </div>
+
+                <p style="margin-top: 1.5rem;">
+                    <strong>Почему это важно:</strong><br>
+                    Если логика размазана по интерфейсу, изменение правила требует перелопатить все кнопки.
+                    Если она в одном месте — правишь в одной точке.
+                </p>
+            </div>
+
+            <!-- Rule 4: Single Source of Truth -->
+            <div class="rule-card rule-structure">
+                <h3>
+                    <span class="rule-icon">🎯</span>
+                    Правило 4: Один источник правды
+                </h3>
+                <p>
+                    Если одна и та же информация хранится в двух местах — рано или поздно они разойдутся.
+                </p>
+
+                <p><strong>Примеры "двух правд" (антипаттерн):</strong></p>
+                <ul>
+                    <li>Расчёт скидки и на сервере, и в приложении</li>
+                    <li>Список ролей и в коде, и в базе</li>
+                    <li>Проверка email-формата и в форме, и в API</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem; color: #06ffa5;">
+                    <strong>Решение:</strong> Выбери одно место как источник правды. Всё остальное берётся оттуда.
+                </p>
+            </div>
+
+            <!-- Rule 5: Boundaries -->
+            <div class="rule-card rule-structure">
+                <h3>
+                    <span class="rule-icon">🔲</span>
+                    Правило 5: Ставь границы
+                </h3>
+                <p>
+                    Чтобы изменения не расползались по всему проекту, создавай <strong>точки соприкосновения</strong> (контракты).
+                </p>
+
+                <p><strong>Простая аналогия:</strong></p>
+                <p>
+                    Представь, что ты делаешь сайт. Между <strong>фронтендом</strong> (то, что видит пользователь)
+                    и <strong>бэкендом</strong> (сервер с данными) есть <strong>API</strong> (договор).
+                </p>
+
+                <p>Если договор чёткий:</p>
+                <ul>
+                    <li>Фронтенд можно переделать — бэкенд не сломается</li>
+                    <li>Бэкенд можно улучшить — фронтенд не сломается</li>
+                </ul>
+            </div>
+
+            <!-- Rule 6: Patch, Don't Rewrite -->
+            <div class="rule-card rule-workflow">
+                <h3>
+                    <span class="rule-icon">🔧</span>
+                    Правило 6: Чини, не переписывай
+                </h3>
+
+                <div class="example-block">
+                    <strong style="color: #ff6b35;">Плохой паттерн:</strong>
+                    "Мне не нравится этот файл, перепишу его полностью"
+                </div>
+
+                <p><strong>Проблема:</strong></p>
+                <ul>
+                    <li>Потеряешь мелкие исправления</li>
+                    <li>Можешь вернуть старые баги</li>
+                    <li>Сложно понять, что изменилось</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem; color: #06ffa5;">
+                    <strong>Хороший паттерн:</strong> Меняй минимальный участок, который решает твою задачу.
+                </p>
+            </div>
+
+            <!-- Rule 7: Three Modes -->
+            <div class="rule-card rule-workflow">
+                <h3>
+                    <span class="rule-icon">🎭</span>
+                    Правило 7: Три режима — не смешивай
+                </h3>
+                <p>Всегда работай в одном из трёх режимов:</p>
+
+                <div class="example-block" style="border-color: #06ffa5;">
+                    <strong style="color: #06ffa5;">1. Feature Mode</strong> — Добавление фичи
+                    <br>
+                    <em>"Делаю новую кнопку 'Поделиться'"</em>
+                </div>
+
+                <div class="example-block" style="border-color: #ff6b35;">
+                    <strong style="color: #ff6b35;">2. Fix Mode</strong> — Исправление багов
+                    <br>
+                    <em>"Исправляю: форма не отправляется на iPhone"</em>
+                </div>
+
+                <div class="example-block" style="border-color: #c77dff;">
+                    <strong style="color: #c77dff;">3. Refactor Mode</strong> — Улучшение кода
+                    <br>
+                    <em>"Переношу логику валидации в отдельный файл"</em>
+                </div>
+
+                <p style="margin-top: 1.5rem;">
+                    <strong>Правило:</strong> Один коммит = один режим. Если смешать Feature + Refactor — что-то сломается,
+                    и будет непонятно где.
+                </p>
+            </div>
+
+            <!-- Rule 8: Check Every Step -->
+            <div class="rule-card rule-tooling">
+                <h3>
+                    <span class="rule-icon">✅</span>
+                    Правило 8: Проверяй каждый шаг
+                </h3>
+                <p>
+                    У тебя должна быть <strong>одна команда</strong>, которая проверяет: "Живо ли приложение?"
+                </p>
+
+                <p><strong>Минимум:</strong></p>
+                <ul>
+                    <li>Приложение запускается?</li>
+                    <li>Основной сценарий работает?</li>
+                    <li>Нет критических ошибок?</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem; background: rgba(255, 107, 53, 0.1); padding: 1rem; border-radius: 8px;">
+                    <strong style="color: #ff6b35;">⚠️ Вайбкодинг без проверок = лотерея</strong>
+                    <br>
+                    Ты не знаешь, сломал ли что-то, пока пользователь не напишет "у меня не работает"
+                </p>
+            </div>
+
+            <!-- Rule 9: Logs -->
+            <div class="rule-card rule-tooling">
+                <h3>
+                    <span class="rule-icon">👁️</span>
+                    Правило 9: Логи — твои глаза
+                </h3>
+                <p>Чем быстрее меняешь код, тем важнее <strong>видеть, что происходит</strong>.</p>
+
+                <pre><code>[INFO] Пользователь 123 вошёл в систему
+[ERROR] Не удалось отправить email: connection timeout
+[WARNING] Медленный запрос к базе: 5 секунд</code></pre>
+
+                <p><strong>Зачем это нужно:</strong></p>
+                <p>Без логов ты слепой. С логами — быстро находишь проблему и видишь паттерны.</p>
+            </div>
+
+            <!-- Rule 10: Feature Flags -->
+            <div class="rule-card rule-tooling">
+                <h3>
+                    <span class="rule-icon">🚩</span>
+                    Правило 10: Конфиги и фичефлаги
+                </h3>
+                <p>Фичефлаг — это выключатель для экспериментов.</p>
+
+                <pre><code>if (featureFlag.newCheckout) {
+  // Новая фича
+} else {
+  // Старая фича
+}</code></pre>
+
+                <p><strong>Профит:</strong></p>
+                <ul>
+                    <li>Можно включить для 10% пользователей</li>
+                    <li>Сломалось — выключил без деплоя</li>
+                    <li>Сравнил метрики: что лучше?</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem; color: #ffd93d;">
+                    <strong>Вайбкодинг = "давай попробуем"</strong>. Флаги делают пробы дешёвыми и безопасными.
+                </p>
+            </div>
+
+            <!-- Rule 11: Data Outside -->
+            <div class="rule-card rule-structure">
+                <h3>
+                    <span class="rule-icon">📦</span>
+                    Правило 11: Выноси данные наружу
+                </h3>
+                <p>Что часто меняется — не должно быть в коде.</p>
+
+                <div class="example-block">
+                    <strong>Плохо:</strong>
+                    <pre><code>if (product === "Кофе") price = 200;
+if (product === "Чай") price = 150;
+// ...100 строк</code></pre>
+                    Теперь хочешь поменять цену → лезешь в код, можешь что-то сломать.
+                </div>
+
+                <div class="example-block" style="border-color: #06ffa5;">
+                    <strong style="color: #06ffa5;">Хорошо:</strong>
+                    <pre><code>// prices.json
+{
+  "Кофе": 200,
+  "Чай": 150
+}</code></pre>
+                    Меняешь цену → правишь JSON. Логика не трогается.
+                </div>
+
+                <p><strong>Что выносить:</strong></p>
+                <ul>
+                    <li>Цены, тарифы, лимиты</li>
+                    <li>Тексты интерфейса</li>
+                    <li>Списки категорий, опций</li>
+                    <li>Правила бизнес-логики (если их много)</li>
+                </ul>
+            </div>
+
+            <!-- Rule 12: Useful Docs -->
+            <div class="rule-card rule-team">
+                <h3>
+                    <span class="rule-icon">📝</span>
+                    Правило 12: Документируй только полезное
+                </h3>
+                <p>Не пиши документацию ради документации. Пиши только то, что <strong>экономит время</strong>.</p>
+
+                <p><strong>Минимальный набор:</strong></p>
+                <ul>
+                    <li><code>README.md</code> — Как запустить (3-5 команд)</li>
+                    <li><code>ARCHITECTURE.md</code> — Как устроено (1 страница)</li>
+                    <li><code>CHANGELOG.md</code> — По 1 строке на итерацию</li>
+                </ul>
+
+                <p><strong>Не пиши:</strong></p>
+                <ul>
+                    <li>Очевидные вещи ("функция login логинит пользователя")</li>
+                    <li>Устаревшую информацию (лучше не писать, чем врать)</li>
+                    <li>Комментарии к каждой строке кода</li>
+                </ul>
+            </div>
+
+            <!-- Rule 13: Don't Keep Everything in Head -->
+            <div class="rule-card rule-workflow">
+                <h3>
+                    <span class="rule-icon">🧠</span>
+                    Правило 13: Не держи всё в голове
+                </h3>
+                <p>Мозг переполняется. Фиксируй решения.</p>
+
+                <p><strong>Практики:</strong></p>
+                <ul>
+                    <li>TODO-листы для задач</li>
+                    <li>Заметки о решениях ("Почему используем PostgreSQL?")</li>
+                    <li>Дневник разработки (опционально)</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem;">
+                    <strong>Зачем:</strong> Через неделю забудешь, почему сделал именно так.
+                    Другим людям проще влиться. Себе же поможешь.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section" id="cycle">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="section-intro">
+                <h2>Идеальный цикл вайбкодинга</h2>
+                <p>Каждая итерация — 15-60 минут</p>
+            </div>
+
+            <div class="cycle-section">
+                <ol class="cycle-steps">
+                    <li>
+                        <strong style="color: #64c8ff;">Цель одной фразой</strong>
+                        <br>
+                        <em>"Добавить кнопку смены пароля"</em>
+                    </li>
+                    <li>
+                        <strong style="color: #64c8ff;">Границы (что НЕ трогаем)</strong>
+                        <br>
+                        <em>"Не меняю базу данных, не трогаю дизайн"</em>
+                    </li>
+                    <li>
+                        <strong style="color: #64c8ff;">Минимальный патч</strong>
+                        <br>
+                        <em>Правлю 1-2 файла, добавляю 10-50 строк</em>
+                    </li>
+                    <li>
+                        <strong style="color: #64c8ff;">Проверка</strong>
+                        <br>
+                        <em>Запустил → нажал кнопку → работает</em>
+                    </li>
+                    <li>
+                        <strong style="color: #64c8ff;">Фиксация</strong>
+                        <br>
+                        <code>git commit -m "Добавлена кнопка смены пароля"</code>
+                    </li>
+                </ol>
+
+                <p style="text-align: center; margin-top: 2rem; font-size: 1.2rem; color: #06ffa5;">
+                    <strong>Цикл занимает 20-40 минут. В конце — рабочая версия.</strong>
+                    <br>
+                    10 таких циклов в день = 10 улучшений. Откатить любое можно за секунды.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section antipatterns" id="antipatterns">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="section-intro">
+                <h2>Антипаттерны</h2>
+                <p>Что убивает вайб</p>
+            </div>
+
+            <div class="antipattern-list">
+                <div class="antipattern-item">
+                    <strong>❌ "Щас быстро перепишу всё"</strong>
+                    <p>Спойлер: не быстро. Потеряешь неделю.</p>
+                </div>
+
+                <div class="antipattern-item">
+                    <strong>❌ "Потом починю"</strong>
+                    <p>Потом = никогда. Технический долг растёт.</p>
+                </div>
+
+                <div class="antipattern-item">
+                    <strong>❌ "Нет тестов, но работает"</strong>
+                    <p>Работает, пока не тронул. Потом — сюрпризы.</p>
+                </div>
+
+                <div class="antipattern-item">
+                    <strong>❌ "Смешаю refactor и фичу"</strong>
+                    <p>Что-то сломается. Не поймёшь где.</p>
+                </div>
+
+                <div class="antipattern-item">
+                    <strong>❌ "Дублирую логику в двух местах"</strong>
+                    <p>Поменяешь в одном, забудешь в другом. Баг.</p>
+                </div>
+
+                <div class="antipattern-item">
+                    <strong>❌ "Слишком умная архитектура до MVP"</strong>
+                    <p>3 месяца делал "правильно". Выяснилось, что фича не нужна.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section" id="team">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="section-intro">
+                <h2>Вайбкодинг в команде</h2>
+            </div>
+
+            <div class="rule-card rule-team">
+                <h3>Если не один работаешь</h3>
+
+                <p><strong>Маленькие Pull Request'ы</strong></p>
+                <p>Не 3000 строк за раз. Лучше 10 PR по 200 строк.</p>
+
+                <p style="margin-top: 1.5rem;"><strong>Описывай "Что" и "Почему"</strong></p>
+                <pre><code># Что
+Добавил фильтр по категориям
+
+# Почему
+Пользователи не могли найти товары</code></pre>
+
+                <p style="margin-top: 1.5rem;"><strong>Автопроверки</strong></p>
+                <p>Линтер, тесты, сборка — всё автоматом. Не надо руками.</p>
+
+                <p style="margin-top: 1.5rem;"><strong>Договорённости</strong></p>
+                <ul>
+                    <li>Как называть ветки: <code>feature/название</code>, <code>fix/bug-123</code></li>
+                    <li>Как писать коммиты: "Добавлен", "Исправлен", "Удалён"</li>
+                    <li>Стиль кода: один форматтер для всех</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem; color: #ff6b35; font-size: 1.1rem;">
+                    <strong>Вайб команды = предсказуемость + скорость</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section" id="rewrite">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="rule-card rule-workflow">
+                <h3>
+                    <span class="rule-icon">🔄</span>
+                    Когда можно переписать с нуля?
+                </h3>
+
+                <p>Переписывание имеет смысл только если:</p>
+
+                <div class="example-block" style="border-color: #06ffa5;">
+                    <ul>
+                        <li>✅ Ты чётко знаешь целевую архитектуру</li>
+                        <li>✅ Есть тесты для проверки</li>
+                        <li>✅ Старая система <strong>реально</strong> мешает</li>
+                        <li>✅ Есть план миграции</li>
+                    </ul>
+                </div>
+
+                <p style="margin-top: 1.5rem;">Иначе переписывание — способ отложить проблемы и создать новые.</p>
+
+                <div class="example-block">
+                    <strong>История из практики:</strong>
+                    <p>
+                        Компания решила "переписать CRM с нуля на новом фреймворке". 1.5 года разработки.
+                        Запустили. Пользователи: "А где функция X?" Разработчики: "Мы её не успели".
+                        Итог: вернулись на старую систему.
+                    </p>
+                </div>
+
+                <p style="margin-top: 1.5rem; color: #c77dff; font-size: 1.1rem;">
+                    <strong>Мораль:</strong> Лучше постепенно улучшать старое, чем за раз делать "идеальное" новое.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section" id="with-machine">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content">
+            <div class="section-intro">
+                <h2>Вайбкодинг с машиной</h2>
+                <p>Как я понял это за 2 часа</p>
+            </div>
+
+            <p style="font-size: 1.2rem; line-height: 2; margin-bottom: 2rem;">
+                Я не программист. Я просто экспериментировал с машиной (ChatGPT/Claude) и вот что понял:
+            </p>
+
+            <div class="rule-card rule-core">
+                <h3>1. Машина делает вайбкодинг доступным</h3>
+                <p>Раньше нужно было знать синтаксис, фреймворки, паттерны. Теперь:</p>
+                <ul>
+                    <li>Описал словами, что хочешь</li>
+                    <li>Машина написала код</li>
+                    <li>Проверил — работает или нет</li>
+                    <li>Уточнил, улучшил</li>
+                </ul>
+            </div>
+
+            <div class="rule-card rule-structure">
+                <h3>2. Паттерны видны сразу</h3>
+                <p>Когда машина генерит код, видны проблемы:</p>
+                <ul>
+                    <li>Задублировала логику → "ага, нужен один источник правды"</li>
+                    <li>Перезаписала весь файл → "лучше бы патчем"</li>
+                    <li>Смешала фичу и рефакторинг → "вот почему сломалось"</li>
+                </ul>
+            </div>
+
+            <div class="rule-card rule-tooling">
+                <h3>3. Скорость проверки = ключ</h3>
+                <p>Мне машина сгенерила 5 вариантов. Я быстро проверил каждый:</p>
+                <ul>
+                    <li>1 — не работает</li>
+                    <li>2 — работает, но криво</li>
+                    <li>3 — отлично!</li>
+                </ul>
+                <p style="margin-top: 1rem;">
+                    Без <strong>быстрой проверки</strong> я бы не понял, какой вариант рабочий.
+                </p>
+            </div>
+
+            <div class="rule-card rule-workflow">
+                <h3>4. Откат спасает</h3>
+                <p>Машина иногда генерит хрень. Но у меня Git:</p>
+                <pre><code>git checkout -- file.js  # вернул как было</code></pre>
+                <p>Без отката я бы боялся экспериментировать.</p>
+            </div>
+
+            <div class="rule-card rule-core">
+                <h3>5. Маленькие шаги работают лучше</h3>
+
+                <div class="example-block">
+                    <strong>Плохо:</strong> "Сделай мне весь проект сразу"
+                    <ul>
+                        <li>Машина сгенерила 10 файлов</li>
+                        <li>Половина не работает</li>
+                        <li>Не понятно, что чинить</li>
+                    </ul>
+                </div>
+
+                <div class="example-block" style="border-color: #06ffa5;">
+                    <strong style="color: #06ffa5;">Хорошо:</strong> "Добавь кнопку. Теперь сделай, чтобы она отправляла данные. Теперь добавь валидацию."
+                    <ul>
+                        <li>Каждый шаг — рабочий</li>
+                        <li>Если что-то не так — понятно где</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="final-section">
+        <canvas class="section-canvas"></canvas>
+        <div class="section-content" style="max-width: 800px; margin: 0 auto;">
+            <h2 style="font-size: 2.5rem; background: linear-gradient(135deg, #00d4ff 0%, #9d7bff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 2rem;">
+                Главный вывод
+            </h2>
+
+            <p style="font-size: 1.3rem; line-height: 2; margin-bottom: 2rem;">
+                Вайбкодинг — это не "кодить быстро". Это <strong style="color: #64c8ff;">"быстро экспериментировать безопасно"</strong>.
+            </p>
+
+            <div style="background: rgba(100, 200, 255, 0.05); border: 2px solid rgba(100, 200, 255, 0.2); border-radius: 16px; padding: 2rem; margin: 3rem 0;">
+                <p style="font-size: 1.2rem; line-height: 2;">
+                    Эти правила не делают код медленнее. Они делают его <strong style="color: #06ffa5;">предсказуемым</strong>:
+                </p>
+                <ul style="list-style: none; padding: 0; margin-top: 1.5rem; font-size: 1.15rem;">
+                    <li style="margin-bottom: 0.8rem;">✅ Быстро добавить фичу</li>
+                    <li style="margin-bottom: 0.8rem;">✅ Быстро откатить</li>
+                    <li style="margin-bottom: 0.8rem;">✅ Быстро понять, что сломалось</li>
+                </ul>
+            </div>
+
+            <p style="font-size: 1.2rem; line-height: 2; margin-top: 2rem;">
+                Без этих правил "быстро" превращается в "быстро накопить проблемы".
+            </p>
+
+            <div class="final-quote">
+                С этими правилами вайбкодинг — это суперсила.
+            </div>
+
+            <p style="margin-top: 3rem; font-size: 1rem; color: #888; font-style: italic;">
+                Если ты дочитал до сюда — попробуй. Худшее, что может случиться, — откатишь изменения за 30 секунд 😉
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Библия Вайбкодинга</p>
+        <p style="margin-top: 0.5rem; color: #666;">Версия 1.0 | Январь 2026</p>
+        <div class="footer-links" style="margin-top: 1rem;">
+            <a href="https://github.com" target="_blank">GitHub</a>
+            <a href="index.html">ProcessLang</a>
+        </div>
+    </footer>
+
+    <script>
+        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+        class BackgroundEffect {
+            constructor(canvas, type) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.type = type;
+                this.time = 0;
+                this.resize();
+                this.animate();
+            }
+
+            resize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+                this.width = rect.width;
+                this.height = rect.height;
+            }
+
+            animate() {
+                this.time += 0.005;
+                this.ctx.clearRect(0, 0, this.width, this.height);
+
+                switch(this.type) {
+                    case 'hero': this.drawHero(); break;
+                    case 'flow': this.drawFlow(); break;
+                    case 'network': this.drawNetwork(); break;
+                    case 'dissolve': this.drawDissolve(); break;
+                }
+
+                requestAnimationFrame(() => this.animate());
+            }
+
+            drawHero() {
+                // Flowing waves with multiple colors
+                const colors = [
+                    'rgba(0, 212, 255, 0.3)',
+                    'rgba(6, 255, 165, 0.3)',
+                    'rgba(157, 123, 255, 0.3)'
+                ];
+
+                colors.forEach((color, idx) => {
+                    this.ctx.strokeStyle = color;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    for (let x = 0; x < this.width; x += 5) {
+                        const y = this.height/2 +
+                            Math.sin((x + this.time * 80 + idx * 100) * 0.01) * 50 +
+                            Math.sin((x + this.time * 50) * 0.02) * 30;
+                        this.ctx.lineTo(x, y);
+                    }
+                    this.ctx.stroke();
+                });
+            }
+
+            drawFlow() {
+                this.ctx.strokeStyle = 'rgba(100, 200, 255, 0.3)';
+                this.ctx.lineWidth = 2;
+
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.beginPath();
+                    for (let x = 0; x < this.width; x += 5) {
+                        const y = this.height/2 +
+                            Math.sin((x + this.time * 60 + i * 80) * 0.015) * 40;
+                        this.ctx.lineTo(x, y);
+                    }
+                    this.ctx.stroke();
+                }
+            }
+
+            drawNetwork() {
+                const nodes = 12;
+                const positions = [];
+
+                for (let i = 0; i < nodes; i++) {
+                    positions.push({
+                        x: (Math.sin(this.time * 1.2 + i * 0.8) + 1) * this.width/2,
+                        y: (Math.cos(this.time * 0.9 + i * 0.8) + 1) * this.height/2
+                    });
+                }
+
+                this.ctx.strokeStyle = 'rgba(6, 255, 165, 0.25)';
+                this.ctx.lineWidth = 1;
+
+                positions.forEach((p, i) => {
+                    for (let j = i + 1; j < positions.length; j++) {
+                        const dist = Math.hypot(positions[j].x - p.x, positions[j].y - p.y);
+                        if (dist < 200) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p.x, p.y);
+                            this.ctx.lineTo(positions[j].x, positions[j].y);
+                            this.ctx.globalAlpha = 0.4 * (1 - dist / 200);
+                            this.ctx.stroke();
+                            this.ctx.globalAlpha = 1;
+                        }
+                    }
+
+                    this.ctx.fillStyle = 'rgba(6, 255, 165, 0.5)';
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+            }
+
+            drawDissolve() {
+                this.ctx.fillStyle = 'rgba(199, 125, 255, 0.4)';
+                for (let i = 0; i < 40; i++) {
+                    const x = (Math.sin(this.time * 0.8 + i * 0.5) + 1) * this.width/2;
+                    const y = (Math.cos(this.time * 0.6 + i * 0.5) + 1) * this.height/2;
+                    const size = Math.abs(Math.sin(this.time + i)) * 8;
+                    const alpha = Math.abs(Math.sin(this.time * 1.5 + i)) * 0.6;
+                    this.ctx.globalAlpha = alpha;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                this.ctx.globalAlpha = 1;
+            }
+        }
+
+        // Initialize hero canvas
+        const heroCanvas = document.getElementById('heroCanvas');
+        new BackgroundEffect(heroCanvas, 'hero');
+
+        // Initialize section canvases
+        const sectionCanvases = document.querySelectorAll('.section-canvas');
+        const effects = [];
+        const types = ['flow', 'network', 'flow', 'dissolve', 'network', 'flow', 'dissolve', 'network'];
+
+        sectionCanvases.forEach((canvas, idx) => {
+            const type = types[idx % types.length];
+            effects.push(new BackgroundEffect(canvas, type));
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            effects.forEach(effect => effect.resize());
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
