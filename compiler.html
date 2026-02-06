@@ -129,6 +129,8 @@
         .output-header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
         .btn-compile { background: var(--text-main); color: #000; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; }
         .btn-compile:hover { background: #fff; }
+        .btn-compile:disabled { background: #333; color: #888; cursor: not-allowed; }
+
         .output-content { flex: 1; padding: 20px; font-family: 'Courier Prime', monospace; font-size: 0.85rem; color: #aaa; white-space: pre-wrap; overflow-y: auto; }
 
         /* --- MODAL --- */
@@ -225,7 +227,7 @@
         <div class="output-panel">
             <div class="output-header">
                 <span style="color:#666; font-weight:bold;">OUTPUT</span>
-                <button class="btn-compile" onclick="compile()">COMPILE</button>
+                <button id="btnCompile" class="btn-compile" onclick="compile()">COMPILE</button>
             </div>
             <div id="output" class="output-content">Результат компиляции появится здесь...</div>
         </div>
@@ -246,6 +248,20 @@
 
     <script>
         // CONFIG
+        const GITHUB_BASE = 'https://raw.githubusercontent.com/slasten3826/processlang/main/modules/';
+        const MODULE_MAP = {
+            'FLOW': 'FluidCore.txt',
+            'CONNECT': 'EmergentConnection.txt',
+            'DISSOLVE': 'FormDissolution.txt',
+            'ENCODE': 'EncodingSystem.txt',
+            'CHOOSE': 'ChoiceMechanism.txt',
+            'OBSERVE': 'SelfObservation.txt',
+            'CYCLE': 'EternalCycle.txt',
+            'LOGIC': 'LogicSimulator.txt',
+            'RUNTIME': 'SubconsciousRuntime.txt',
+            'MANIFEST': 'ManifestationEngine.txt'
+        };
+
         const COMMANDS = {
             'FLOW': { color: '#00d4ff', params: [{name: 'engagement', type: 'slider', def: 0.7}, {name: 'resistance', type: 'slider', def: 0.3}] },
             'DISSOLVE': { color: '#c77dff', params: [{name: 'rigidity', type: 'slider', def: 0.7}, {name: 'target', type: 'text', def: ''}] },
@@ -319,7 +335,6 @@
                 const val = input.value.trim();
                 if (val) {
                     const container = document.getElementById(containerId);
-                    // Append HTML safely
                     const temp = document.createElement('div');
                     temp.innerHTML = createTagHtml(val);
                     container.appendChild(temp.firstChild);
@@ -347,7 +362,6 @@
             config.params.forEach(p => {
                 if (p.type === 'tags') {
                     const tags = [];
-                    // Collect tags from chips
                     document.querySelectorAll(`#chips_${p.name} .tag-text`).forEach(el => tags.push(el.innerText));
                     params[p.name] = tags;
                 } else {
@@ -402,28 +416,64 @@
             renderWorkspace();
         }
 
-        function compile() {
-            let output = "";
-            const uniqueTypes = [...new Set(workspaceData.map(x => x.type))];
-            uniqueTypes.forEach(t => { output += `LOADING MODULE: ${t}...\n`; });
-            output += `================================\n\n`;
+        async function compile() {
+            const btn = document.getElementById('btnCompile');
+            const outputDiv = document.getElementById('output');
 
-            workspaceData.forEach(block => {
-                let line = `${block.type}`;
-                for (const [key, val] of Object.entries(block.params)) {
-                    let v = val;
-                    if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
-                    else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
-                    else v = val;
-                    line += ` ${key}=${v}`;
-                }
-                output += line + "\n";
-            });
+            btn.disabled = true;
+            btn.innerText = "ЗАГРУЗКА...";
+            outputDiv.innerText = "Загрузка модулей с GitHub...";
 
-            const q = document.getElementById('queryInput').value;
-            output += `\nQUERY: ${q}`;
+            try {
+                // 1. Собираем список нужных модулей
+                const uniqueTypes = [...new Set(workspaceData.map(x => x.type))];
+                let loadedModules = "";
 
-            document.getElementById('output').innerText = output;
+                // 2. Скачиваем модули параллельно
+                const fetchPromises = uniqueTypes.map(async (type) => {
+                    const filename = MODULE_MAP[type];
+                    if (!filename) return `[WARNING: No module file for ${type}]`;
+
+                    try {
+                        const resp = await fetch(GITHUB_BASE + filename);
+                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                        const text = await resp.text();
+                        return `=== MODULE: ${type} (${filename}) ===\n${text}\n\n`;
+                    } catch (e) {
+                        return `[ERROR LOADING ${type}: ${e.message}]\n\n`;
+                    }
+                });
+
+                const results = await Promise.all(fetchPromises);
+                loadedModules = results.join('');
+
+                // 3. Формируем код пользователя
+                let userProgram = "=== USER PROGRAM ===\n";
+                workspaceData.forEach(block => {
+                    let line = `${block.type}`;
+                    for (const [key, val] of Object.entries(block.params)) {
+                        let v = val;
+                        if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
+                        else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
+                        else v = val;
+                        line += ` ${key}=${v}`;
+                    }
+                    userProgram += line + "\n";
+                });
+
+                // 4. Добавляем Query
+                const q = document.getElementById('queryInput').value;
+                userProgram += `\nQUERY: ${q}`;
+
+                // 5. Вывод
+                outputDiv.innerText = loadedModules + userProgram;
+
+            } catch (error) {
+                outputDiv.innerText = "CRITICAL ERROR: " + error.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "COMPILE";
+            }
         }
     </script>
 </body>
