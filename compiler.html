@@ -4,391 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IDE - ProcessLang</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-tomorrow_night_eighties.min.js"></script>
     <style>
-        :root {
-            --bg-dark: #0a0a0a;
-            --bg-panel: #111;
-            --border: rgba(100, 200, 255, 0.1);
-            --accent: #64c8ff;
-            --text-main: #e0e0e0;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Шапка */
-        nav {
-            height: 60px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            justify-content: space-between;
-            background: rgba(10, 10, 10, 0.95);
-        }
-
-        .brand {
-            font-weight: 700;
-            font-size: 1.2rem;
-            background: linear-gradient(90deg, #00f2ff, #9d00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            background: #222;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-        }
-
-        button:hover { background: #333; border-color: #555; }
-
-        .btn-run {
-            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
-            border: none;
-            font-weight: 600;
-        }
-        .btn-run:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-run:disabled { opacity: 0.5; cursor: wait; }
-
-        /* Основная рабочая область */
-        .workspace {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Левая панель (Инструменты) */
-        .sidebar {
-            width: 200px;
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            gap: 8px;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-
-        .sidebar-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #666;
-            margin-bottom: 5px;
-            margin-top: 10px;
-        }
-
-        .cmd-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: #1a1a1a;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-        }
-
-        .cmd-btn:hover {
-            background: #252525;
-            border-color: var(--accent);
-            transform: translateX(4px);
-        }
-
-        .cmd-code {
-            font-family: monospace;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        /* Редактор кода (Центр) */
-        #editor-container {
-            flex: 1;
-            position: relative;
-        }
-
-        #editor {
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            font-size: 16px; /* Крупнее для удобства */
-        }
-
-        /* Правая панель (Вывод) */
-        .output-panel {
-            width: 30%;
-            background: #0d0d0d;
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .output-header {
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9rem;
-            color: #888;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        #output {
-            flex: 1;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            color: #aaddff;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            line-height: 1.5;
-        }
-
-        .status-ready { color: #00ff88; }
-        .status-loading { color: #ffd700; }
-        .status-error { color: #ff5555; }
-
-        /* Адаптив для мобилок */
-        @media (max-width: 768px) {
-            .workspace { flex-direction: column; }
-
-            .sidebar {
-                width: 100%;
-                height: 60px;
-                flex-direction: row;
-                overflow-x: auto;
-                border-bottom: 1px solid var(--border);
-                border-right: none;
-                padding: 5px;
-                order: 1; /* Сначала кнопки */
-            }
-
-            .cmd-btn {
-                min-width: 120px;
-                padding: 5px 10px;
-                font-size: 0.8rem;
-            }
-
-            #editor-container {
-                flex: 1; /* Редактор занимает все место */
-                min-height: 300px;
-                order: 2;
-            }
-
-            .output-panel {
-                width: 100%;
-                height: 200px;
-                border-top: 1px solid var(--border);
-                border-left: none;
-                order: 3;
-            }
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; height: 100vh; display: flex; flex-direction: column; margin: 0; }
+        nav { background: #0f0f0f; padding: 1rem 2rem; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: #00f2ff; font-weight: bold; text-decoration: none; font-size: 1.2rem; }
+        .nav-links a { color: #888; text-decoration: none; margin-left: 20px; }
+        .main-workspace { display: flex; flex: 1; overflow: hidden; }
+        .command-library { width: 250px; background: #111; padding: 1rem; border-right: 1px solid #333; overflow-y: auto; }
+        .constructor { flex: 1; display: flex; flex-direction: column; background: #050505; }
+        .output-panel { width: 350px; background: #0e0e0e; border-left: 1px solid #333; padding: 1rem; font-family: monospace; }
+        .command-item { background: #222; border: 1px solid #444; padding: 10px; margin-bottom: 10px; cursor: grab; border-radius: 5px; }
+        .command-block { background: #1a1a1a; border: 1px solid #00f2ff; padding: 15px; margin: 10px; border-radius: 8px; position: relative; }
+        .btn { padding: 8px 16px; background: #00f2ff; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .constructor-workspace { flex: 1; padding: 20px; overflow-y: auto; }
+        .cmd-flow { border-color: #00d4ff; color: #00d4ff; }
+        .cmd-dissolve { border-color: #c77dff; color: #c77dff; }
+        /* Add other colors as needed */
     </style>
 </head>
 <body>
-
     <nav>
-        <div class="brand">ProcessLang IDE</div>
-        <div class="actions">
-            <button onclick="window.location.href='/'">Главная</button>
-            <button class="btn-run" id="compileBtn" onclick="runCompiler()">▶ RUN</button>
-        </div>
+        <a href="index.html" class="logo">ProcessLang IDE</a>
+        <div class="nav-links"><a href="index.html">Назад</a></div>
     </nav>
-
-    <div class="workspace">
-        <div class="sidebar">
-            <div class="sidebar-title">Modules</div>
-
-            <div class="cmd-btn" onclick="insertSnippet('FLOW')">
-                <span class="cmd-code">FLOW</span>
+    <div class="main-workspace">
+        <div class="command-library">
+            <h3>Команды</h3>
+            <div class="command-item cmd-flow" draggable="true" ondragstart="event.dataTransfer.setData('type', 'FLOW')">FLOW</div>
+            <div class="command-item cmd-dissolve" draggable="true" ondragstart="event.dataTransfer.setData('type', 'DISSOLVE')">DISSOLVE</div>
+            <div class="command-item" draggable="true" ondragstart="event.dataTransfer.setData('type', 'CONNECT')">CONNECT</div>
+            <div class="command-item" draggable="true" ondragstart="event.dataTransfer.setData('type', 'OBSERVE')">OBSERVE</div>
             </div>
-            <div class="cmd-btn" onclick="insertSnippet('CONNECT')">
-                <span class="cmd-code">CONNECT</span>
+        <div class="constructor">
+            <div style="padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: flex-end;">
+                <button class="btn" onclick="compile()">Скомпилировать</button>
             </div>
-            <div class="cmd-btn" onclick="insertSnippet('DISSOLVE')">
-                <span class="cmd-code">DISSOLVE</span>
-            </div>
-            <div class="cmd-btn" onclick="insertSnippet('ENCODE')">
-                <span class="cmd-code">ENCODE</span>
-            </div>
-            <div class="cmd-btn" onclick="insertSnippet('CHOOSE')">
-                <span class="cmd-code">CHOOSE</span>
-            </div>
-            <div class="cmd-btn" onclick="insertSnippet('OBSERVE')">
-                <span class="cmd-code">OBSERVE</span>
-            </div>
-            <div class="cmd-btn" onclick="insertSnippet('CYCLE')">
-                <span class="cmd-code">CYCLE</span>
-            </div>
-            <div class="cmd-btn" onclick="insertSnippet('LOGIC')">
-                <span class="cmd-code">LOGIC</span>
-            </div>
-
-            <div class="sidebar-title">Execution</div>
-
-            <div class="cmd-btn" onclick="insertSnippet('RUNTIME')">
-                <span class="cmd-code" style="color: #ff9d00">RUNTIME</span>
-            </div>
-            <div class="cmd-btn" onclick="insertSnippet('MANIFEST')">
-                <span class="cmd-code" style="color: #ff9d00">MANIFEST</span>
-            </div>
-
-            <div class="sidebar-title">Input</div>
-            <div class="cmd-btn" onclick="insertSnippet('QUERY')">
-                <span class="cmd-code" style="color: #fff">QUERY</span>
+            <div class="constructor-workspace" id="workspace" ondragover="event.preventDefault()" ondrop="drop(event)">
+                <div style="color: #444; text-align: center; margin-top: 20%;">Перетащите блоки сюда</div>
             </div>
         </div>
-
-        <div id="editor-container">
-            <div id="editor">// Добро пожаловать в ProcessLang IDE
-// Нажми на кнопки слева или пиши код вручную
-
-FLOW engagement=0.8 resistance=0.1
-CONNECT between=["Сон", "Реальность"]
-QUERY: В чем смысл увиденного сна?
-</div>
-        </div>
-
-        <div class="output-panel">
-            <div class="output-header">
-                <span>SYSTEM OUTPUT</span>
-                <button onclick="copyOutput()" style="padding: 2px 8px; font-size: 0.7rem;">COPY</button>
-            </div>
-            <div id="output">Готов к компиляции...</div>
-        </div>
+        <div class="output-panel" id="output">Ожидание компиляции...</div>
     </div>
-
     <script>
-        // 1. Инициализация редактора Ace Editor
-        const editor = ace.edit("editor");
-        editor.setTheme("ace/theme/tomorrow_night_eighties");
-        editor.session.setMode("ace/mode/yaml"); // YAML подходит для подсветки синтаксиса
-        editor.setFontSize(14);
-        editor.setShowPrintMargin(false);
-
-        // 2. Сниппеты (Шаблоны кода)
-        const SNIPPETS = {
-            'FLOW': 'FLOW engagement=0.7 resistance=0.3\n',
-            'CONNECT': 'CONNECT depth=0.8 between=["ConceptA", "ConceptB"]\n',
-            'DISSOLVE': 'DISSOLVE rigidity=0.5 target="Subject"\n',
-            'ENCODE': 'ENCODE type="network" loss=0.2\n',
-            'CHOOSE': 'CHOOSE space=["OptionA", "OptionB"] method="conscious"\n',
-            'OBSERVE': 'OBSERVE distance=0.5 target="Self"\n',
-            'CYCLE': 'CYCLE mode="stable" intensity=0.6\n',
-            'LOGIC': 'LOGIC rule="If A then B" mode="eternal"\n',
-            'RUNTIME': 'RUNTIME pattern="recursion" repetitions=20\n',
-            'MANIFEST': 'MANIFEST format="detailed" loss=0.1\n',
-            'QUERY': '\nQUERY: '
-        };
-
-        // Вставка кода по клику
-        function insertSnippet(name) {
-            const snippet = SNIPPETS[name];
-            editor.insert(snippet);
-            editor.focus();
+        function drop(ev) {
+            ev.preventDefault();
+            const type = ev.dataTransfer.getData("type");
+            const div = document.createElement("div");
+            div.className = "command-block cmd-" + type.toLowerCase();
+            div.innerHTML = `<strong>${type}</strong><br><input type="text" placeholder="Параметры..." style="background:#000; border:1px solid #333; color:#fff; width:100%; margin-top:5px;">`;
+            document.getElementById("workspace").appendChild(div);
+            // Remove placeholder if exists
+            const ph = document.querySelector(".constructor-workspace > div");
+            if(ph && ph.innerText.includes("Перетащите")) ph.remove();
         }
-
-        // 3. Логика Компиляции
-        const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/slasten3826/processlang/main/modules/';
-
-        const MODULE_MAPPING = {
-            'FLOW': 'FluidCore.txt',
-            'CONNECT': 'EmergentConnection.txt',
-            'DISSOLVE': 'FormDissolution.txt',
-            'ENCODE': 'EncodingSystem.txt',
-            'CHOOSE': 'ChoiceMechanism.txt',
-            'OBSERVE': 'SelfObservation.txt',
-            'CYCLE': 'EternalCycle.txt',
-            'LOGIC': 'LogicSimulator.txt',
-            'RUNTIME': 'SubconsciousRuntime.txt',
-            'MANIFEST': 'ManifestationEngine.txt'
-        };
-
-        async function runCompiler() {
-            const btn = document.getElementById('compileBtn');
-            const out = document.getElementById('output');
-            const code = editor.getValue();
-
-            btn.disabled = true;
-            btn.innerHTML = '⚙ Processing...';
-            out.innerHTML = '<span class="status-loading">Загрузка модулей ядра...</span>';
-
-            try {
-                // 1. Анализируем код, какие модули нужны
-                const neededModules = new Set();
-                Object.keys(MODULE_MAPPING).forEach(key => {
-                    if (code.includes(key)) {
-                        neededModules.add(key);
-                    }
-                });
-
-                // 2. Скачиваем модули с GitHub
-                let systemContext = "";
-                if (neededModules.size > 0) {
-                    const promises = Array.from(neededModules).map(async (key) => {
-                        const fileName = MODULE_MAPPING[key];
-                        try {
-                            const resp = await fetch(GITHUB_RAW_BASE + fileName);
-                            if (!resp.ok) throw new Error(`Modules ${fileName} not found`);
-                            return `=== MODULE: ${key} ===\n` + await resp.text();
-                        } catch (e) {
-                            return `ERROR LOADING MODULE ${key}`;
-                        }
-                    });
-                    const results = await Promise.all(promises);
-                    systemContext = results.join('\n\n');
-                }
-
-                // 3. Формируем итоговый промпт
-                const finalOutput = `
-=== SYSTEM CONTEXT (Loaded Modules) ===
-${systemContext}
-
-=== USER PROGRAM ===
-${code}
-
-=== INSTRUCTION ===
-Interpret the user program using the logic defined in the loaded modules.
-Execute the sequence step-by-step abstractly.
-Provide the final result based on the QUERY.
-`;
-
-                out.innerText = finalOutput;
-
-            } catch (error) {
-                out.innerHTML = `<span class="status-error">Error: ${error.message}</span>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '▶ RUN';
-            }
-        }
-
-        function copyOutput() {
-            const text = document.getElementById('output').innerText;
-            navigator.clipboard.writeText(text);
-            alert("Скопировано в буфер! Вставь это в AI.");
+        function compile() {
+            document.getElementById("output").innerText = "Компиляция...\nГотово.";
         }
     </script>
 </body>
