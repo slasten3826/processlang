@@ -1,277 +1,232 @@
+/* style.css */
+
 :root {
-    --bg-dark: #050505;
-    --text-main: #ffffff;
-    --text-dim: #888888;
-    --accent-cyan: #00d4ff;
-    --accent-purple: #9d4edd;
-    --border-light: rgba(255, 255, 255, 0.1);
+    --bg-color: #050505;
+    --text-color: #e0e0e0;
+    --text-dim: #888;
+    --accent-cyan: #00f2ff;
+    --accent-purple: #9d00ff;
+    --accent-pink: #ff0055;
+    --nav-bg: rgba(5, 5, 5, 0.85);
+    --border-color: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/* Навигация */
+/* --- НАВИГАЦИЯ (ИСПРАВЛЕНА) --- */
 nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid var(--border-light);
-    backdrop-filter: blur(10px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(5, 5, 5, 0.8);
-}
-
-.logo {
-    font-weight: 800;
-    font-size: 1.2rem;
-    letter-spacing: -0.5px;
-    color: #64c8ff;
-    text-decoration: none;
-}
-
-.nav-links {
-    display: flex;
-    gap: 2rem;
-}
-
-.nav-links a {
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: color 0.2s;
-}
-
-.nav-links a:hover {
-    color: var(--text-main);
-}
-
-.btn-login {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--border-light);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    color: white;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-login:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: white;
-}
-
-/* Мобильное меню */
-.hamburger {
-    display: none;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .nav-links {
-        display: none;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--bg-dark);
-        padding: 1rem;
-        border-bottom: 1px solid var(--border-light);
-    }
-    .nav-links.active {
-        display: flex;
-    }
-    .hamburger {
-        display: block;
-    }
-}
-
-/* --- СТИЛИ ДЛЯ ГЛАВНОЙ (Hero & Cards) --- */
-
-.hero-section {
-    text-align: center;
-    padding: 6rem 1rem 4rem;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.hero-title {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 800;
-    line-height: 1.1;
-    margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 50%, #ff6b9d 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.hero-subtitle {
-    color: var(--text-dim);
-    font-size: 1.2rem;
-    line-height: 1.6;
-    margin-bottom: 3rem;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-    color: white;
-    padding: 0.8rem 2rem;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 600;
-    border: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(100, 200, 255, 0.2);
-}
-
-.btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border-light);
-    color: var(--text-main);
-    padding: 0.8rem 2rem;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.btn-secondary:hover {
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
-}
-
-/* Сетка карточек */
-.commands-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto 4rem;
-    padding: 0 1rem;
-}
-
-/* Основной стиль карточки */
-.command-card {
-    position: relative; /* Обязательно для позиционирования canvas */
-    min-height: 380px;  /* Увеличили высоту для полного текста */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; /* Текст прижимаем к низу */
-    background: rgba(10, 10, 10, 0.8); /* Чуть темнее фон */
-    border: 1px solid var(--border-light);
-    border-radius: 16px;
-    padding: 2rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
-}
-
-.command-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-    background: rgba(30, 30, 30, 0.8);
-}
-
-/* Цветные полоски сверху карточек */
-.command-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--card-color, #fff);
-    z-index: 2;
-}
-
-/* Цвета для разных команд */
-.cmd-flow { --card-color: #00d4ff; }
-.cmd-connect { --card-color: #06ffa5; }
-.cmd-dissolve { --card-color: #c77dff; }
-.cmd-encode { --card-color: #ffd93d; }
-.cmd-choose { --card-color: #ff6b35; }
-.cmd-observe { --card-color: #e0f2fe; }
-.cmd-cycle { --card-color: #9d4edd; }
-.cmd-logic { --card-color: #7dd3fc; }
-.cmd-runtime { --card-color: #60a5fa; }
-.cmd-manifest { --card-color: #fb923c; }
-
-/* Холст анимации (лежит фоном) */
-.command-canvas {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    z-index: 0; /* На задний план */
-    pointer-events: none;
-    border-radius: 16px;
+    height: 70px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 1000;
 }
 
-/* Контент карточки (поднят над анимацией) */
-.card-header {
-    display: flex;
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 100%;
+    display: flex; /* Магия, которая выстраивает всё в ряд */
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    position: relative;
-    z-index: 1;
 }
 
-.card-title {
-    font-family: 'Courier New', monospace;
+/* Логотип */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    font-weight: 800;
     font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--card-color);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
 }
 
-.card-icon {
-    font-size: 1.5rem;
+/* Меню ссылок */
+.nav-menu {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-/* Описание с фиксом шрифта */
-.card-desc {
-    color: #cccccc; /* Светлый текст */
-    font-size: 0.85rem; /* Размер, чтобы влезло */
-    line-height: 1.5;
-    position: relative;
-    z-index: 1;
-    margin-top: auto;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.9); /* Черная тень для читаемости */
-}
-
-/* Футер */
-footer {
-    text-align: center;
-    padding: 3rem 1rem;
+.nav-menu a {
     color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a:hover, .nav-menu a.active {
+    color: var(--text-color);
+}
+
+/* IDE ссылка */
+.nav-menu a[href="compiler.html"] {
+    position: relative;
+}
+
+.nav-menu a[href="compiler.html"]::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+    opacity: 0.7;
+}
+
+/* Правая часть (Auth + Lang) */
+.auth-section {
+    display: flex;
+    align-items: center;
+}
+
+.lang-switch {
+    margin-left: 20px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.lang-switch:hover {
+    border-color: var(--text-color);
+    color: var(--text-color);
+}
+
+/* Кнопка входа */
+.btn-login {
+    background: transparent;
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 6px 16px;
+    border-radius: 20px;
+    cursor: pointer;
     font-size: 0.9rem;
-    border-top: 1px solid var(--border-light);
-    margin-top: 4rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.btn-login:hover {
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+}
+
+/* Аватарка юзера */
+.user-profile img {
+    transition: transform 0.2s;
+}
+.user-profile img:hover {
+    transform: scale(1.1);
+}
+
+/* Бургер меню (скрыт на десктопе) */
+.menu-toggle {
+    display: none;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+/* --- HERO SECTION --- */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 20px;
+    background: radial-gradient(circle at center, rgba(157, 0, 255, 0.05) 0%, rgba(5, 5, 5, 0) 70%);
+}
+
+.hero h1 {
+    font-size: 4rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #64c8ff, #9d7bff, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: gradientFlow 5s linear infinite;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+/* Анимация градиента */
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- АДАПТИВ (Мобилки) --- */
+@media (max-width: 768px) {
+    .nav-menu {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: black;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .nav-menu.active {
+        transform: translateX(0);
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
 }
