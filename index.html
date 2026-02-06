@@ -2,61 +2,52 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProcessLang | The Refinery</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProcessLang</title>
     <link rel="stylesheet" href="style.css">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#home" class="logo" onclick="route(event)">
-                <span class="logo-gradient">ProcessLang</span>
-            </a>
+    <nav>
+        <a href="#home" class="logo" onclick="route(event)">ProcessLang</a>
 
-            <div class="nav-menu" id="navMenu">
-                <a href="#feed" class="nav-link" data-i18n="nav_feed" onclick="route(event)">Лента</a>
-                <a href="#compiler" class="nav-link" data-i18n="nav_create" onclick="route(event)">Создать</a>
+        <button class="hamburger" onclick="toggleMenu()">
+            <i class="ph ph-list"></i>
+        </button>
 
-                <div id="auth-container" class="auth-box">
-                    <button class="btn-login" onclick="signIn()">
-                        <i class="ph ph-sign-in"></i>
-                        <span data-i18n="btn_login">Войти</span>
-                    </button>
-                </div>
-            </div>
+        <div class="nav-links" id="navMenu">
+            <a href="#feed" onclick="route(event)" data-i18n="nav_feed">Лента</a>
+            <a href="#compiler" onclick="route(event)" data-i18n="nav_create">Создать</a>
 
-            <div class="mobile-controls">
-                <button class="lang-switch" onclick="toggleLanguage()">RU</button>
-                <button class="burger-btn" onclick="toggleMenu()">
-                    <i class="ph ph-list"></i>
-                </button>
-            </div>
+            <div id="auth-container"></div>
+
+            <button class="btn-login lang-switch" onclick="toggleLanguage()" style="min-width: 40px; justify-content: center;">
+                RU
+            </button>
         </div>
     </nav>
 
     <main id="app-view">
-        <div class="loader-container">
-            <div class="spinner"></div>
-            <p>Loading the Void...</p>
+        <div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-dim);">
+            <i class="ph ph-spinner" style="font-size: 2rem; animation: spin 1s linear infinite;"></i>
+            <p style="margin-top: 1rem;" data-i18n="loading">Loading the Void...</p>
         </div>
     </main>
 
-    <div id="modal-overlay" class="hidden">
-        <div class="modal-window">
-            <button class="modal-close" onclick="closeModal()">×</button>
-            <div id="modal-content"></div>
-        </div>
-    </div>
-
     <script src="src/scripts/config.js"></script>
     <script src="src/scripts/i18n.js"></script>
+    <script src="src/scripts/visuals.js"></script>
     <script src="src/scripts/app.js"></script>
-<script src="src/scripts/visuals.js"></script>
+
+    <style>
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
 </body>
 </html>
