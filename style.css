@@ -1,152 +1,110 @@
 :root {
-    /* Цветовая палитра "Void Neon" */
-    --bg-dark: #0a0a0a;
-    --bg-card: #141414;
-    --text-main: #e0e0e0;
+    --bg-dark: #050505;
+    --text-main: #ffffff;
     --text-dim: #888888;
-
-    --accent-cyan: #64c8ff;
-    --accent-purple: #9d7bff;
-    --accent-flow: #00d4ff; /* Цвет потока */
-
+    --accent-cyan: #00d4ff;
+    --accent-purple: #9d4edd;
     --border-light: rgba(255, 255, 255, 0.1);
-    --nav-height: 60px;
 }
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg-dark);
     color: var(--text-main);
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    overflow-x: hidden;
-    min-height: 100vh;
+    line-height: 1.6;
 }
 
-/* --- НАВИГАЦИЯ --- */
-.navbar {
-    height: var(--nav-height);
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-light);
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 1000;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    height: 100%;
+/* Навигация */
+nav {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 0 1rem;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5, 5, 5, 0.8);
 }
 
-.logo-gradient {
+.logo {
     font-weight: 800;
     font-size: 1.2rem;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+    color: #64c8ff;
+    text-decoration: none;
 }
 
-/* Десктопное меню */
-.nav-menu {
+.nav-links {
     display: flex;
     gap: 2rem;
-    align-items: center;
 }
 
-.nav-link {
-    color: var(--text-main);
+.nav-links a {
+    color: var(--text-dim);
     text-decoration: none;
-    font-weight: 500;
+    font-size: 0.95rem;
     transition: color 0.2s;
 }
 
-.nav-link:hover { color: var(--accent-cyan); }
+.nav-links a:hover {
+    color: var(--text-main);
+}
 
-/* Кнопка входа */
 .btn-login {
-    background: var(--bg-card);
-    border: 1px solid var(--accent-purple);
-    color: var(--accent-purple);
-    padding: 0.4rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-light);
+    padding: 0.5rem 1rem;
     border-radius: 20px;
+    color: white;
+    font-size: 0.9rem;
     cursor: pointer;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.3s;
 }
 
 .btn-login:hover {
-    background: var(--accent-purple);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+}
+
+/* Мобильное меню */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
     color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
 }
 
-/* Мобильные элементы (скрыты на ПК) */
-.mobile-controls { display: none; }
-.burger-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-
-/* --- МОБИЛЬНЫЙ АДАПТИВ --- */
 @media (max-width: 768px) {
-    .nav-menu {
-        position: fixed;
-        top: var(--nav-height);
-        left: 0; right: 0;
-        background: var(--bg-dark);
+    .nav-links {
+        display: none;
         flex-direction: column;
-        padding: 2rem;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-dark);
+        padding: 1rem;
         border-bottom: 1px solid var(--border-light);
-        transform: translateY(-150%); /* Спрятано вверх */
-        transition: transform 0.3s ease;
     }
-
-    .nav-menu.active {
-        transform: translateY(0); /* Показать */
+    .nav-links.active {
+        display: flex;
     }
-
-    .mobile-controls { display: flex; gap: 1rem; align-items: center; }
-
-    .lang-switch {
-        background: none; border: 1px solid var(--border-light);
-        color: var(--text-dim); padding: 0.2rem 0.5rem; border-radius: 4px;
+    .hamburger {
+        display: block;
     }
 }
-
-/* --- КОНТЕЙНЕР --- */
-#app-view {
-padding-top: calc(var(--nav-height) + 2rem); /* Отступ сверху */
-min-height: 100vh;
-padding-left: 1rem;
-padding-right: 1rem;
-}
-
-/* --- Loader --- */
-.loader-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-    color: var(--text-dim);
-}
-.spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--bg-card);
-    border-top: 3px solid var(--accent-cyan);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
-}
-@keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* --- СТИЛИ ДЛЯ ГЛАВНОЙ (Hero & Cards) --- */
 
-/* Заголовок */
 .hero-section {
     text-align: center;
     padding: 6rem 1rem 4rem;
@@ -220,13 +178,18 @@ padding-right: 1rem;
     padding: 0 1rem;
 }
 
+/* Основной стиль карточки */
 .command-card {
-    background: rgba(20, 20, 20, 0.6);
+    position: relative; /* Обязательно для позиционирования canvas */
+    min-height: 380px;  /* Увеличили высоту для полного текста */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Текст прижимаем к низу */
+    background: rgba(10, 10, 10, 0.8); /* Чуть темнее фон */
     border: 1px solid var(--border-light);
     border-radius: 16px;
     padding: 2rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
     overflow: hidden;
 }
 
@@ -243,8 +206,10 @@ padding-right: 1rem;
     top: 0; left: 0; right: 0;
     height: 3px;
     background: var(--card-color, #fff);
+    z-index: 2;
 }
 
+/* Цвета для разных команд */
 .cmd-flow { --card-color: #00d4ff; }
 .cmd-connect { --card-color: #06ffa5; }
 .cmd-dissolve { --card-color: #c77dff; }
@@ -256,11 +221,26 @@ padding-right: 1rem;
 .cmd-runtime { --card-color: #60a5fa; }
 .cmd-manifest { --card-color: #fb923c; }
 
+/* Холст анимации (лежит фоном) */
+.command-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* На задний план */
+    pointer-events: none;
+    border-radius: 16px;
+}
+
+/* Контент карточки (поднят над анимацией) */
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
 }
 
 .card-title {
@@ -268,16 +248,22 @@ padding-right: 1rem;
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--card-color);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .card-icon {
     font-size: 1.5rem;
 }
 
+/* Описание с фиксом шрифта */
 .card-desc {
-    color: var(--text-dim);
-    font-size: 0.95rem;
-    line-height: 1.6;
+    color: #cccccc; /* Светлый текст */
+    font-size: 0.85rem; /* Размер, чтобы влезло */
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9); /* Черная тень для читаемости */
 }
 
 /* Футер */
@@ -288,34 +274,4 @@ footer {
     font-size: 0.9rem;
     border-top: 1px solid var(--border-light);
     margin-top: 4rem;
-}
-/* --- ФИКС ДЛЯ КАРТОЧЕК --- */
-
-/* 1. Делаем анимацию фоном */
-.command-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0; /* На задний план */
-    pointer-events: none; /* Чтобы можно было выделять текст сквозь неё */
-    border-radius: 16px; /* Скругляем углы холста вместе с карточкой */
-}
-
-/* 2. Поднимаем текст над анимацией */
-.card-header,
-.card-desc {
-    position: relative;
-    z-index: 1; /* На передний план */
-}
-
-/* 3. Задаем карточкам красивую форму */
-.command-card {
-    position: relative; /* Обязательно для позиционирования canvas */
-    min-height: 320px;  /* Минимальная высота, чтобы анимации было где разгуляться */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; /* Текст прижимаем к низу */
-    background: rgba(10, 10, 10, 0.8); /* Чуть темнее фон, чтобы текст читался */
 }

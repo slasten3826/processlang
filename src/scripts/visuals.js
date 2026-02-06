@@ -18,7 +18,6 @@ class CommandEffect {
     }
 
     resize() {
-        // Проверяем, жив ли еще canvas в DOM
         if (!this.canvas.parentElement) return;
 
         const rect = this.canvas.parentElement.getBoundingClientRect();
@@ -32,8 +31,6 @@ class CommandEffect {
     }
 
     animate() {
-        // ГЛАВНОЕ ИСПРАВЛЕНИЕ:
-        // Если canvas исчез со страницы (мы ушли с главной), останавливаем анимацию
         if (!document.body.contains(this.canvas)) {
             cancelAnimationFrame(this.animationId);
             return;
@@ -47,7 +44,7 @@ class CommandEffect {
             this.ctx.shadowColor = this.color;
         }
 
-        // Рисуем эффект в зависимости от типа
+        // Рисуем эффект
         switch(this.type) {
             case 'flow': this.drawFlow(); break;
             case 'dissolve': this.drawDissolve(); break;
@@ -64,7 +61,6 @@ class CommandEffect {
         this.animationId = requestAnimationFrame(() => this.animate());
     }
 
-    // --- МЕТОДЫ ОТРИСОВКИ (Твой оригинальный код) ---
     drawFlow() {
         this.ctx.strokeStyle = this.color.replace('1)', '0.4)');
         this.ctx.lineWidth = 2;
@@ -80,7 +76,7 @@ class CommandEffect {
 
     drawDissolve() {
         this.ctx.fillStyle = this.color.replace('1)', '0.5)');
-        for (let i = 0; i < 20; i++) { // Уменьшил кол-во частиц для оптимизации
+        for (let i = 0; i < 20; i++) {
             const x = (Math.sin(this.time + i) + 1) * this.width/2;
             const y = (Math.cos(this.time * 0.7 + i) + 1) * this.height/2;
             const size = Math.abs(Math.sin(this.time + i)) * 6;
@@ -124,22 +120,45 @@ class CommandEffect {
     }
 
     drawChoose() {
-        // Упрощенная версия для производительности
-        const gridSize = 40;
-        this.ctx.strokeStyle = this.color.replace('1)', '0.2)');
-        for (let x = 0; x < this.width; x += gridSize) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, this.height);
-            this.ctx.stroke();
-        }
-        // Активный выбор
-        const activeX = (Math.sin(this.time) + 1) * this.width/2;
-        this.ctx.strokeStyle = this.color;
+        // НОВАЯ АНИМАЦИЯ: Молния выбора
+        const cx = this.width / 2;
+        const cy = this.height / 2;
+
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
+
+        // Показываем, как один путь загорается, а другой гаснет
+        const toggle = Math.sin(this.time * 2) > 0;
+
+        // Левый путь
+        this.ctx.strokeStyle = toggle ? this.color : this.color.replace('1)', '0.1)');
+        this.ctx.shadowBlur = toggle ? 15 : 0;
+        this.ctx.shadowColor = this.color;
+
         this.ctx.beginPath();
-        this.ctx.moveTo(activeX, 0);
-        this.ctx.lineTo(activeX, this.height);
+        this.ctx.moveTo(cx, this.height);       // Снизу
+        this.ctx.lineTo(cx, cy);                // До центра
+        this.ctx.lineTo(cx - 40, cy - 60);      // Влево вверх
+        this.ctx.lineTo(cx - 40, 0);            // Вверх
         this.ctx.stroke();
+
+        // Правый путь
+        this.ctx.strokeStyle = !toggle ? this.color : this.color.replace('1)', '0.1)');
+        this.ctx.shadowBlur = !toggle ? 15 : 0;
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(cx, this.height);       // Снизу
+        this.ctx.lineTo(cx, cy);                // До центра
+        this.ctx.lineTo(cx + 40, cy - 60);      // Вправо вверх
+        this.ctx.lineTo(cx + 40, 0);            // Вверх
+        this.ctx.stroke();
+
+        // Центральная искра в точке выбора
+        this.ctx.fillStyle = '#fff';
+        this.ctx.shadowBlur = 20;
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, 3 + Math.random() * 2, 0, Math.PI * 2);
+        this.ctx.fill();
     }
 
     drawEncode() {
@@ -201,7 +220,6 @@ class CommandEffect {
     }
 }
 
-// Экспортируемая функция инициализации
 function initHomeVisuals() {
     const colorMap = {
         'flow': 'rgba(0, 212, 255, 1)',
