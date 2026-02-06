@@ -155,6 +155,41 @@
         .btn-compile:hover { background: #fff; }
         .btn-compile:disabled { background: #333; color: #888; cursor: not-allowed; }
         .output-content { flex: 1; padding: 20px; font-family: 'Courier Prime', monospace; font-size: 0.85rem; color: #aaa; white-space: pre-wrap; overflow-y: auto; }
+        /* Группа кнопок справа */
+.output-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Общий стиль для кнопок в хедере */
+.btn-action {
+    background: var(--text-main);
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;       /* Чтобы иконка и текст ровно стояли */
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-action:hover { background: #fff; }
+.btn-action:disabled { background: #333; color: #888; cursor: not-allowed; }
+
+/* Специфичный стиль для кнопки COPY (темная) */
+.btn-copy {
+    background: #222;
+    color: #ccc;
+    border: 1px solid #333;
+}
+.btn-copy:hover {
+    background: #333;
+    color: #fff;
+    border-color: #555;
+}
 
         /* --- MODAL --- */
         .modal-overlay {
@@ -250,12 +285,14 @@
         </div>
         <div class="output-panel">
             <div class="output-header">
-                <span style="color:#666; font-weight:bold;">OUTPUT</span>
-                <button id="btnCompile" class="btn-compile" onclick="compile()">COMPILE</button>
-            </div>
-            <div id="output" class="output-content">Результат компиляции появится здесь...</div>
-        </div>
+    <span style="color:#666; font-weight:bold;">OUTPUT</span>
+    <div class="output-actions">
+        <button id="btnCopy" class="btn-action btn-copy" onclick="copyOutput()">
+            <i class="ph ph-copy"></i> COPY
+        </button>
+        <button id="btnCompile" class="btn-action" onclick="compile()">COMPILE</button>
     </div>
+</div>
 
     <div id="modal" class="modal-overlay">
         <div class="modal">
@@ -619,6 +656,30 @@
             } catch (error) { outputDiv.innerText = "ERROR: " + error.message; }
             finally { btn.disabled = false; btn.innerText = "COMPILE"; }
         }
+        function copyOutput() {
+    const outputText = document.getElementById('output').innerText;
+    if (!outputText || outputText.includes("Результат компиляции...")) return;
+
+    navigator.clipboard.writeText(outputText).then(() => {
+        const btn = document.getElementById('btnCopy');
+        const originalHtml = btn.innerHTML; // Запоминаем "COPY"
+
+        // Визуальное подтверждение (зеленая галочка)
+        btn.innerHTML = `<i class="ph ph-check"></i> COPIED`;
+        btn.style.borderColor = '#00ff88';
+        btn.style.color = '#00ff88';
+
+        // Возвращаем как было через 2 секунды
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.style.borderColor = '#333';
+            btn.style.color = '#ccc';
+        }, 2000);
+    }).catch(err => {
+        console.error('Ошибка копирования: ', err);
+        alert("Не удалось скопировать (проверьте права доступа в браузере)");
+    });
+}
     </script>
 </body>
 </html>
