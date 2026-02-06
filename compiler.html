@@ -15,7 +15,7 @@
             --text-main: #e0e0e0;
             --text-dim: #888;
 
-            /* Цвета команд (как на главной) */
+            /* Цвета команд */
             --c-flow: #00d4ff;
             --c-dissolve: #c77dff;
             --c-connect: #06ffa5;
@@ -50,37 +50,22 @@
         .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; margin-left: 20px; transition: 0.3s; }
         .nav-link:hover { color: #fff; }
 
-        /* --- MAIN LAYOUT --- */
-        .workspace-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* --- TOOLBAR (Верхняя панель команд) --- */
+        /* --- TOOLBAR --- */
         .toolbar {
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
             background: var(--panel-bg);
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
         }
 
         .cmd-btn {
             background: rgba(255,255,255,0.05);
             border: 1px solid var(--border-color);
             color: var(--text-dim);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Courier Prime', monospace;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: flex; align-items: center; gap: 6px;
-            transition: all 0.2s;
+            padding: 6px 12px; border-radius: 6px;
+            cursor: pointer; font-family: 'Courier Prime', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
         .cmd-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
@@ -96,61 +81,38 @@
         .btn-runtime { color: var(--c-runtime); border-color: rgba(96, 165, 250, 0.3); }
         .btn-manifest { color: var(--c-manifest); border-color: rgba(251, 146, 60, 0.3); }
 
-        /* --- EDITOR AREA (Центр) --- */
-        .editor-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #000;
-            position: relative;
-        }
+        /* --- WORKSPACE --- */
+        .workspace-container { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+        .editor-area { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
 
         .canvas {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            font-family: 'Courier Prime', monospace;
-            font-size: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding-bottom: 150px; /* Место под Query */
+            flex: 1; padding: 30px; overflow-y: auto;
+            font-family: 'Courier Prime', monospace; font-size: 1rem;
+            display: flex; flex-direction: column; gap: 15px;
+            padding-bottom: 150px;
         }
 
-        .empty-state {
-            color: #333; text-align: center; margin-top: 50px;
-            font-family: 'Inter', sans-serif; font-size: 0.9rem;
-        }
+        .empty-state { color: #333; text-align: center; margin-top: 50px; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
 
-        /* Умная Строка */
         .smart-line {
             display: flex; align-items: center; flex-wrap: wrap;
-            padding: 12px 15px;
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid #222;
-            border-left: 3px solid transparent; /* Цвет задается JS */
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-            position: relative;
+            padding: 12px 15px; background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #222; border-left: 3px solid transparent;
+            border-radius: 4px; cursor: pointer; transition: 0.2s;
         }
         .smart-line:hover { background: #1a1a1a; }
         .smart-line .cmd-name { font-weight: 700; margin-right: 10px; }
         .smart-line .params { color: #888; font-size: 0.9em; word-break: break-all; }
-        .smart-line .delete-btn {
-            margin-left: auto; color: #444; padding: 5px;
-            cursor: pointer; opacity: 0; transition: 0.2s;
-        }
+        .smart-line .delete-btn { margin-left: auto; color: #444; padding: 5px; opacity: 0; transition: 0.2s; }
         .smart-line:hover .delete-btn { opacity: 1; }
         .smart-line .delete-btn:hover { color: #ff5555; }
 
-        /* --- QUERY PANEL (Низ) --- */
+        /* --- QUERY --- */
         .query-panel {
             position: absolute; bottom: 0; left: 0; width: 100%;
-            background: var(--panel-bg);
-            border-top: 1px solid var(--border-color);
-            padding: 20px;
-            z-index: 5;
+            background: var(--panel-bg); border-top: 1px solid var(--border-color);
+            padding: 20px; z-index: 5;
         }
         .query-label { color: var(--c-manifest); font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; display: block; }
         .query-input {
@@ -158,30 +120,18 @@
             padding: 12px; border-radius: 6px; font-family: 'Inter', sans-serif;
             resize: none; height: 60px;
         }
-        .query-input:focus { border-color: #555; }
 
-        /* --- OUTPUT PANEL (Справа) --- */
+        /* --- OUTPUT --- */
         .output-panel {
-            width: 350px;
-            background: #080808;
-            border-left: 1px solid var(--border-color);
+            width: 350px; background: #080808; border-left: 1px solid var(--border-color);
             display: flex; flex-direction: column;
         }
-        .output-header {
-            padding: 15px; border-bottom: 1px solid #222;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .btn-compile {
-            background: var(--text-main); color: #000; border: none;
-            padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer;
-        }
+        .output-header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .btn-compile { background: var(--text-main); color: #000; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; }
         .btn-compile:hover { background: #fff; }
-        .output-content {
-            flex: 1; padding: 20px; font-family: 'Courier Prime', monospace;
-            font-size: 0.85rem; color: #aaa; white-space: pre-wrap; overflow-y: auto;
-        }
+        .output-content { flex: 1; padding: 20px; font-family: 'Courier Prime', monospace; font-size: 0.85rem; color: #aaa; white-space: pre-wrap; overflow-y: auto; }
 
-        /* --- MODAL (Окно настроек) --- */
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
@@ -190,7 +140,7 @@
         .modal-overlay.active { display: flex; }
 
         .modal {
-            background: #111; border: 1px solid #333; width: 90%; max-width: 450px;
+            background: #111; border: 1px solid #333; width: 90%; max-width: 500px;
             border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -203,20 +153,33 @@
         input[type="range"] { width: 100%; accent-color: var(--text-main); }
         .range-val { float: right; color: #fff; font-family: monospace; }
 
-        /* Теги */
+        /* Input Text */
+        .input-text { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 4px; }
+
+        /* Теги (Исправленные) */
         .tags-container {
-            border: 1px solid #333; background: #000; padding: 5px; border-radius: 6px;
-            display: flex; flex-wrap: wrap; gap: 5px; min-height: 40px;
+            border: 1px solid #333; background: #000; padding: 8px; border-radius: 6px;
+            display: flex; flex-wrap: wrap; gap: 8px; min-height: 45px; cursor: text;
         }
-        .tag { background: #222; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
-        .tag i { cursor: pointer; color: #666; }
-        .tags-input { background: transparent; border: none; color: #fff; flex: 1; min-width: 100px; padding: 5px; }
+        .tag-chip {
+            background: #222; color: #fff; padding: 4px 10px; border-radius: 20px;
+            font-size: 0.9rem; display: flex; align-items: center; gap: 6px; border: 1px solid #444;
+        }
+        .tag-chip i { cursor: pointer; color: #888; font-size: 0.8rem; }
+        .tag-chip i:hover { color: #ff5555; }
+
+        .tags-input-field {
+            background: transparent; border: none; color: #fff; flex: 1;
+            min-width: 120px; padding: 4px; font-size: 0.95rem;
+        }
 
         /* Радио */
         .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .radio-btn {
-            border: 1px solid #333; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; color: #666;
+            border: 1px solid #333; padding: 8px 14px; border-radius: 4px;
+            cursor: pointer; font-size: 0.9rem; color: #888; transition: 0.2s; background: #050505;
         }
+        .radio-btn:hover { border-color: #555; }
         .radio-btn.active { border-color: #fff; color: #fff; background: #222; }
 
         .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
@@ -252,15 +215,13 @@
     <div class="workspace-container">
         <div class="editor-area">
             <div id="canvas" class="canvas">
-                <div class="empty-state">Добавьте команды сверху...</div>
+                <div class="empty-state">Добавьте команды из меню сверху...</div>
             </div>
-
             <div class="query-panel">
                 <span class="query-label">QUERY</span>
                 <textarea id="queryInput" class="query-input" placeholder="Введите ваш запрос к системе..."></textarea>
             </div>
         </div>
-
         <div class="output-panel">
             <div class="output-header">
                 <span style="color:#666; font-weight:bold;">OUTPUT</span>
@@ -275,8 +236,7 @@
             <div class="modal-header">
                 <div id="modalTitle" class="modal-title">COMMAND</div>
             </div>
-            <div id="modalBody">
-                </div>
+            <div id="modalBody"></div>
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeModal()">Отмена</button>
                 <button class="btn-save" onclick="saveCommand()">OK</button>
@@ -285,24 +245,24 @@
     </div>
 
     <script>
-        // --- КОНФИГУРАЦИЯ КОМАНД ---
+        // CONFIG
         const COMMANDS = {
             'FLOW': { color: '#00d4ff', params: [{name: 'engagement', type: 'slider', def: 0.7}, {name: 'resistance', type: 'slider', def: 0.3}] },
             'DISSOLVE': { color: '#c77dff', params: [{name: 'rigidity', type: 'slider', def: 0.7}, {name: 'target', type: 'text', def: ''}] },
             'CONNECT': { color: '#06ffa5', params: [{name: 'depth', type: 'slider', def: 0.8}, {name: 'between', type: 'tags', def: []}] },
             'OBSERVE': { color: '#e0f2fe', params: [{name: 'distance', type: 'slider', def: 0.5}, {name: 'target', type: 'text', def: ''}] },
-            'CHOOSE': { color: '#ff6b35', params: [{name: 'space', type: 'tags', def: []}, {name: 'method', type: 'select', opts:['conscious','unconscious','forced'], def:'conscious'}] },
-            'ENCODE': { color: '#ffd93d', params: [{name: 'type', type: 'select', opts:['network','hierarchy','narrative'], def:'network'}, {name: 'loss', type: 'slider', def: 0.3}] },
+            'CHOOSE': { color: '#ff6b35', params: [{name: 'space', type: 'tags', def: []}, {name: 'method', type: 'select', opts:['conscious','unconscious','forced', 'random'], def:'conscious'}] },
+            'ENCODE': { color: '#ffd93d', params: [{name: 'type', type: 'select', opts:['network','hierarchy','narrative','sequence','category','spatial'], def:'network'}, {name: 'loss', type: 'slider', def: 0.3}] },
             'CYCLE': { color: '#9d4edd', params: [{name: 'mode', type: 'select', opts:['stable','intense','degrading'], def:'stable'}, {name: 'intensity', type: 'slider', def: 0.7}] },
             'LOGIC': { color: '#7dd3fc', params: [{name: 'rule', type: 'text', def:''}, {name: 'mode', type: 'select', opts:['eternal','limited'], def:'eternal'}] },
             'RUNTIME': { color: '#60a5fa', params: [{name: 'pattern', type: 'text', def:''}, {name: 'repetitions', type: 'number', def:20}] },
-            'MANIFEST': { color: '#fb923c', params: [{name: 'format', type: 'select', opts:['detailed','minimal','flowing'], def:'detailed'}, {name: 'loss', type: 'slider', def: 0.2}] }
+            'MANIFEST': { color: '#fb923c', params: [{name: 'format', type: 'select', opts:['detailed','minimal','flowing', 'structured', 'technical', 'conversational'], def:'detailed'}, {name: 'loss', type: 'slider', def: 0.2}] }
         };
 
         let workspaceData = [];
         let editingId = null;
 
-        // --- МОДАЛЬНОЕ ОКНО ---
+        // --- RENDER MODAL ---
         function openModal(type, id = null) {
             editingId = id;
             const config = COMMANDS[type];
@@ -312,7 +272,6 @@
             document.getElementById('modalTitle').innerText = type;
             document.getElementById('modal').classList.add('active');
 
-            // Генерация формы
             let html = '';
             config.params.forEach(p => {
                 const val = data ? data[p.name] : p.def;
@@ -322,7 +281,9 @@
                     html += `<input type="range" min="0" max="1" step="0.05" value="${val}" id="inp_${p.name}" oninput="this.nextElementSibling.innerText=this.value">
                              <span class="range-val">${val}</span>`;
                 } else if (p.type === 'text') {
-                    html += `<input type="text" value="${val}" id="inp_${p.name}" style="width:100%; background:#000; border:1px solid #333; color:#fff; padding:8px;">`;
+                    html += `<input type="text" value="${val}" id="inp_${p.name}" class="input-text">`;
+                } else if (p.type === 'number') {
+                    html += `<input type="number" value="${val}" id="inp_${p.name}" class="input-text">`;
                 } else if (p.type === 'select') {
                     html += `<div class="radio-group">`;
                     p.opts.forEach(opt => {
@@ -331,20 +292,46 @@
                     });
                     html += `<input type="hidden" id="inp_${p.name}" value="${val}"></div>`;
                 } else if (p.type === 'tags') {
-                    html += `<div class="tags-container" id="tags_${p.name}" onclick="document.getElementById('input_${p.name}').focus()">`;
+                    // NEW TAG SYSTEM
+                    html += `<div class="tags-container" onclick="document.getElementById('input_${p.name}').focus()">`;
+                    html += `<div id="chips_${p.name}" style="display:contents">`;
                     (Array.isArray(val) ? val : []).forEach(t => {
-                        html += `<div class="tag">${t} <i onclick="this.parentElement.remove()">×</i></div>`;
+                        html += createTagHtml(t);
                     });
-                    html += `<input id="input_${p.name}" class="tags-input" onkeydown="handleTag(event, this)"></div>`;
-                } else if (p.type === 'number') {
-                    html += `<input type="number" value="${val}" id="inp_${p.name}" style="background:#000; border:1px solid #333; color:#fff; padding:8px;">`;
+                    html += `</div>`;
+                    html += `<input id="input_${p.name}" class="tags-input-field" onkeydown="handleTag(event, this, 'chips_${p.name}')"></div>`;
                 }
                 html += `</div>`;
             });
 
-            // Храним тип текущей команды
             document.getElementById('modal').dataset.type = type;
             document.getElementById('modalBody').innerHTML = html;
+        }
+
+        // --- TAG SYSTEM HELPERS ---
+        function createTagHtml(text) {
+            return `<div class="tag-chip"><span class="tag-text">${text}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`;
+        }
+
+        function handleTag(e, input, containerId) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const val = input.value.trim();
+                if (val) {
+                    const container = document.getElementById(containerId);
+                    // Append HTML safely
+                    const temp = document.createElement('div');
+                    temp.innerHTML = createTagHtml(val);
+                    container.appendChild(temp.firstChild);
+                    input.value = '';
+                }
+            }
+        }
+
+        function selectRadio(el, name) {
+            el.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(`inp_${name}`).value = el.dataset.val;
         }
 
         function closeModal() {
@@ -360,7 +347,8 @@
             config.params.forEach(p => {
                 if (p.type === 'tags') {
                     const tags = [];
-                    document.querySelectorAll(`#tags_${p.name} .tag`).forEach(el => tags.push(el.innerText.replace(' ×', '')));
+                    // Collect tags from chips
+                    document.querySelectorAll(`#chips_${p.name} .tag-text`).forEach(el => tags.push(el.innerText));
                     params[p.name] = tags;
                 } else {
                     params[p.name] = document.getElementById(`inp_${p.name}`).value;
@@ -376,26 +364,6 @@
 
             renderWorkspace();
             closeModal();
-        }
-
-        // --- ЛОГИКА ИНТЕРФЕЙСА ---
-        function selectRadio(el, name) {
-            el.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById(`inp_${name}`).value = el.dataset.val;
-        }
-
-        function handleTag(e, input) {
-            if (e.key === 'Enter') {
-                const val = input.value.trim();
-                if (val) {
-                    const tag = document.createElement('div');
-                    tag.className = 'tag';
-                    tag.innerHTML = `${val} <i onclick="this.parentElement.remove()">×</i>`;
-                    input.parentElement.insertBefore(tag, input);
-                    input.value = '';
-                }
-            }
         }
 
         function renderWorkspace() {
@@ -436,27 +404,22 @@
 
         function compile() {
             let output = "";
-
-            // 1. Модули (Заглушка)
             const uniqueTypes = [...new Set(workspaceData.map(x => x.type))];
-            uniqueTypes.forEach(t => {
-                output += `LOADING MODULE: ${t}...\n`;
-            });
+            uniqueTypes.forEach(t => { output += `LOADING MODULE: ${t}...\n`; });
             output += `================================\n\n`;
 
-            // 2. Код программы
             workspaceData.forEach(block => {
                 let line = `${block.type}`;
                 for (const [key, val] of Object.entries(block.params)) {
                     let v = val;
                     if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
-                    else if (isNaN(val)) v = `"${val}"`; // Кавычки для текста
+                    else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
+                    else v = val;
                     line += ` ${key}=${v}`;
                 }
                 output += line + "\n";
             });
 
-            // 3. Query
             const q = document.getElementById('queryInput').value;
             output += `\nQUERY: ${q}`;
 
