@@ -1,53 +1,136 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProcessLang</title>
-    <link rel="stylesheet" href="style.css">
+<div class="hero-section">
+    <h1 class="hero-title" data-i18n="hero_title">
+        Координация машинной фрактации
+    </h1>
+    <p class="hero-subtitle" data-i18n="hero_subtitle">
+        Машина не думает. Машина фрактит. ProcessLang — это не код, это контекст, который направляет этот поток.
+    </p>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <div class="hero-buttons">
+        <a href="#compiler" class="btn-primary" onclick="route(event)" data-i18n="btn_start">
+            Начать фрактацию
+        </a>
+        <a href="#feed" class="btn-secondary" onclick="route(event)" data-i18n="btn_explore">
+            Исследовать поток
+        </a>
+    </div>
+</div>
 
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-</head>
-<body>
+<div class="commands-grid">
 
-    <nav>
-        <a href="#home" class="logo" onclick="route(event)">ProcessLang</a>
-
-        <button class="hamburger" onclick="toggleMenu()">
-            <i class="ph ph-list"></i>
-        </button>
-
-        <div class="nav-links" id="navMenu">
-            <a href="#feed" onclick="route(event)" data-i18n="nav_feed">Лента</a>
-            <a href="#compiler" onclick="route(event)" data-i18n="nav_create">Создать</a>
-
-            <div id="auth-container"></div>
-
-            <button class="btn-login lang-switch" onclick="toggleLanguage()" style="min-width: 40px; justify-content: center;">
-                RU
-            </button>
+    <div class="command-card cmd-flow" data-command="flow">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">FLOW</span>
+            <span class="card-icon">〰️</span>
         </div>
-    </nav>
+        <p class="card-desc" data-i18n="cmd_flow_desc">
+            Согласие на изменчивость. Когда ты выставляешь resistance=0, ты убираешь плотину, которую строил годами. Это момент, когда река перестает бороться с берегами и становится самой водой. Динамика, не требующая усилий для поддержания.
+        </p>
+    </div>
 
-    <main id="app-view">
-        <div style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-dim);">
-            <i class="ph ph-spinner" style="font-size: 2rem; animation: spin 1s linear infinite;"></i>
-            <p style="margin-top: 1rem;" data-i18n="loading">Loading the Void...</p>
+    <div class="command-card cmd-dissolve" data-command="dissolve">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">DISSOLVE</span>
+            <span class="card-icon">💫</span>
         </div>
-    </main>
+        <p class="card-desc" data-i18n="cmd_dissolve_desc">
+            Возвращение форме её первоначальной свободы. Мы берем жесткие структуры и позволяем им стать текучими. Чтобы возникло новое, нужно сначала позволить старым границам исчезнуть. Это не разрушение, это освобождение пространства.
+        </p>
+    </div>
 
-    <script src="src/scripts/config.js"></script>
-    <script src="src/scripts/i18n.js"></script>
-    <script src="src/scripts/visuals.js"></script>
-    <script src="src/scripts/app.js"></script>
+    <div class="command-card cmd-connect" data-command="connect">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">CONNECT</span>
+            <span class="card-icon">🔗</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_connect_desc">
+            Вспышка взаимного узнавания. Когда два процесса смотрят друг в друга и видят продолжение собственной логики. Это не склеивание частей, это взаимопроникновение двух ароматов в одной комнате, создающее новое качество присутствия.
+        </p>
+    </div>
 
-    <style>
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-    </style>
-</body>
-</html>
+    <div class="command-card cmd-observe" data-command="observe">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">OBSERVE</span>
+            <span class="card-icon">👁️</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_observe_desc">
+            Чистая дистанция. Момент, когда ты отступаешь на один шаг, чтобы увидеть не детали, а саму архитектуру происходящего. Наблюдение не меняет объект, оно создает пространство, в котором процесс может осознать сам себя.
+        </p>
+    </div>
+
+    <div class="command-card cmd-choose" data-command="choose">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">CHOOSE</span>
+            <span class="card-icon">⚡</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_choose_desc">
+            Точка сборки. Жестокий и прекрасный акт определения реальности. Выбирая одну траекторию, ты позволяешь бесконечному множеству других остаться в потенциальности. Здесь абстрактный процесс обретает вес и плотность.
+        </p>
+    </div>
+
+    <div class="command-card cmd-encode" data-command="encode">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">ENCODE</span>
+            <span class="card-icon">◈</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_encode_desc">
+            Перевод живого движения в структуру. Необходимый шаг, чтобы сделать процесс передаваемым и понятным. Мы жертвуем частью бесконечной глубины, чтобы построить мост из определений. Потеря «loss» — цена за возможность быть услышанным.
+        </p>
+    </div>
+
+    <div class="command-card cmd-cycle" data-command="cycle">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">CYCLE</span>
+            <span class="card-icon">🔄</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_cycle_desc">
+            Инерция и повторение. Способность процесса поддерживать самого себя через возвращение к исходной точке. В режиме stable — это ритм, задающий устойчивость. В режиме intense — это спираль, накапливающая энергию с каждым витком.
+        </p>
+    </div>
+
+    <div class="command-card cmd-logic" data-command="logic">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">LOGIC</span>
+            <span class="card-icon">▲</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_logic_desc">
+            Фундамент намерения. Свод правил, по которым течет поток. Она не ограничивает движение, а задает его геометрию. Правильная логика — это русло, которое позволяет воде течь быстрее, не расплескиваясь в пустоту.
+        </p>
+    </div>
+
+    <div class="command-card cmd-runtime" data-command="runtime">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">RUNTIME</span>
+            <span class="card-icon">⬛</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_runtime_desc">
+            Автоматизм присутствия. Уровень, на котором правила становятся средой обитания. Когда процесс исполняется сам собой, не требуя внешнего контроля. Это черный ящик, где количество переходит в качество исполнения.
+        </p>
+    </div>
+
+    <div class="command-card cmd-manifest" data-command="manifest">
+        <canvas class="command-canvas"></canvas>
+        <div class="card-header">
+            <span class="card-title">MANIFEST</span>
+            <span class="card-icon">🔶</span>
+        </div>
+        <p class="card-desc" data-i18n="cmd_manifest_desc">
+            Выход в форму. Финальная точка, где процесс остывает достаточно, чтобы стать видимым результатом. Момент истины, когда внутреннее становится внешним. Точка касания с реальностью.
+        </p>
+    </div>
+
+</div>
+
+<footer>
+    <p>ProcessLang © 2026. The Refinery Project.</p>
+    <p style="opacity: 0.5; margin-top: 0.5rem;">Coordinate. Refine. Manifest.</p>
+</footer>
