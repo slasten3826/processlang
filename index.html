@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProcessLang | The Refinery</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo" onclick="route(event)">
+                <span class="logo-gradient">ProcessLang</span>
+            </a>
+
+            <div class="nav-menu" id="navMenu">
+                <a href="#feed" class="nav-link" data-i18n="nav_feed" onclick="route(event)">Лента</a>
+                <a href="#compiler" class="nav-link" data-i18n="nav_create" onclick="route(event)">Создать</a>
+
+                <div id="auth-container" class="auth-box">
+                    <button class="btn-login" onclick="signIn()">
+                        <i class="ph ph-sign-in"></i>
+                        <span data-i18n="btn_login">Войти</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mobile-controls">
+                <button class="lang-switch" onclick="toggleLanguage()">RU</button>
+                <button class="burger-btn" onclick="toggleMenu()">
+                    <i class="ph ph-list"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="app-view">
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <p>Loading the Void...</p>
+        </div>
+    </main>
+
+    <div id="modal-overlay" class="hidden">
+        <div class="modal-window">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script src="src/scripts/config.js"></script>
+    <script src="src/scripts/i18n.js"></script>
+    <script src="src/scripts/app.js"></script>
+<script src="src/scripts/visuals.js"></script>
+</body>
+</html>
