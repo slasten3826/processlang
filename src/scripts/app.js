@@ -5,15 +5,9 @@ const client = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
 // 2. Роутер (Переключатель страниц)
 async function route(event) {
-    // ПРОВЕРКА ССЫЛОК:
-    // Если кликнули по ссылке, которая НЕ начинается с # (например, compiler.html),
-    // то разрешаем браузеру перейти по ней нормально.
+    // Если это просто ссылка внутри сайта, блокируем стандартный переход
     if (event && event.target.tagName === 'A') {
-        const href = event.target.getAttribute('href');
-        if (href && !href.startsWith('#')) {
-            return; // Пропускаем, пусть переходит
-        }
-        event.preventDefault(); // Остальные (внутренние) ссылки перехватываем
+        event.preventDefault();
     }
 
     let hash = window.location.hash;
@@ -35,7 +29,7 @@ async function route(event) {
 
         updateTranslations();
 
-        // Специфичные скрипты для главной страницы
+        // Специфичные скрипты для страниц
         if (page === 'home') {
             setTimeout(() => {
                 if (typeof initHomeVisuals === 'function') initHomeVisuals();
@@ -74,11 +68,18 @@ async function signIn() {
     if (error) console.error("Ошибка входа:", error);
 }
 
-// --- ФУНКЦИЯ ВЫХОДА (Глобальная) ---
+// --- ФУНКЦИЯ ВЫХОДА (Исправленная) ---
+// Делаем её доступной глобально
 window.signOut = async function() {
     console.log("Выходим...");
+
+    // 1. Выходим из Supabase
     await client.auth.signOut();
+
+    // 2. Чистим локальное хранилище на всякий случай
     localStorage.clear();
+
+    // 3. Жесткая перезагрузка страницы
     window.location.href = '/';
 }
 
@@ -95,6 +96,7 @@ function renderAuthUI(user) {
         const avatar = user.user_metadata.avatar_url || 'https://via.placeholder.com/32';
         const name = user.user_metadata.full_name || user.email;
 
+        // ВАЖНО: Кнопка выхода теперь вызывает signOut() напрямую
         authContainer.innerHTML = `
         <div class="user-profile" style="position: relative; display: flex; align-items: center; gap: 10px;">
         <img src="${avatar}"
@@ -104,6 +106,7 @@ function renderAuthUI(user) {
 
         <div id="profile-dropdown" style="display: none; position: absolute; top: 50px; right: 0; background: #111; border: 1px solid #333; padding: 10px; border-radius: 8px; width: 150px; flex-direction: column; gap: 5px; z-index: 1000;">
         <div style="font-size: 0.8rem; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px;">${name}</div>
+
         <a href="#" onclick="event.preventDefault(); signOut()" style="color: #ff6b6b; text-decoration: none; cursor: pointer;">Выйти</a>
         </div>
         </div>
