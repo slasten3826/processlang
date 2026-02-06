@@ -5,19 +5,20 @@ const client = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
 // 2. Роутер (Переключатель страниц)
 async function route(event) {
-    if (event) event.preventDefault();
+    // Если это просто ссылка внутри сайта, блокируем стандартный переход
+    if (event && event.target.tagName === 'A') {
+        event.preventDefault();
+    }
 
     let hash = window.location.hash;
     if (!hash || hash === '') hash = '#home';
 
+    // Убираем #, чтобы получить имя страницы
     const page = hash.replace('#', '');
     const app = document.getElementById('app-view');
 
-    // --- ИСПРАВЛЕНИЕ: Ловим выход здесь ---
-    if (page === 'logout') {
-        await signOut();
-        return;
-    }
+    // Если это logout, роутер тут не нужен, его обработает функция signOut
+    if (page === 'logout') return;
 
     try {
         const response = await fetch(`src/pages/${page}.html`);
@@ -36,7 +37,6 @@ async function route(event) {
         }
     } catch (error) {
         console.error("Router error:", error);
-        // Если страницы нет, кидаем на главную (или можно сделать 404)
         if (page !== 'home') {
             window.location.hash = '#home';
             route();
@@ -58,46 +58,45 @@ function updateTranslations() {
 
 // 4. Логика Авторизации (Auth)
 
-// Функция входа через GitHub
 async function signIn() {
     const { data, error } = await client.auth.signInWithOAuth({
         provider: 'github',
         options: {
-            redirectTo: 'https://processlang.org' // Куда вернуться после GitHub
+            redirectTo: 'https://processlang.org'
         }
     });
     if (error) console.error("Ошибка входа:", error);
 }
 
-// --- ИСПРАВЛЕНИЕ: Ядерная функция выхода (Глобальная) ---
-async function signOut() {
-    // 1. Сообщаем Supabase, что мы выходим
+// --- ФУНКЦИЯ ВЫХОДА (Исправленная) ---
+// Делаем её доступной глобально
+window.signOut = async function() {
+    console.log("Выходим...");
+
+    // 1. Выходим из Supabase
     await client.auth.signOut();
 
-    // 2. Убираем хеш #logout из адресной строки
-    history.replaceState(null, null, ' ');
+    // 2. Чистим локальное хранилище на всякий случай
+    localStorage.clear();
 
-    // 3. Принудительная перезагрузка страницы (Hard Reload)
+    // 3. Жесткая перезагрузка страницы
     window.location.href = '/';
 }
 
-// Проверка текущего юзера и отрисовка шапки
 async function checkUser() {
-    // Получаем текущую сессию
     const { data: { session } } = await client.auth.getSession();
     renderAuthUI(session?.user);
 }
 
-// Отрисовка кнопки или аватарки
 function renderAuthUI(user) {
     const authContainer = document.getElementById('auth-container');
     if (!authContainer) return;
 
     if (user) {
-        // Если вошел — показываем Аватарку
         const avatar = user.user_metadata.avatar_url || 'https://via.placeholder.com/32';
         const name = user.user_metadata.full_name || user.email;
 
+        // ВАЖНО: Кнопка выхода теперь вызывает signOut() напрямую
         authContainer.innerHTML = `
         <div class="user-profile" style="position: relative; display: flex; align-items: center; gap: 10px;">
         <img src="${avatar}"
@@ -107,12 +106,12 @@ function renderAuthUI(user) {
 
         <div id="profile-dropdown" style="display: none; position: absolute; top: 50px; right: 0; background: #111; border: 1px solid #333; padding: 10px; border-radius: 8px; width: 150px; flex-direction: column; gap: 5px; z-index: 1000;">
         <div style="font-size: 0.8rem; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px;">${name}</div>
-        <a href="#logout" onclick="route(event)" style="color: #ff6b6b; text-decoration: none; cursor: pointer;">Выйти</a>
+
+        <a href="#" onclick="event.preventDefault(); signOut()" style="color: #ff6b6b; text-decoration: none; cursor: pointer;">Выйти</a>
         </div>
         </div>
         `;
     } else {
-        // Если нет — показываем кнопку Войти
         authContainer.innerHTML = `
         <button class="btn-login" onclick="signIn()">
         <i class="ph ph-sign-in"></i>
@@ -123,7 +122,6 @@ function renderAuthUI(user) {
     }
 }
 
-// Открывашка меню профиля
 function toggleProfileMenu() {
     const menu = document.getElementById('profile-dropdown');
     if (menu) {
@@ -131,24 +129,20 @@ function toggleProfileMenu() {
     }
 }
 
-// Слушатель изменений авторизации (магия Supabase)
 client.auth.onAuthStateChange((event, session) => {
-    // Если просто обновилась сессия - перерисовываем
     if (event !== 'SIGNED_OUT') {
         renderAuthUI(session?.user);
     }
 });
 
-// Мобильное меню
 function toggleMenu() {
     const menu = document.getElementById('navMenu');
     if (menu) menu.classList.toggle('active');
 }
 
-// Глобальные слушатели
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', () => {
     updateTranslations();
-    checkUser(); // Проверяем юзера при загрузке
+    checkUser();
     route();
 });
