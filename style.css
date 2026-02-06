@@ -289,3 +289,33 @@ footer {
     border-top: 1px solid var(--border-light);
     margin-top: 4rem;
 }
+/* --- ФИКС ДЛЯ КАРТОЧЕК --- */
+
+/* 1. Делаем анимацию фоном */
+.command-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* На задний план */
+    pointer-events: none; /* Чтобы можно было выделять текст сквозь неё */
+    border-radius: 16px; /* Скругляем углы холста вместе с карточкой */
+}
+
+/* 2. Поднимаем текст над анимацией */
+.card-header,
+.card-desc {
+    position: relative;
+    z-index: 1; /* На передний план */
+}
+
+/* 3. Задаем карточкам красивую форму */
+.command-card {
+    position: relative; /* Обязательно для позиционирования canvas */
+    min-height: 320px;  /* Минимальная высота, чтобы анимации было где разгуляться */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Текст прижимаем к низу */
+    background: rgba(10, 10, 10, 0.8); /* Чуть темнее фон, чтобы текст читался */
+}
