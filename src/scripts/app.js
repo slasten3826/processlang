@@ -13,10 +13,9 @@ async function route(event) {
     const page = hash.replace('#', '');
     const app = document.getElementById('app-view');
 
-    // Если пытаемся выйти (logout), делаем это и уходим на главную
+    // --- ИСПРАВЛЕНИЕ: Ловим выход здесь ---
     if (page === 'logout') {
         await signOut();
-        window.location.hash = '#home';
         return;
     }
 
@@ -70,11 +69,16 @@ async function signIn() {
     if (error) console.error("Ошибка входа:", error);
 }
 
-// Функция выхода
+// --- ИСПРАВЛЕНИЕ: Ядерная функция выхода (Глобальная) ---
 async function signOut() {
-    const { error } = await client.auth.signOut();
-    if (error) console.error("Ошибка выхода:", error);
-    checkUser(); // Обновляем шапку
+    // 1. Сообщаем Supabase, что мы выходим
+    await client.auth.signOut();
+
+    // 2. Убираем хеш #logout из адресной строки
+    history.replaceState(null, null, ' ');
+
+    // 3. Принудительная перезагрузка страницы (Hard Reload)
+    window.location.href = '/';
 }
 
 // Проверка текущего юзера и отрисовка шапки
@@ -101,7 +105,7 @@ function renderAuthUI(user) {
         style="width:36px; height:36px; border-radius:50%; border:2px solid var(--accent-cyan); cursor: pointer;"
         title="${name}">
 
-        <div id="profile-dropdown" style="display: none; position: absolute; top: 50px; right: 0; background: #111; border: 1px solid #333; padding: 10px; border-radius: 8px; width: 150px; flex-direction: column; gap: 5px;">
+        <div id="profile-dropdown" style="display: none; position: absolute; top: 50px; right: 0; background: #111; border: 1px solid #333; padding: 10px; border-radius: 8px; width: 150px; flex-direction: column; gap: 5px; z-index: 1000;">
         <div style="font-size: 0.8rem; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px;">${name}</div>
         <a href="#logout" onclick="route(event)" style="color: #ff6b6b; text-decoration: none; cursor: pointer;">Выйти</a>
         </div>
@@ -115,7 +119,7 @@ function renderAuthUI(user) {
         <span data-i18n="btn_login">${t('btn_login')}</span>
         </button>
         `;
-        updateTranslations(); // Чтобы перевелось "Войти"
+        updateTranslations();
     }
 }
 
@@ -128,9 +132,11 @@ function toggleProfileMenu() {
 }
 
 // Слушатель изменений авторизации (магия Supabase)
-// Срабатывает сам, когда юзер входит или выходит
 client.auth.onAuthStateChange((event, session) => {
-    renderAuthUI(session?.user);
+    // Если просто обновилась сессия - перерисовываем
+    if (event !== 'SIGNED_OUT') {
+        renderAuthUI(session?.user);
+    }
 });
 
 // Мобильное меню
