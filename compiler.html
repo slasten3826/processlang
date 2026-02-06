@@ -26,6 +26,7 @@
             --c-logic: #7dd3fc;
             --c-runtime: #60a5fa;
             --c-manifest: #fb923c;
+            --c-comment: #444; /* Цвет для комментариев */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
@@ -37,7 +38,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* На ПК скролла нет */
+            overflow: hidden;
         }
 
         /* --- NAV --- */
@@ -51,7 +52,6 @@
         .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
         .nav-link:hover { color: #fff; }
 
-        /* Переключатель режимов */
         .mode-switch {
             background: #222; border: 1px solid #333; border-radius: 4px;
             display: flex; overflow: hidden;
@@ -70,7 +70,7 @@
             flex-shrink: 0;
             transition: max-height 0.3s, opacity 0.3s;
         }
-        .toolbar.hidden { display: none; } /* Скрываем в режиме кода */
+        .toolbar.hidden { display: none; }
 
         .cmd-btn {
             background: rgba(255,255,255,0.05);
@@ -82,6 +82,7 @@
             display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
         .cmd-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .cmd-btn-comment { border-color: #333; color: #666; } /* Кнопка коммента */
 
         .btn-flow { color: var(--c-flow); border-color: rgba(0, 212, 255, 0.3); }
         .btn-dissolve { color: var(--c-dissolve); border-color: rgba(199, 125, 255, 0.3); }
@@ -96,10 +97,8 @@
 
         /* --- WORKSPACE --- */
         .workspace-container { display: flex; flex: 1; overflow: hidden; position: relative; }
-
         .editor-area { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
 
-        /* VISUAL CANVAS */
         .canvas {
             flex: 1; padding: 30px; overflow-y: auto;
             font-family: 'Courier Prime', monospace; font-size: 1rem;
@@ -107,14 +106,12 @@
             padding-bottom: 150px;
         }
 
-        /* CODE EDITOR (TEXTAREA) */
         .raw-code-area {
             flex: 1; padding: 20px; background: #080808; color: #00f2ff;
             font-family: 'Courier Prime', monospace; font-size: 0.9rem;
             border: none; resize: none; line-height: 1.5; display: none;
         }
         .raw-code-area.active { display: block; }
-        .raw-code-area:focus { outline: none; }
 
         .empty-state { color: #333; text-align: center; margin-top: 50px; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
 
@@ -130,6 +127,10 @@
         .smart-line .delete-btn { margin-left: auto; color: #444; padding: 5px; opacity: 0; transition: 0.2s; }
         .smart-line:hover .delete-btn { opacity: 1; }
         .smart-line .delete-btn:hover { color: #ff5555; }
+
+        /* Стиль для блока комментария */
+        .smart-line.is-comment { background: #111; border: 1px dashed #333; border-left: 3px solid #444; min-height: 30px; padding: 8px 15px; }
+        .smart-line.is-comment .params { color: #555; font-style: italic; }
 
         /* --- QUERY --- */
         .query-panel {
@@ -153,7 +154,6 @@
         .btn-compile { background: var(--text-main); color: #000; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; }
         .btn-compile:hover { background: #fff; }
         .btn-compile:disabled { background: #333; color: #888; cursor: not-allowed; }
-
         .output-content { flex: 1; padding: 20px; font-family: 'Courier Prime', monospace; font-size: 0.85rem; color: #aaa; white-space: pre-wrap; overflow-y: auto; }
 
         /* --- MODAL --- */
@@ -196,33 +196,15 @@
         .btn-cancel { background: transparent; color: #666; border: none; cursor: pointer; }
         .btn-save { background: #fff; color: #000; border: none; padding: 8px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; }
 
-        /* --- MOBILE FIX --- */
         @media (max-width: 800px) {
-            body {
-                overflow-y: auto; /* РАЗРЕШАЕМ скролл на мобилке */
-                height: auto;
-                min-height: 100vh;
-            }
+            body { overflow-y: auto; height: auto; min-height: 100vh; }
             nav { position: sticky; top: 0; }
             .toolbar { position: sticky; top: 60px; z-index: 9; }
-            .workspace-container {
-                flex-direction: column;
-                overflow: visible; /* Контейнер растягивается */
-                height: auto;
-            }
+            .workspace-container { flex-direction: column; overflow: visible; height: auto; }
             .editor-area { height: auto; min-height: 500px; }
-            .query-panel {
-                position: relative; /* Отлепляем от низа, теперь оно просто в потоке */
-                margin-top: 20px;
-            }
+            .query-panel { position: relative; margin-top: 20px; }
             .canvas { padding-bottom: 20px; }
-            .output-panel {
-                height: auto;
-                min-height: 300px;
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid #222;
-            }
+            .output-panel { height: auto; min-height: 300px; width: 100%; border-left: none; border-top: 1px solid #222; }
         }
     </style>
 </head>
@@ -240,6 +222,9 @@
     </nav>
 
     <div class="toolbar" id="toolbar">
+        <button class="cmd-btn cmd-btn-comment" onclick="addCommentBlock()"><i class="ph ph-hash"></i> COMMENT</button>
+        <div style="width: 1px; height: 20px; background: #333; margin: 0 5px;"></div>
+
         <button class="cmd-btn btn-flow" onclick="openModal('FLOW')"><i class="ph ph-waves"></i> FLOW</button>
         <button class="cmd-btn btn-dissolve" onclick="openModal('DISSOLVE')"><i class="ph ph-drop"></i> DISSOLVE</button>
         <button class="cmd-btn btn-connect" onclick="openModal('CONNECT')"><i class="ph ph-link"></i> CONNECT</button>
@@ -255,11 +240,9 @@
     <div class="workspace-container">
         <div class="editor-area">
             <div id="canvas" class="canvas">
-                <div class="empty-state">Добавьте команды из меню сверху...</div>
+                <div class="empty-state">Добавьте команды или переключитесь в CODE...</div>
             </div>
-
-            <textarea id="rawCodeArea" class="raw-code-area" placeholder="Вставьте код сюда..."></textarea>
-
+            <textarea id="rawCodeArea" class="raw-code-area" placeholder="# Введите код здесь..."></textarea>
             <div class="query-panel" id="queryPanel">
                 <span class="query-label">QUERY</span>
                 <textarea id="queryInput" class="query-input" placeholder="Введите ваш запрос к системе..."></textarea>
@@ -288,18 +271,11 @@
     </div>
 
     <script>
-        // CONFIG
         const GITHUB_BASE = 'https://raw.githubusercontent.com/slasten3826/processlang/main/modules/';
         const MODULE_MAP = {
-            'FLOW': 'FluidCore.txt',
-            'CONNECT': 'EmergentConnection.txt',
-            'DISSOLVE': 'FormDissolution.txt',
-            'ENCODE': 'EncodingSystem.txt',
-            'CHOOSE': 'ChoiceMechanism.txt',
-            'OBSERVE': 'SelfObservation.txt',
-            'CYCLE': 'EternalCycle.txt',
-            'LOGIC': 'LogicSimulator.txt',
-            'RUNTIME': 'SubconsciousRuntime.txt',
+            'FLOW': 'FluidCore.txt', 'CONNECT': 'EmergentConnection.txt', 'DISSOLVE': 'FormDissolution.txt',
+            'ENCODE': 'EncodingSystem.txt', 'CHOOSE': 'ChoiceMechanism.txt', 'OBSERVE': 'SelfObservation.txt',
+            'CYCLE': 'EternalCycle.txt', 'LOGIC': 'LogicSimulator.txt', 'RUNTIME': 'SubconsciousRuntime.txt',
             'MANIFEST': 'ManifestationEngine.txt'
         };
 
@@ -313,38 +289,221 @@
             'CYCLE': { color: '#9d4edd', params: [{name: 'mode', type: 'select', opts:['stable','intense','degrading'], def:'stable'}, {name: 'intensity', type: 'slider', def: 0.7}] },
             'LOGIC': { color: '#7dd3fc', params: [{name: 'rule', type: 'text', def:''}, {name: 'mode', type: 'select', opts:['eternal','limited'], def:'eternal'}] },
             'RUNTIME': { color: '#60a5fa', params: [{name: 'pattern', type: 'text', def:''}, {name: 'repetitions', type: 'number', def:20}] },
-            'MANIFEST': { color: '#fb923c', params: [{name: 'format', type: 'select', opts:['detailed','minimal','flowing', 'structured', 'technical', 'conversational'], def:'detailed'}, {name: 'loss', type: 'slider', def: 0.2}] }
+            'MANIFEST': { color: '#fb923c', params: [{name: 'format', type: 'select', opts:['detailed','minimal','flowing', 'structured', 'technical', 'conversational'], def:'detailed'}, {name: 'loss', type: 'slider', def: 0.2}] },
+            // Спец. команда для комментариев
+            '#': { color: '#444', params: [{name: 'text', type: 'text', def: ''}] }
         };
 
         let workspaceData = [];
         let editingId = null;
-        let currentMode = 'visual'; // 'visual' | 'code'
+        let currentMode = 'visual';
 
-        // --- MODE SWITCH ---
+        // --- SYNCHRONIZATION LOGIC ---
         function setMode(mode) {
+            if (mode === currentMode) return;
+
+            const rawArea = document.getElementById('rawCodeArea');
+            const queryInput = document.getElementById('queryInput');
+
+            if (mode === 'code') {
+                // VISUAL -> CODE
+                let code = generateCodeFromBlocks();
+                // Добавляем QUERY в конец кода, так привычнее редактировать
+                code += `\nQUERY: ${queryInput.value}`;
+                rawArea.value = code;
+            } else {
+                // CODE -> VISUAL (PARSER)
+                const fullText = rawArea.value;
+                parseCodeToBlocks(fullText);
+            }
+
             currentMode = mode;
-            document.getElementById('btnModeVisual').classList.toggle('active', mode === 'visual');
-            document.getElementById('btnModeCode').classList.toggle('active', mode === 'code');
+            updateUIForMode();
+        }
+
+        function updateUIForMode() {
+            document.getElementById('btnModeVisual').classList.toggle('active', currentMode === 'visual');
+            document.getElementById('btnModeCode').classList.toggle('active', currentMode === 'code');
 
             const toolbar = document.getElementById('toolbar');
             const canvas = document.getElementById('canvas');
             const rawArea = document.getElementById('rawCodeArea');
             const queryPanel = document.getElementById('queryPanel');
 
-            if (mode === 'visual') {
+            if (currentMode === 'visual') {
                 toolbar.classList.remove('hidden');
                 canvas.style.display = 'flex';
                 rawArea.classList.remove('active');
-                queryPanel.style.display = 'block'; // Показываем Query в визуале
+                queryPanel.style.display = 'block';
+                renderWorkspace();
             } else {
                 toolbar.classList.add('hidden');
                 canvas.style.display = 'none';
                 rawArea.classList.add('active');
-                queryPanel.style.display = 'none'; // Скрываем Query в коде (он должен быть внутри текста)
+                queryPanel.style.display = 'none'; // Query редактируется внутри текста
             }
         }
 
-        // --- RENDER MODAL ---
+        // --- PARSER (THE BRAIN) ---
+        function generateCodeFromBlocks() {
+            let code = "";
+            workspaceData.forEach(block => {
+                if (block.type === '#') {
+                    code += `# ${block.params.text}\n`;
+                } else {
+                    let line = `${block.type}`;
+                    for (const [key, val] of Object.entries(block.params)) {
+                        let v = val;
+                        if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
+                        else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
+                        else v = val;
+                        line += ` ${key}=${v}`;
+                    }
+                    code += line + "\n";
+                }
+            });
+            return code;
+        }
+
+        function parseCodeToBlocks(text) {
+            workspaceData = [];
+            const lines = text.split('\n');
+            const queryInput = document.getElementById('queryInput');
+            let queryFound = false;
+            let queryText = "";
+
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+
+                // 1. QUERY Parsing
+                if (line.startsWith('QUERY:')) {
+                    queryFound = true;
+                    queryText = line.replace('QUERY:', '').trim();
+                    continue;
+                }
+                if (queryFound) {
+                    queryText += "\n" + line; // Multiline query support
+                    continue;
+                }
+
+                // 2. COMMENT Parsing
+                if (line.startsWith('#')) {
+                    workspaceData.push({
+                        id: Date.now() + Math.random(),
+                        type: '#',
+                        params: { text: line.substring(1).trim() }
+                    });
+                    continue;
+                }
+
+                // 3. COMMAND Parsing
+                // Regex: CommandName followed by key=value pairs
+                // Supports: key="val with spaces", key=[arr, ay], key=simple
+                const cmdMatch = line.match(/^([A-Z]+)\s+(.*)/);
+                if (cmdMatch) {
+                    const type = cmdMatch[1];
+                    const argsStr = cmdMatch[2];
+
+                    if (COMMANDS[type]) {
+                        const params = {};
+                        // Сложная регулярка для парсинга параметров
+                        const paramRegex = /([a-z]+)=((?:\[.*?\])|(?:"[^"]*")|(?:[^ ]+))/g;
+                        let match;
+                        while ((match = paramRegex.exec(argsStr)) !== null) {
+                            const key = match[1];
+                            let val = match[2];
+
+                            // Clean value
+                            if (val.startsWith('"') && val.endsWith('"')) {
+                                val = val.slice(1, -1);
+                            } else if (val.startsWith('[') && val.endsWith(']')) {
+                                // Parse array: ["a", "b"] -> [a, b]
+                                val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+                            } else if (!isNaN(val)) {
+                                val = parseFloat(val);
+                            }
+                            params[key] = val;
+                        }
+
+                        // Fill missing defaults
+                        COMMANDS[type].params.forEach(p => {
+                            if (params[p.name] === undefined) params[p.name] = p.def;
+                        });
+
+                        workspaceData.push({ id: Date.now() + Math.random(), type, params });
+                    }
+                }
+            }
+            queryInput.value = queryText;
+        }
+
+        // --- RENDER WORKSPACE ---
+        function renderWorkspace() {
+            const canvas = document.getElementById('canvas');
+            canvas.innerHTML = '';
+
+            if (workspaceData.length === 0) {
+                canvas.innerHTML = '<div class="empty-state">Добавьте команды или переключитесь в CODE...</div>';
+                return;
+            }
+
+            workspaceData.forEach(block => {
+                const div = document.createElement('div');
+                div.className = 'smart-line';
+
+                if (block.type === '#') {
+                    // Рендер комментария
+                    div.classList.add('is-comment');
+                    div.innerHTML = `
+                        <span style="color:#666; font-weight:bold;">#</span>
+                        <span class="params" style="margin-left:10px;">${block.params.text}</span>
+                        <i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>
+                    `;
+                    // Редактирование коммента по клику
+                    div.onclick = () => {
+                        const newText = prompt("Редактировать комментарий:", block.params.text);
+                        if (newText !== null) {
+                            block.params.text = newText;
+                            renderWorkspace();
+                        }
+                    };
+                } else {
+                    // Рендер команды
+                    const config = COMMANDS[block.type];
+                    div.style.borderLeftColor = config.color;
+
+                    let paramStr = '';
+                    for (const [key, val] of Object.entries(block.params)) {
+                        let displayVal = val;
+                        if (Array.isArray(val)) displayVal = `[${val.map(v=>`"${v}"`).join(', ')}]`;
+                        paramStr += `<span style="color:#666; margin-left:10px;">${key}=</span><span style="color:#bbb;">${displayVal}</span>`;
+                    }
+
+                    div.innerHTML = `
+                        <span class="cmd-name" style="color:${config.color}">${block.type}</span>
+                        <span class="params">${paramStr}</span>
+                        <i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>
+                    `;
+                    div.onclick = () => openModal(block.type, block.id);
+                }
+                canvas.appendChild(div);
+            });
+        }
+
+        // --- MODALS & EDITORS ---
+        function addCommentBlock() {
+            workspaceData.push({
+                id: Date.now(),
+                type: '#',
+                params: { text: 'Ваш комментарий...' }
+            });
+            renderWorkspace();
+            // Scroll to bottom
+            const canvas = document.getElementById('canvas');
+            setTimeout(() => canvas.scrollTop = canvas.scrollHeight, 50);
+        }
+
         function openModal(type, id = null) {
             editingId = id;
             const config = COMMANDS[type];
@@ -376,9 +535,7 @@
                 } else if (p.type === 'tags') {
                     html += `<div class="tags-container" onclick="document.getElementById('input_${p.name}').focus()">`;
                     html += `<div id="chips_${p.name}" style="display:contents">`;
-                    (Array.isArray(val) ? val : []).forEach(t => {
-                        html += createTagHtml(t);
-                    });
+                    (Array.isArray(val) ? val : []).forEach(t => { html += createTagHtml(t); });
                     html += `</div>`;
                     html += `<input id="input_${p.name}" class="tags-input-field" onkeydown="handleTag(event, this, 'chips_${p.name}')"></div>`;
                 }
@@ -389,168 +546,78 @@
             document.getElementById('modalBody').innerHTML = html;
         }
 
-        function createTagHtml(text) {
-            return `<div class="tag-chip"><span class="tag-text">${text}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`;
-        }
-
+        // Helpers (Tags, Radio, Modal logic is same as before)
+        function createTagHtml(text) { return `<div class="tag-chip"><span class="tag-text">${text}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`; }
         function handleTag(e, input, containerId) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const val = input.value.trim();
-                if (val) {
-                    const container = document.getElementById(containerId);
-                    const temp = document.createElement('div');
-                    temp.innerHTML = createTagHtml(val);
-                    container.appendChild(temp.firstChild);
-                    input.value = '';
-                }
-            }
+            if (e.key === 'Enter') { e.preventDefault(); const val = input.value.trim(); if(val){ document.getElementById(containerId).insertAdjacentHTML('beforeend', createTagHtml(val)); input.value=''; } }
         }
-
-        function selectRadio(el, name) {
-            el.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById(`inp_${name}`).value = el.dataset.val;
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-            editingId = null;
-        }
-
+        function selectRadio(el, name) { el.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); document.getElementById(`inp_${name}`).value = el.dataset.val; }
+        function closeModal() { document.getElementById('modal').classList.remove('active'); editingId = null; }
         function saveCommand() {
             const type = document.getElementById('modal').dataset.type;
             const config = COMMANDS[type];
             const params = {};
-
             config.params.forEach(p => {
                 if (p.type === 'tags') {
-                    const tags = [];
-                    document.querySelectorAll(`#chips_${p.name} .tag-text`).forEach(el => tags.push(el.innerText));
-                    params[p.name] = tags;
-                } else {
-                    params[p.name] = document.getElementById(`inp_${p.name}`).value;
-                }
+                    const tags = []; document.querySelectorAll(`#chips_${p.name} .tag-text`).forEach(el => tags.push(el.innerText)); params[p.name] = tags;
+                } else { params[p.name] = document.getElementById(`inp_${p.name}`).value; }
             });
-
-            if (editingId !== null) {
-                const idx = workspaceData.findIndex(x => x.id === editingId);
-                workspaceData[idx].params = params;
-            } else {
-                workspaceData.push({ id: Date.now(), type, params });
-            }
-
-            renderWorkspace();
-            closeModal();
+            if (editingId !== null) { const idx = workspaceData.findIndex(x => x.id === editingId); workspaceData[idx].params = params; }
+            else { workspaceData.push({ id: Date.now(), type, params }); }
+            renderWorkspace(); closeModal();
         }
+        function deleteBlock(id) { workspaceData = workspaceData.filter(x => x.id !== id); renderWorkspace(); }
 
-        function renderWorkspace() {
-            const canvas = document.getElementById('canvas');
-            canvas.innerHTML = '';
-
-            if (workspaceData.length === 0) {
-                canvas.innerHTML = '<div class="empty-state">Добавьте команды из меню сверху...</div>';
-                return;
-            }
-
-            workspaceData.forEach(block => {
-                const config = COMMANDS[block.type];
-                let paramStr = '';
-                for (const [key, val] of Object.entries(block.params)) {
-                    let displayVal = val;
-                    if (Array.isArray(val)) displayVal = `[${val.map(v=>`"${v}"`).join(', ')}]`;
-                    paramStr += `<span style="color:#666; margin-left:10px;">${key}=</span><span style="color:#bbb;">${displayVal}</span>`;
-                }
-
-                const div = document.createElement('div');
-                div.className = 'smart-line';
-                div.style.borderLeftColor = config.color;
-                div.innerHTML = `
-                    <span class="cmd-name" style="color:${config.color}">${block.type}</span>
-                    <span class="params">${paramStr}</span>
-                    <i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>
-                `;
-                div.onclick = () => openModal(block.type, block.id);
-                canvas.appendChild(div);
-            });
-        }
-
-        function deleteBlock(id) {
-            workspaceData = workspaceData.filter(x => x.id !== id);
-            renderWorkspace();
-        }
-
+        // --- COMPILATION ---
         async function compile() {
+            // Если мы в CODE режиме, сначала синхронизируемся, чтобы обновить визуальные данные (хотя компилировать можно и текст напрямую, но лучше через общую структуру)
+            if (currentMode === 'code') {
+                const rawText = document.getElementById('rawCodeArea').value;
+                parseCodeToBlocks(rawText);
+                // Не переключаем режим, просто обновляем данные
+            }
+
             const btn = document.getElementById('btnCompile');
             const outputDiv = document.getElementById('output');
 
-            btn.disabled = true;
-            btn.innerText = "ЗАГРУЗКА...";
-            outputDiv.innerText = "Загрузка модулей с GitHub...";
+            btn.disabled = true; btn.innerText = "ЗАГРУЗКА..."; outputDiv.innerText = "Загрузка модулей...";
 
             try {
-                let uniqueTypes = [];
-                let userProgram = "";
+                // Фильтруем комментарии перед компиляцией!
+                const activeBlocks = workspaceData.filter(b => b.type !== '#');
+                const uniqueTypes = [...new Set(activeBlocks.map(x => x.type))];
 
-                // ЛОГИКА КОМПИЛЯЦИИ ЗАВИСИТ ОТ РЕЖИМА
-                if (currentMode === 'visual') {
-                    // 1. Берем типы из блоков
-                    uniqueTypes = [...new Set(workspaceData.map(x => x.type))];
-
-                    // 2. Генерируем код из блоков
-                    userProgram = "=== USER PROGRAM ===\n";
-                    workspaceData.forEach(block => {
-                        let line = `${block.type}`;
-                        for (const [key, val] of Object.entries(block.params)) {
-                            let v = val;
-                            if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
-                            else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
-                            else v = val;
-                            line += ` ${key}=${v}`;
-                        }
-                        userProgram += line + "\n";
-                    });
-                    const q = document.getElementById('queryInput').value;
-                    userProgram += `\nQUERY: ${q}`;
-
-                } else {
-                    // РЕЖИМ КОДА
-                    const rawCode = document.getElementById('rawCodeArea').value;
-                    userProgram = "=== USER PROGRAM (RAW) ===\n" + rawCode;
-
-                    // Пытаемся понять, какие модули нужны, просто поиском подстрок
-                    // Это примитивно, но работает для импорта
-                    const allCommands = Object.keys(COMMANDS);
-                    uniqueTypes = allCommands.filter(cmd => rawCode.includes(cmd));
-                }
-
-                // 3. Скачиваем модули
-                let loadedModules = "";
                 const fetchPromises = uniqueTypes.map(async (type) => {
                     const filename = MODULE_MAP[type];
-                    if (!filename) return `[WARNING: No module file for ${type}]`;
+                    if (!filename) return ``;
                     try {
                         const resp = await fetch(GITHUB_BASE + filename);
                         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                         const text = await resp.text();
                         return `=== MODULE: ${type} (${filename}) ===\n${text}\n\n`;
-                    } catch (e) {
-                        return `[ERROR LOADING ${type}: ${e.message}]\n\n`;
-                    }
+                    } catch (e) { return `[ERROR ${type}]\n`; }
                 });
 
-                const results = await Promise.all(fetchPromises);
-                loadedModules = results.join('');
+                const loadedModules = (await Promise.all(fetchPromises)).join('');
 
-                // 4. Вывод
+                let userProgram = "=== USER PROGRAM ===\n";
+                activeBlocks.forEach(block => {
+                    let line = `${block.type}`;
+                    for (const [key, val] of Object.entries(block.params)) {
+                        let v = val;
+                        if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
+                        else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
+                        else v = val;
+                        line += ` ${key}=${v}`;
+                    }
+                    userProgram += line + "\n";
+                });
+                userProgram += `\nQUERY: ${document.getElementById('queryInput').value}`;
+
                 outputDiv.innerText = loadedModules + userProgram;
 
-            } catch (error) {
-                outputDiv.innerText = "CRITICAL ERROR: " + error.message;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "COMPILE";
-            }
+            } catch (error) { outputDiv.innerText = "ERROR: " + error.message; }
+            finally { btn.disabled = false; btn.innerText = "COMPILE"; }
         }
     </script>
 </body>
