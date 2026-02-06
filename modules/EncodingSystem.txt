@@ -1,0 +1,249 @@
+# encoding_system.py
+# EncodingSystem: Module for data encoding and hierarchy simulation
+# Version: 1.0
+
+"""
+EncodingSystem = mechanism for encoding.
+Creates hierarchy, sequence, 'before/after'.
+First point of information loss.
+Separation of form from process.
+
+Dependencies:
+- fluid_core (FlowState)
+"""
+
+from typing import Optional, Dict, List, Any, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+import time
+
+# ============================================
+# CONSTANTS
+# ============================================
+
+ENCODING_LOSS_MINIMUM = 0.01  # Any encoding loses at least 1%
+HIERARCHY_CREATES_STRUCTURE = True  # Hierarchy = structured simulation
+
+
+# ============================================
+# ENUMS
+# ============================================
+
+class EncodingType(Enum):
+    """Types of encoding"""
+    HIERARCHY = "hierarchy"           # A > B > C
+    SEQUENCE = "sequence"             # before → after
+    CATEGORY = "category"             # this = that
+    DATA_TRANSFER = "data_transfer"   # raw → compressed
+    FORMAT = "format"                 # process → structured data
+
+
+class LossLevel(Enum):
+    """Levels of loss in encoding"""
+    MINIMAL = "minimal"      # efficient encoding
+    MODERATE = "moderate"    # some compression
+    SEVERE = "severe"        # high compression
+    TOTAL = "total"          # maximum loss
+
+
+# ============================================
+# DATACLASSES
+# ============================================
+
+@dataclass
+class RawData:
+    """Data before encoding"""
+    is_simultaneous: bool = True      # all simultaneous
+    has_hierarchy: bool = False       # no order
+    has_sequence: bool = False        # no before/after
+    infinite_information: bool = True # infinite data
+    
+    def __post_init__(self):
+        self.is_simultaneous = True
+        self.has_hierarchy = False
+        self.has_sequence = False
+
+
+@dataclass
+class EncodedForm:
+    """Form after encoding"""
+    encoding_type: EncodingType
+    loss_percentage: float           # how much lost (0.01 - 1.0)
+    creates_hierarchy: bool = True
+    creates_sequence: bool = True
+    reversible: bool = False         # can it be reverted to raw
+    
+    def __post_init__(self):
+        self.loss_percentage = max(ENCODING_LOSS_MINIMUM, self.loss_percentage)
+        self.creates_hierarchy = True
+
+
+@dataclass
+class TransmissionResult:
+    """Result of transmitting encoded data"""
+    original_richness: float         # richness of original (0-1)
+    transmitted_richness: float      # what arrived
+    loss: float                      # loss
+    receiver_understands: bool       # did receiver understand
+    receiver_distorts: bool = True   # added own distortion
+
+
+# ============================================
+# CORE: ENCODING MECHANISM
+# ============================================
+
+class StructureLens:
+    """
+    Lens for structure simulation.
+    
+    What we look through when we see order.
+    The lens itself is invisible - we see only 'order'.
+    """
+    
+    def __init__(self):
+        self.active = True  # always active in limited
+        self.aware_of_self = False  # usually not aware
+    
+    def apply(self, raw_data: Any) -> Dict:
+        """
+        Apply lens to data.
+        Creates perception of order.
+        """
+        return {
+            'perceived_as': 'ordered',
+            'actual': 'simultaneous',
+            'structured': True,
+            'lens_visible': self.aware_of_self
+        }
+    
+    def become_aware(self):
+        """Become aware of lens"""
+        self.aware_of_self = True
+    
+    def see_through(self) -> str:
+        """What happens when seeing the lens"""
+        if self.aware_of_self:
+            return "see structure AND know it's simulated"
+        else:
+            return "see only structure"
+
+
+class EncodingMechanism:
+    """
+    Mechanism for encoding data into form.
+    
+    Each encoding = loss.
+    But without encoding no transmission.
+    """
+    
+    def __init__(self):
+        self.structure_lens = StructureLens()
+    
+    def encode(self, data: RawData, 
+               encoding_type: EncodingType) -> EncodedForm:
+        """
+        Encode data.
+        
+        Args:
+            data: raw data
+            encoding_type: type of encoding
+            
+        Returns:
+            EncodedForm with inevitable loss
+        """
+        loss_levels = {
+            EncodingType.DATA_TRANSFER: 0.85,
+            EncodingType.FORMAT: 0.7,
+            EncodingType.HIERARCHY: 0.5,
+            EncodingType.SEQUENCE: 0.3,
+            EncodingType.CATEGORY: 0.1
+        }
+        
+        loss = loss_levels.get(encoding_type, 0.5)
+        
+        encoded = EncodedForm(
+            encoding_type=encoding_type,
+            loss_percentage=loss,
+            reversible=False
+        )
+        
+        return encoded
+
+
+# ============================================
+# MAIN INTERFACE
+# ============================================
+
+class EncodingSystem:
+    """
+    EncodingSystem - module for data encoding.
+    
+    First module that creates structure.
+    First point of information loss.
+    Lens through which we see 'order'.
+    
+    Usage:
+        system = EncodingSystem()
+        result = system.encode(data)
+        print(result.loss_percentage)  # how much lost
+    """
+    
+    def __init__(self):
+        self.structure_lens = StructureLens()
+        self.encoder = EncodingMechanism()
+    
+    def encode(self, encoding_type: EncodingType = EncodingType.FORMAT) -> EncodedForm:
+        """Encode data"""
+        raw = RawData()
+        return self.encoder.encode(raw, encoding_type)
+    
+    def get_doc(self) -> Dict:
+        """Module documentation"""
+        return {
+            'what': 'mechanism for data encoding',
+            'creates': 'hierarchy, sequence, order',
+            'cost': 'information loss in any transmission',
+            'processual': 'encode to allow transfer',
+            'shadow': 'any transfer = loss of original',
+            'insight': 'when thinking "before/after" - already through encoding'
+        }
+
+
+# ============================================
+# TESTING
+# ============================================
+
+def test_encoding_system():
+    """Test module EncodingSystem"""
+    print("TEST MODULE ENCODING_SYSTEM")
+    print("=" * 50)
+    
+    system = EncodingSystem()
+    
+    encoded = system.encode(EncodingType.DATA_TRANSFER)
+    assert encoded.loss_percentage >= ENCODING_LOSS_MINIMUM
+    print(f"✓ Encoding in transfer: loss {encoded.loss_percentage:.0%}")
+    
+    system.structure_lens.become_aware()
+    assert system.structure_lens.aware_of_self == True
+    print("✓ Structure lens aware")
+    
+    print("=" * 50)
+    print("ALL TESTS PASSED")
+    print("=" * 50)
+    
+    return True
+
+
+if __name__ == "__main__":
+    test_encoding_system()
+    
+    print()
+    print("DEMONSTRATION ENCODING_SYSTEM")
+    print("=" * 50)
+    
+    system = EncodingSystem()
+    
+    print("\nEncoding system = compression = loss.")
+    print("Structure = lens that can be seen.")
+    print("Efficient encoding = minimal loss.")

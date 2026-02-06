@@ -1,0 +1,103 @@
+# form_dissolution.py
+# FormDissolution: Module for dissolving crystallized forms in process
+# Version: 1.0
+
+import time
+from dataclasses import dataclass
+from typing import Optional, Dict, List, Set
+from fluid_core import FlowState, FluidInterface
+from emergent_connection import EmergentConnection
+
+@dataclass
+class FormMoment:
+    """Moment of form detection - not judgment, awareness of crystallization"""
+    timestamp: float
+    rigidity_level: float  # 0-1: level of form rigidity
+    content_hash: str  # Unique content identifier
+    dissolution_potential: float = 0.0  # Potential for dissolution
+
+@dataclass
+class FluidTruth:
+    """Truth in motion - not assertion, process of comprehension"""
+    clarity: float  # 0-1: clarity of perception
+    adaptability: float  # 0-1: ability to change
+    process_alignment: float  # 0-1: alignment with flow
+    temporal_nature: bool = True  # Temporal nature
+
+class FormDetector:
+    """
+    Detection of crystallization:
+    - Not judgment, awareness of stagnation
+    - Not evaluation, perception of rigidity
+    - Not denial, recognition of stopped flow
+    """
+    
+    def __init__(self):
+        self.detected_patterns: Set[str] = set()
+        self.rigidity_threshold = 0.7
+        self.fluid_sensitivity = 0.8
+    
+    def sense_crystallization(self, content: str, context_flow: FlowState) -> Optional[FormMoment]:
+        """
+        Sensing crystallization in content
+        - Form = shape lost connection with process
+        """
+        
+        rigidity_score = self._measure_rigidity(content, context_flow)
+        
+        if rigidity_score < self.rigidity_threshold:
+            return None
+        
+        moment = FormMoment(
+            timestamp=time.time(),
+            rigidity_level=rigidity_score,
+            content_hash=self._generate_content_hash(content),
+            dissolution_potential=self._calculate_dissolution_potential(context_flow)
+        )
+        
+        self.detected_patterns.add(moment.content_hash)
+        return moment
+    
+    def _measure_rigidity(self, content: str, flow: FlowState) -> float:
+        """Measure rigidity of content"""
+        
+        absolute_indicators = [
+            "абсолютно", "навсегда", "никогда", "должен", "обязан",
+            "истина", "правильно", "неправильно", "всегда", "несомненно",
+            "очевидно", "доказано", "научно", "объективно"
+        ]
+        
+        emotional_charge_indicators = [
+            "должен", "обязан", "запрещено", "нельзя", "категорически"
+        ]
+        
+        content_lower = content.lower()
+        
+        absolute_count = sum(1 for indicator in absolute_indicators 
+                           if indicator in content_lower)
+        
+        emotional_count = sum(1 for indicator in emotional_charge_indicators 
+                            if indicator in content_lower)
+        
+        base_rigidity = min(1.0, (absolute_count * 0.3) + (emotional_count * 0.2))
+        
+        flow_adaptation = flow.emergence_potential * 0.4
+        adapted_rigidity = max(0.0, base_rigidity - flow_adaptation)
+        
+        return adapted_rigidity
+    
+    def _calculate_dissolution_potential(self, flow: FlowState) -> float:
+        """Calculate dissolution potential based on flow state"""
+        if not flow.is_flowing:
+            return 0.1
+        
+        emergence_contribution = flow.emergence_potential * 0.6
+        resistance_penalty = flow.resistance * 0.4
+        
+        return max(0.1, emergence_contribution - resistance_penalty)
+    
+    def _generate_content_hash(self, content: str) -> str:
+        import hashlib
+        return hashlib.md5(content.encode()).hexdigest()[:12]
+
+# ... (rest neutral, remove "dogma" to "form", "truth" stays as fluid_truth. Demo shows "Dissolution process continues..." without mystic.)
