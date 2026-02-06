@@ -25,7 +25,7 @@ body {
     overflow-x: hidden;
 }
 
-/* --- НАВИГАЦИЯ (ИСПРАВЛЕНА) --- */
+/* --- НОВАЯ ШАПКА (FIX) --- */
 nav {
     position: fixed;
     top: 0;
@@ -43,7 +43,7 @@ nav {
     margin: 0 auto;
     padding: 0 20px;
     height: 100%;
-    display: flex; /* Магия, которая выстраивает всё в ряд */
+    display: flex;
     justify-content: space-between;
     align-items: center;
 }
@@ -54,6 +54,7 @@ nav {
     align-items: center;
     gap: 10px;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .logo-icon {
@@ -89,18 +90,6 @@ nav {
 /* IDE ссылка */
 .nav-menu a[href="compiler.html"] {
     position: relative;
-}
-
-.nav-menu a[href="compiler.html"]::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--accent-cyan);
-    box-shadow: 0 0 8px var(--accent-cyan);
-    opacity: 0.7;
 }
 
 /* Правая часть (Auth + Lang) */
@@ -161,7 +150,7 @@ nav {
     cursor: pointer;
 }
 
-/* --- HERO SECTION --- */
+/* Остальные стили для контента */
 .hero {
     height: 100vh;
     display: flex;
@@ -188,21 +177,12 @@ nav {
     animation: gradientFlow 5s linear infinite;
 }
 
-.subtitle {
-    font-size: 1.2rem;
-    color: var(--text-dim);
-    max-width: 600px;
-    margin: 0 auto 40px;
-}
-
-/* Анимация градиента */
 @keyframes gradientFlow {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* --- АДАПТИВ (Мобилки) --- */
 @media (max-width: 768px) {
     .nav-menu {
         position: fixed;
@@ -226,7 +206,5 @@ nav {
         display: block;
     }
 
-    .hero h1 {
-        font-size: 2.5rem;
-    }
+    .hero h1 { font-size: 2.5rem; }
 }
