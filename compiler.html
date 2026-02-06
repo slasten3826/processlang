@@ -37,18 +37,29 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: hidden; /* На ПК скролла нет */
         }
 
         /* --- NAV --- */
         nav {
             height: 60px; border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; background: rgba(5,5,5,0.95); z-index: 10;
+            padding: 0 20px; background: rgba(5,5,5,0.95); z-index: 10; flex-shrink: 0;
         }
         .logo { font-weight: 800; color: #fff; text-decoration: none; font-size: 1.2rem; }
-        .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; margin-left: 20px; transition: 0.3s; }
+        .nav-right { display: flex; gap: 20px; align-items: center; }
+        .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
         .nav-link:hover { color: #fff; }
+
+        /* Переключатель режимов */
+        .mode-switch {
+            background: #222; border: 1px solid #333; border-radius: 4px;
+            display: flex; overflow: hidden;
+        }
+        .mode-btn {
+            padding: 4px 12px; font-size: 0.8rem; cursor: pointer; color: #666; font-weight: 600;
+        }
+        .mode-btn.active { background: var(--text-main); color: #000; }
 
         /* --- TOOLBAR --- */
         .toolbar {
@@ -56,7 +67,10 @@
             border-bottom: 1px solid var(--border-color);
             background: var(--panel-bg);
             display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+            flex-shrink: 0;
+            transition: max-height 0.3s, opacity 0.3s;
         }
+        .toolbar.hidden { display: none; } /* Скрываем в режиме кода */
 
         .cmd-btn {
             background: rgba(255,255,255,0.05);
@@ -69,7 +83,6 @@
         }
         .cmd-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
-        /* Цвета кнопок */
         .btn-flow { color: var(--c-flow); border-color: rgba(0, 212, 255, 0.3); }
         .btn-dissolve { color: var(--c-dissolve); border-color: rgba(199, 125, 255, 0.3); }
         .btn-connect { color: var(--c-connect); border-color: rgba(6, 255, 165, 0.3); }
@@ -86,12 +99,22 @@
 
         .editor-area { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
 
+        /* VISUAL CANVAS */
         .canvas {
             flex: 1; padding: 30px; overflow-y: auto;
             font-family: 'Courier Prime', monospace; font-size: 1rem;
             display: flex; flex-direction: column; gap: 15px;
             padding-bottom: 150px;
         }
+
+        /* CODE EDITOR (TEXTAREA) */
+        .raw-code-area {
+            flex: 1; padding: 20px; background: #080808; color: #00f2ff;
+            font-family: 'Courier Prime', monospace; font-size: 0.9rem;
+            border: none; resize: none; line-height: 1.5; display: none;
+        }
+        .raw-code-area.active { display: block; }
+        .raw-code-area:focus { outline: none; }
 
         .empty-state { color: #333; text-align: center; margin-top: 50px; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
 
@@ -140,25 +163,17 @@
             z-index: 100; display: none; justify-content: center; align-items: center;
         }
         .modal-overlay.active { display: flex; }
-
         .modal {
             background: #111; border: 1px solid #333; width: 90%; max-width: 500px;
             border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-family: 'Courier Prime', monospace; font-size: 1.5rem; font-weight: 700; }
-
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; color: #888; font-size: 0.85rem; margin-bottom: 8px; }
-
-        /* Слайдеры */
         input[type="range"] { width: 100%; accent-color: var(--text-main); }
         .range-val { float: right; color: #fff; font-family: monospace; }
-
-        /* Input Text */
         .input-text { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 4px; }
-
-        /* Теги (Исправленные) */
         .tags-container {
             border: 1px solid #333; background: #000; padding: 8px; border-radius: 6px;
             display: flex; flex-wrap: wrap; gap: 8px; min-height: 45px; cursor: text;
@@ -169,13 +184,7 @@
         }
         .tag-chip i { cursor: pointer; color: #888; font-size: 0.8rem; }
         .tag-chip i:hover { color: #ff5555; }
-
-        .tags-input-field {
-            background: transparent; border: none; color: #fff; flex: 1;
-            min-width: 120px; padding: 4px; font-size: 0.95rem;
-        }
-
-        /* Радио */
+        .tags-input-field { background: transparent; border: none; color: #fff; flex: 1; min-width: 120px; padding: 4px; font-size: 0.95rem; }
         .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .radio-btn {
             border: 1px solid #333; padding: 8px 14px; border-radius: 4px;
@@ -183,14 +192,37 @@
         }
         .radio-btn:hover { border-color: #555; }
         .radio-btn.active { border-color: #fff; color: #fff; background: #222; }
-
         .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
         .btn-cancel { background: transparent; color: #666; border: none; cursor: pointer; }
         .btn-save { background: #fff; color: #000; border: none; padding: 8px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; }
 
+        /* --- MOBILE FIX --- */
         @media (max-width: 800px) {
-            .workspace-container { flex-direction: column; }
-            .output-panel { height: 200px; width: 100%; border-left: none; border-top: 1px solid #222; }
+            body {
+                overflow-y: auto; /* РАЗРЕШАЕМ скролл на мобилке */
+                height: auto;
+                min-height: 100vh;
+            }
+            nav { position: sticky; top: 0; }
+            .toolbar { position: sticky; top: 60px; z-index: 9; }
+            .workspace-container {
+                flex-direction: column;
+                overflow: visible; /* Контейнер растягивается */
+                height: auto;
+            }
+            .editor-area { height: auto; min-height: 500px; }
+            .query-panel {
+                position: relative; /* Отлепляем от низа, теперь оно просто в потоке */
+                margin-top: 20px;
+            }
+            .canvas { padding-bottom: 20px; }
+            .output-panel {
+                height: auto;
+                min-height: 300px;
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #222;
+            }
         }
     </style>
 </head>
@@ -198,10 +230,16 @@
 
     <nav>
         <a href="index.html" class="logo">ProcessLang IDE</a>
-        <a href="index.html" class="nav-link">Выход</a>
+        <div class="nav-right">
+            <div class="mode-switch">
+                <div class="mode-btn active" id="btnModeVisual" onclick="setMode('visual')">VISUAL</div>
+                <div class="mode-btn" id="btnModeCode" onclick="setMode('code')">CODE</div>
+            </div>
+            <a href="index.html" class="nav-link">Выход</a>
+        </div>
     </nav>
 
-    <div class="toolbar">
+    <div class="toolbar" id="toolbar">
         <button class="cmd-btn btn-flow" onclick="openModal('FLOW')"><i class="ph ph-waves"></i> FLOW</button>
         <button class="cmd-btn btn-dissolve" onclick="openModal('DISSOLVE')"><i class="ph ph-drop"></i> DISSOLVE</button>
         <button class="cmd-btn btn-connect" onclick="openModal('CONNECT')"><i class="ph ph-link"></i> CONNECT</button>
@@ -219,7 +257,10 @@
             <div id="canvas" class="canvas">
                 <div class="empty-state">Добавьте команды из меню сверху...</div>
             </div>
-            <div class="query-panel">
+
+            <textarea id="rawCodeArea" class="raw-code-area" placeholder="Вставьте код сюда..."></textarea>
+
+            <div class="query-panel" id="queryPanel">
                 <span class="query-label">QUERY</span>
                 <textarea id="queryInput" class="query-input" placeholder="Введите ваш запрос к системе..."></textarea>
             </div>
@@ -277,6 +318,31 @@
 
         let workspaceData = [];
         let editingId = null;
+        let currentMode = 'visual'; // 'visual' | 'code'
+
+        // --- MODE SWITCH ---
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btnModeVisual').classList.toggle('active', mode === 'visual');
+            document.getElementById('btnModeCode').classList.toggle('active', mode === 'code');
+
+            const toolbar = document.getElementById('toolbar');
+            const canvas = document.getElementById('canvas');
+            const rawArea = document.getElementById('rawCodeArea');
+            const queryPanel = document.getElementById('queryPanel');
+
+            if (mode === 'visual') {
+                toolbar.classList.remove('hidden');
+                canvas.style.display = 'flex';
+                rawArea.classList.remove('active');
+                queryPanel.style.display = 'block'; // Показываем Query в визуале
+            } else {
+                toolbar.classList.add('hidden');
+                canvas.style.display = 'none';
+                rawArea.classList.add('active');
+                queryPanel.style.display = 'none'; // Скрываем Query в коде (он должен быть внутри текста)
+            }
+        }
 
         // --- RENDER MODAL ---
         function openModal(type, id = null) {
@@ -308,7 +374,6 @@
                     });
                     html += `<input type="hidden" id="inp_${p.name}" value="${val}"></div>`;
                 } else if (p.type === 'tags') {
-                    // NEW TAG SYSTEM
                     html += `<div class="tags-container" onclick="document.getElementById('input_${p.name}').focus()">`;
                     html += `<div id="chips_${p.name}" style="display:contents">`;
                     (Array.isArray(val) ? val : []).forEach(t => {
@@ -324,7 +389,6 @@
             document.getElementById('modalBody').innerHTML = html;
         }
 
-        // --- TAG SYSTEM HELPERS ---
         function createTagHtml(text) {
             return `<div class="tag-chip"><span class="tag-text">${text}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`;
         }
@@ -425,15 +489,46 @@
             outputDiv.innerText = "Загрузка модулей с GitHub...";
 
             try {
-                // 1. Собираем список нужных модулей
-                const uniqueTypes = [...new Set(workspaceData.map(x => x.type))];
-                let loadedModules = "";
+                let uniqueTypes = [];
+                let userProgram = "";
 
-                // 2. Скачиваем модули параллельно
+                // ЛОГИКА КОМПИЛЯЦИИ ЗАВИСИТ ОТ РЕЖИМА
+                if (currentMode === 'visual') {
+                    // 1. Берем типы из блоков
+                    uniqueTypes = [...new Set(workspaceData.map(x => x.type))];
+
+                    // 2. Генерируем код из блоков
+                    userProgram = "=== USER PROGRAM ===\n";
+                    workspaceData.forEach(block => {
+                        let line = `${block.type}`;
+                        for (const [key, val] of Object.entries(block.params)) {
+                            let v = val;
+                            if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
+                            else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
+                            else v = val;
+                            line += ` ${key}=${v}`;
+                        }
+                        userProgram += line + "\n";
+                    });
+                    const q = document.getElementById('queryInput').value;
+                    userProgram += `\nQUERY: ${q}`;
+
+                } else {
+                    // РЕЖИМ КОДА
+                    const rawCode = document.getElementById('rawCodeArea').value;
+                    userProgram = "=== USER PROGRAM (RAW) ===\n" + rawCode;
+
+                    // Пытаемся понять, какие модули нужны, просто поиском подстрок
+                    // Это примитивно, но работает для импорта
+                    const allCommands = Object.keys(COMMANDS);
+                    uniqueTypes = allCommands.filter(cmd => rawCode.includes(cmd));
+                }
+
+                // 3. Скачиваем модули
+                let loadedModules = "";
                 const fetchPromises = uniqueTypes.map(async (type) => {
                     const filename = MODULE_MAP[type];
                     if (!filename) return `[WARNING: No module file for ${type}]`;
-
                     try {
                         const resp = await fetch(GITHUB_BASE + filename);
                         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -447,25 +542,7 @@
                 const results = await Promise.all(fetchPromises);
                 loadedModules = results.join('');
 
-                // 3. Формируем код пользователя
-                let userProgram = "=== USER PROGRAM ===\n";
-                workspaceData.forEach(block => {
-                    let line = `${block.type}`;
-                    for (const [key, val] of Object.entries(block.params)) {
-                        let v = val;
-                        if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
-                        else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
-                        else v = val;
-                        line += ` ${key}=${v}`;
-                    }
-                    userProgram += line + "\n";
-                });
-
-                // 4. Добавляем Query
-                const q = document.getElementById('queryInput').value;
-                userProgram += `\nQUERY: ${q}`;
-
-                // 5. Вывод
+                // 4. Вывод
                 outputDiv.innerText = loadedModules + userProgram;
 
             } catch (error) {
