@@ -1,15 +1,10 @@
-// src/scripts/app.js
-
-// 1. Инициализация Supabase
 const client = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-// 2. Логика Авторизации
 async function signIn() {
     const { data, error } = await client.auth.signInWithOAuth({
         provider: 'github',
         options: { redirectTo: 'https://processlang.org' }
     });
-    if (error) console.error("Login error:", error);
 }
 
 window.signOut = async function() {
@@ -18,7 +13,6 @@ window.signOut = async function() {
     window.location.href = '/';
 }
 
-// 3. UI Обновление (Шапка)
 async function checkUser() {
     const { data: { session } } = await client.auth.getSession();
     renderAuthUI(session?.user);
@@ -31,26 +25,22 @@ function renderAuthUI(user) {
     if (user) {
         const avatar = user.user_metadata.avatar_url || 'https://via.placeholder.com/32';
         const name = user.user_metadata.full_name || user.email;
-
         authContainer.innerHTML = `
         <div class="user-profile" style="position: relative; cursor: pointer;" onclick="toggleProfileMenu()">
         <img src="${avatar}" style="width:36px; height:36px; border-radius:50%; border:2px solid var(--accent-cyan);">
-
         <div id="profile-dropdown" style="display: none; position: absolute; top: 45px; right: 0; background: #111; border: 1px solid #333; padding: 10px; border-radius: 8px; width: 140px; z-index: 1001;">
-        <div style="font-size: 0.8rem; color: #888; padding-bottom: 5px; border-bottom: 1px solid #333; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis;">${name}</div>
+        <div style="font-size: 0.8rem; color: #888; padding-bottom: 5px; border-bottom: 1px solid #333; margin-bottom: 5px;">${name}</div>
         <a href="#" onclick="event.preventDefault(); signOut()" style="color: #ff6b6b; text-decoration: none; font-size: 0.9rem;">Выйти</a>
         </div>
         </div>
         `;
     } else {
-        // Кнопка входа
         authContainer.innerHTML = `
         <button class="btn-login" onclick="signIn()">
         <i class="ph ph-sign-in" style="margin-right:5px;"></i>
         <span data-i18n="btn_login">Войти</span>
         </button>
         `;
-        // Обновляем перевод кнопки сразу
         if (typeof updateTranslations === 'function') updateTranslations();
     }
 }
@@ -60,12 +50,10 @@ function toggleProfileMenu() {
     if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 }
 
-// Слушаем изменения входа
 client.auth.onAuthStateChange((event, session) => {
     if (event !== 'SIGNED_OUT') renderAuthUI(session?.user);
 });
 
-// 4. Запуск при загрузке
 window.addEventListener('DOMContentLoaded', () => {
     checkUser();
     if (typeof updateTranslations === 'function') updateTranslations();
