@@ -16,21 +16,33 @@
 <body>
 
     <nav>
-        <a href="#home" class="logo" onclick="route(event)">ProcessLang</a>
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div class="glitch-pl">PL</div>
+                </div>
+                </div>
 
-        <button class="hamburger" onclick="toggleMenu()">
-            <i class="ph ph-list"></i>
-        </button>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <i class="ph ph-list"></i>
+            </div>
 
-        <div class="nav-links" id="navMenu">
-            <a href="#feed" onclick="route(event)" data-i18n="nav_feed">Лента</a>
-            <a href="#compiler" onclick="route(event)" data-i18n="nav_create">Создать</a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" data-i18n="nav_home" onclick="toggleMenu()">Главная</a></li>
+                <li><a href="#syntax" data-i18n="nav_syntax" onclick="toggleMenu()">Синтаксис</a></li>
+                <li><a href="#philosophy" data-i18n="nav_philosophy" onclick="toggleMenu()">Философия</a></li>
 
-            <div id="auth-container"></div>
+                <li>
+                    <a href="compiler.html" style="color: var(--accent-cyan); font-weight: bold; text-shadow: 0 0 10px rgba(100,200,255,0.3);">
+                        IDE
+                    </a>
+                </li>
+            </ul>
 
-            <button class="btn-login lang-switch" onclick="toggleLanguage()" style="min-width: 40px; justify-content: center;">
-                RU
-            </button>
+            <div class="auth-section" id="auth-container">
+                </div>
+
+            <div class="lang-switch" onclick="toggleLanguage()">RU</div>
         </div>
     </nav>
 
