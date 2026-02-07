@@ -26,7 +26,7 @@
             --c-logic: #7dd3fc;
             --c-runtime: #60a5fa;
             --c-manifest: #fb923c;
-            --c-comment: #444; /* Цвет для комментариев */
+            --c-comment: #444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
@@ -82,7 +82,7 @@
             display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
         .cmd-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
-        .cmd-btn-comment { border-color: #333; color: #666; } /* Кнопка коммента */
+        .cmd-btn-comment { border-color: #333; color: #666; }
 
         .btn-flow { color: var(--c-flow); border-color: rgba(0, 212, 255, 0.3); }
         .btn-dissolve { color: var(--c-dissolve); border-color: rgba(199, 125, 255, 0.3); }
@@ -128,7 +128,6 @@
         .smart-line:hover .delete-btn { opacity: 1; }
         .smart-line .delete-btn:hover { color: #ff5555; }
 
-        /* Стиль для блока комментария */
         .smart-line.is-comment { background: #111; border: 1px dashed #333; border-left: 3px solid #444; min-height: 30px; padding: 8px 15px; }
         .smart-line.is-comment .params { color: #555; font-style: italic; }
 
@@ -151,9 +150,22 @@
             display: flex; flex-direction: column;
         }
         .output-header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .btn-compile { background: var(--text-main); color: #000; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; }
-        .btn-compile:hover { background: #fff; }
-        .btn-compile:disabled { background: #333; color: #888; cursor: not-allowed; }
+
+        /* КНОПКИ В OUTPUT */
+        .output-actions { display: flex; gap: 10px; }
+
+        .btn-action {
+            background: var(--text-main); color: #000; border: none;
+            padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer;
+            font-size: 0.85rem; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-action:hover { background: #fff; }
+        .btn-action:disabled { background: #333; color: #888; cursor: not-allowed; }
+
+        /* Стиль кнопки COPY */
+        .btn-copy { background: #222; color: #ccc; border: 1px solid #333; }
+        .btn-copy:hover { background: #333; color: #fff; border-color: #555; }
+
         .output-content { flex: 1; padding: 20px; font-family: 'Courier Prime', monospace; font-size: 0.85rem; color: #aaa; white-space: pre-wrap; overflow-y: auto; }
 
         /* --- MODAL --- */
@@ -251,7 +263,12 @@
         <div class="output-panel">
             <div class="output-header">
                 <span style="color:#666; font-weight:bold;">OUTPUT</span>
-                <button id="btnCompile" class="btn-compile" onclick="compile()">COMPILE</button>
+                <div class="output-actions">
+                    <button id="btnCopy" class="btn-action btn-copy" onclick="copyOutput()">
+                        <i class="ph ph-copy"></i> COPY
+                    </button>
+                    <button id="btnCompile" class="btn-action" onclick="compile()">COMPILE</button>
+                </div>
             </div>
             <div id="output" class="output-content">Результат компиляции появится здесь...</div>
         </div>
@@ -271,6 +288,7 @@
     </div>
 
     <script>
+        // ИСПОЛЬЗУЕМ fetch С GITHUB (КАК В ВЕРСИИ 0.6)
         const GITHUB_BASE = 'https://raw.githubusercontent.com/slasten3826/processlang/main/modules/';
         const MODULE_MAP = {
             'FLOW': 'FluidCore.txt', 'CONNECT': 'EmergentConnection.txt', 'DISSOLVE': 'FormDissolution.txt',
@@ -290,7 +308,6 @@
             'LOGIC': { color: '#7dd3fc', params: [{name: 'rule', type: 'text', def:''}, {name: 'mode', type: 'select', opts:['eternal','limited'], def:'eternal'}] },
             'RUNTIME': { color: '#60a5fa', params: [{name: 'pattern', type: 'text', def:''}, {name: 'repetitions', type: 'number', def:20}] },
             'MANIFEST': { color: '#fb923c', params: [{name: 'format', type: 'select', opts:['detailed','minimal','flowing', 'structured', 'technical', 'conversational'], def:'detailed'}, {name: 'loss', type: 'slider', def: 0.2}] },
-            // Спец. команда для комментариев
             '#': { color: '#444', params: [{name: 'text', type: 'text', def: ''}] }
         };
 
@@ -298,25 +315,18 @@
         let editingId = null;
         let currentMode = 'visual';
 
-        // --- SYNCHRONIZATION LOGIC ---
         function setMode(mode) {
             if (mode === currentMode) return;
-
             const rawArea = document.getElementById('rawCodeArea');
             const queryInput = document.getElementById('queryInput');
 
             if (mode === 'code') {
-                // VISUAL -> CODE
                 let code = generateCodeFromBlocks();
-                // Добавляем QUERY в конец кода, так привычнее редактировать
                 code += `\nQUERY: ${queryInput.value}`;
                 rawArea.value = code;
             } else {
-                // CODE -> VISUAL (PARSER)
-                const fullText = rawArea.value;
-                parseCodeToBlocks(fullText);
+                parseCodeToBlocks(rawArea.value);
             }
-
             currentMode = mode;
             updateUIForMode();
         }
@@ -324,7 +334,6 @@
         function updateUIForMode() {
             document.getElementById('btnModeVisual').classList.toggle('active', currentMode === 'visual');
             document.getElementById('btnModeCode').classList.toggle('active', currentMode === 'code');
-
             const toolbar = document.getElementById('toolbar');
             const canvas = document.getElementById('canvas');
             const rawArea = document.getElementById('rawCodeArea');
@@ -340,11 +349,10 @@
                 toolbar.classList.add('hidden');
                 canvas.style.display = 'none';
                 rawArea.classList.add('active');
-                queryPanel.style.display = 'none'; // Query редактируется внутри текста
+                queryPanel.style.display = 'none';
             }
         }
 
-        // --- PARSER (THE BRAIN) ---
         function generateCodeFromBlocks() {
             let code = "";
             workspaceData.forEach(block => {
@@ -375,62 +383,33 @@
             for (let line of lines) {
                 line = line.trim();
                 if (!line) continue;
-
-                // 1. QUERY Parsing
                 if (line.startsWith('QUERY:')) {
                     queryFound = true;
                     queryText = line.replace('QUERY:', '').trim();
                     continue;
                 }
-                if (queryFound) {
-                    queryText += "\n" + line; // Multiline query support
-                    continue;
-                }
-
-                // 2. COMMENT Parsing
+                if (queryFound) { queryText += "\n" + line; continue; }
                 if (line.startsWith('#')) {
-                    workspaceData.push({
-                        id: Date.now() + Math.random(),
-                        type: '#',
-                        params: { text: line.substring(1).trim() }
-                    });
+                    workspaceData.push({ id: Date.now() + Math.random(), type: '#', params: { text: line.substring(1).trim() } });
                     continue;
                 }
-
-                // 3. COMMAND Parsing
-                // Regex: CommandName followed by key=value pairs
-                // Supports: key="val with spaces", key=[arr, ay], key=simple
                 const cmdMatch = line.match(/^([A-Z]+)\s+(.*)/);
                 if (cmdMatch) {
                     const type = cmdMatch[1];
                     const argsStr = cmdMatch[2];
-
                     if (COMMANDS[type]) {
                         const params = {};
-                        // Сложная регулярка для парсинга параметров
                         const paramRegex = /([a-z]+)=((?:\[.*?\])|(?:"[^"]*")|(?:[^ ]+))/g;
                         let match;
                         while ((match = paramRegex.exec(argsStr)) !== null) {
                             const key = match[1];
                             let val = match[2];
-
-                            // Clean value
-                            if (val.startsWith('"') && val.endsWith('"')) {
-                                val = val.slice(1, -1);
-                            } else if (val.startsWith('[') && val.endsWith(']')) {
-                                // Parse array: ["a", "b"] -> [a, b]
-                                val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-                            } else if (!isNaN(val)) {
-                                val = parseFloat(val);
-                            }
+                            if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+                            else if (val.startsWith('[') && val.endsWith(']')) val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+                            else if (!isNaN(val)) val = parseFloat(val);
                             params[key] = val;
                         }
-
-                        // Fill missing defaults
-                        COMMANDS[type].params.forEach(p => {
-                            if (params[p.name] === undefined) params[p.name] = p.def;
-                        });
-
+                        COMMANDS[type].params.forEach(p => { if (params[p.name] === undefined) params[p.name] = p.def; });
                         workspaceData.push({ id: Date.now() + Math.random(), type, params });
                     }
                 }
@@ -438,155 +417,75 @@
             queryInput.value = queryText;
         }
 
-        // --- RENDER WORKSPACE ---
         function renderWorkspace() {
             const canvas = document.getElementById('canvas');
             canvas.innerHTML = '';
-
-            if (workspaceData.length === 0) {
-                canvas.innerHTML = '<div class="empty-state">Добавьте команды или переключитесь в CODE...</div>';
-                return;
-            }
-
+            if (workspaceData.length === 0) { canvas.innerHTML = '<div class="empty-state">Добавьте команды или переключитесь в CODE...</div>'; return; }
             workspaceData.forEach(block => {
                 const div = document.createElement('div');
                 div.className = 'smart-line';
-
                 if (block.type === '#') {
-                    // Рендер комментария
                     div.classList.add('is-comment');
-                    div.innerHTML = `
-                        <span style="color:#666; font-weight:bold;">#</span>
-                        <span class="params" style="margin-left:10px;">${block.params.text}</span>
-                        <i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>
-                    `;
-                    // Редактирование коммента по клику
-                    div.onclick = () => {
-                        const newText = prompt("Редактировать комментарий:", block.params.text);
-                        if (newText !== null) {
-                            block.params.text = newText;
-                            renderWorkspace();
-                        }
-                    };
+                    div.innerHTML = `<span style="color:#666; font-weight:bold;">#</span><span class="params" style="margin-left:10px;">${block.params.text}</span><i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>`;
+                    div.onclick = () => { const newText = prompt("Редактировать:", block.params.text); if (newText) { block.params.text = newText; renderWorkspace(); } };
                 } else {
-                    // Рендер команды
                     const config = COMMANDS[block.type];
                     div.style.borderLeftColor = config.color;
-
                     let paramStr = '';
                     for (const [key, val] of Object.entries(block.params)) {
                         let displayVal = val;
                         if (Array.isArray(val)) displayVal = `[${val.map(v=>`"${v}"`).join(', ')}]`;
                         paramStr += `<span style="color:#666; margin-left:10px;">${key}=</span><span style="color:#bbb;">${displayVal}</span>`;
                     }
-
-                    div.innerHTML = `
-                        <span class="cmd-name" style="color:${config.color}">${block.type}</span>
-                        <span class="params">${paramStr}</span>
-                        <i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>
-                    `;
+                    div.innerHTML = `<span class="cmd-name" style="color:${config.color}">${block.type}</span><span class="params">${paramStr}</span><i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>`;
                     div.onclick = () => openModal(block.type, block.id);
                 }
                 canvas.appendChild(div);
             });
         }
 
-        // --- MODALS & EDITORS ---
-        function addCommentBlock() {
-            workspaceData.push({
-                id: Date.now(),
-                type: '#',
-                params: { text: 'Ваш комментарий...' }
-            });
-            renderWorkspace();
-            // Scroll to bottom
-            const canvas = document.getElementById('canvas');
-            setTimeout(() => canvas.scrollTop = canvas.scrollHeight, 50);
-        }
-
+        function addCommentBlock() { workspaceData.push({ id: Date.now(), type: '#', params: { text: 'Ваш комментарий...' } }); renderWorkspace(); setTimeout(() => document.getElementById('canvas').scrollTop = 9999, 50); }
         function openModal(type, id = null) {
-            editingId = id;
-            const config = COMMANDS[type];
-            const data = id !== null ? workspaceData.find(x => x.id === id).params : null;
-
-            document.getElementById('modalTitle').style.color = config.color;
-            document.getElementById('modalTitle').innerText = type;
-            document.getElementById('modal').classList.add('active');
-
+            editingId = id; const config = COMMANDS[type]; const data = id !== null ? workspaceData.find(x => x.id === id).params : null;
+            document.getElementById('modalTitle').style.color = config.color; document.getElementById('modalTitle').innerText = type; document.getElementById('modal').classList.add('active');
             let html = '';
             config.params.forEach(p => {
                 const val = data ? data[p.name] : p.def;
                 html += `<div class="form-group"><label class="form-label">${p.name.toUpperCase()}</label>`;
-
-                if (p.type === 'slider') {
-                    html += `<input type="range" min="0" max="1" step="0.05" value="${val}" id="inp_${p.name}" oninput="this.nextElementSibling.innerText=this.value">
-                             <span class="range-val">${val}</span>`;
-                } else if (p.type === 'text') {
-                    html += `<input type="text" value="${val}" id="inp_${p.name}" class="input-text">`;
-                } else if (p.type === 'number') {
-                    html += `<input type="number" value="${val}" id="inp_${p.name}" class="input-text">`;
-                } else if (p.type === 'select') {
-                    html += `<div class="radio-group">`;
-                    p.opts.forEach(opt => {
-                        const active = opt === val ? 'active' : '';
-                        html += `<div class="radio-btn ${active}" onclick="selectRadio(this, '${p.name}')" data-val="${opt}">${opt}</div>`;
-                    });
-                    html += `<input type="hidden" id="inp_${p.name}" value="${val}"></div>`;
-                } else if (p.type === 'tags') {
-                    html += `<div class="tags-container" onclick="document.getElementById('input_${p.name}').focus()">`;
-                    html += `<div id="chips_${p.name}" style="display:contents">`;
-                    (Array.isArray(val) ? val : []).forEach(t => { html += createTagHtml(t); });
-                    html += `</div>`;
-                    html += `<input id="input_${p.name}" class="tags-input-field" onkeydown="handleTag(event, this, 'chips_${p.name}')"></div>`;
-                }
+                if (p.type === 'slider') html += `<input type="range" min="0" max="1" step="0.05" value="${val}" id="inp_${p.name}" oninput="this.nextElementSibling.innerText=this.value"><span class="range-val">${val}</span>`;
+                else if (p.type === 'text') html += `<input type="text" value="${val}" id="inp_${p.name}" class="input-text">`;
+                else if (p.type === 'number') html += `<input type="number" value="${val}" id="inp_${p.name}" class="input-text">`;
+                else if (p.type === 'select') { html += `<div class="radio-group">`; p.opts.forEach(opt => { const active = opt === val ? 'active' : ''; html += `<div class="radio-btn ${active}" onclick="selectRadio(this, '${p.name}')" data-val="${opt}">${opt}</div>`; }); html += `<input type="hidden" id="inp_${p.name}" value="${val}"></div>`; }
+                else if (p.type === 'tags') { html += `<div class="tags-container" onclick="document.getElementById('input_${p.name}').focus()"><div id="chips_${p.name}" style="display:contents">`; (Array.isArray(val) ? val : []).forEach(t => html += `<div class="tag-chip"><span class="tag-text">${t}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`); html += `</div><input id="input_${p.name}" class="tags-input-field" onkeydown="handleTag(event, this, 'chips_${p.name}')"></div>`; }
                 html += `</div>`;
             });
-
-            document.getElementById('modal').dataset.type = type;
-            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('modal').dataset.type = type; document.getElementById('modalBody').innerHTML = html;
         }
 
-        // Helpers (Tags, Radio, Modal logic is same as before)
-        function createTagHtml(text) { return `<div class="tag-chip"><span class="tag-text">${text}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`; }
-        function handleTag(e, input, containerId) {
-            if (e.key === 'Enter') { e.preventDefault(); const val = input.value.trim(); if(val){ document.getElementById(containerId).insertAdjacentHTML('beforeend', createTagHtml(val)); input.value=''; } }
-        }
+        function handleTag(e, input, containerId) { if (e.key === 'Enter') { e.preventDefault(); const val = input.value.trim(); if(val){ document.getElementById(containerId).insertAdjacentHTML('beforeend', `<div class="tag-chip"><span class="tag-text">${val}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`); input.value=''; } } }
         function selectRadio(el, name) { el.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); document.getElementById(`inp_${name}`).value = el.dataset.val; }
         function closeModal() { document.getElementById('modal').classList.remove('active'); editingId = null; }
         function saveCommand() {
-            const type = document.getElementById('modal').dataset.type;
-            const config = COMMANDS[type];
-            const params = {};
-            config.params.forEach(p => {
-                if (p.type === 'tags') {
-                    const tags = []; document.querySelectorAll(`#chips_${p.name} .tag-text`).forEach(el => tags.push(el.innerText)); params[p.name] = tags;
-                } else { params[p.name] = document.getElementById(`inp_${p.name}`).value; }
-            });
-            if (editingId !== null) { const idx = workspaceData.findIndex(x => x.id === editingId); workspaceData[idx].params = params; }
-            else { workspaceData.push({ id: Date.now(), type, params }); }
+            const type = document.getElementById('modal').dataset.type; const config = COMMANDS[type]; const params = {};
+            config.params.forEach(p => { if (p.type === 'tags') { const tags = []; document.querySelectorAll(`#chips_${p.name} .tag-text`).forEach(el => tags.push(el.innerText)); params[p.name] = tags; } else { params[p.name] = document.getElementById(`inp_${p.name}`).value; } });
+            if (editingId !== null) { const idx = workspaceData.findIndex(x => x.id === editingId); workspaceData[idx].params = params; } else { workspaceData.push({ id: Date.now(), type, params }); }
             renderWorkspace(); closeModal();
         }
         function deleteBlock(id) { workspaceData = workspaceData.filter(x => x.id !== id); renderWorkspace(); }
 
-        // --- COMPILATION ---
         async function compile() {
-            // Если мы в CODE режиме, сначала синхронизируемся, чтобы обновить визуальные данные (хотя компилировать можно и текст напрямую, но лучше через общую структуру)
-            if (currentMode === 'code') {
-                const rawText = document.getElementById('rawCodeArea').value;
-                parseCodeToBlocks(rawText);
-                // Не переключаем режим, просто обновляем данные
-            }
-
+            if (currentMode === 'code') parseCodeToBlocks(document.getElementById('rawCodeArea').value);
             const btn = document.getElementById('btnCompile');
             const outputDiv = document.getElementById('output');
 
-            btn.disabled = true; btn.innerText = "ЗАГРУЗКА..."; outputDiv.innerText = "Загрузка модулей...";
+            btn.disabled = true; btn.innerText = "ЗАГРУЗКА..."; outputDiv.innerText = "Загрузка модулей с GitHub...";
 
             try {
                 // Фильтруем комментарии перед компиляцией!
                 const activeBlocks = workspaceData.filter(b => b.type !== '#');
                 const uniqueTypes = [...new Set(activeBlocks.map(x => x.type))];
 
+                // ФЕТЧИМ С ГИТХАБА (КАК В ВЕРСИИ 0.6)
                 const fetchPromises = uniqueTypes.map(async (type) => {
                     const filename = MODULE_MAP[type];
                     if (!filename) return ``;
@@ -618,6 +517,31 @@
 
             } catch (error) { outputDiv.innerText = "ERROR: " + error.message; }
             finally { btn.disabled = false; btn.innerText = "COMPILE"; }
+        }
+
+        // --- НОВАЯ ФУНКЦИЯ КОПИРОВАНИЯ ---
+        function copyOutput() {
+            const outputText = document.getElementById('output').innerText;
+            if (!outputText || outputText.includes("Результат компиляции...")) return;
+
+            navigator.clipboard.writeText(outputText).then(() => {
+                const btn = document.getElementById('btnCopy');
+                const originalHtml = btn.innerHTML;
+
+                // Визуальный эффект
+                btn.innerHTML = `<i class="ph ph-check"></i> COPIED`;
+                btn.style.borderColor = '#00ff88';
+                btn.style.color = '#00ff88';
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.style.borderColor = '#333';
+                    btn.style.color = '#ccc';
+                }, 2000);
+            }).catch(err => {
+                console.error('Ошибка:', err);
+                alert("Не удалось скопировать (проверьте права доступа в браузере)");
+            });
         }
     </script>
 </body>
