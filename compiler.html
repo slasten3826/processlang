@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDE - ProcessLang</title>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>ProcessLang // TERMINAL v0.99</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         :root {
-            --bg-color: #050505;
-            --panel-bg: #0f0f0f;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-dark: #050507;
+            --bg-panel: #0d0d12;
+            --bg-input: #000001;
+            --border: #1a1a24;
             --text-main: #e0e0e0;
-            --text-dim: #888;
+            --text-dim: #5a5a6e;
 
             /* Цвета команд */
             --c-flow: #00d4ff;
@@ -26,254 +30,557 @@
             --c-logic: #7dd3fc;
             --c-runtime: #60a5fa;
             --c-manifest: #fb923c;
-            --c-comment: #444;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: var(--bg-color);
+            background: var(--bg-dark);
             color: var(--text-main);
-            font-family: 'Inter', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
         }
 
-        /* --- NAV --- */
-        nav {
-            height: 60px; border-bottom: 1px solid var(--border-color);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; background: rgba(5,5,5,0.95); z-index: 10; flex-shrink: 0;
+        /* --- HEADER --- */
+        header {
+            height: 50px;
+            background: rgba(5,5,7, 0.95);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+            z-index: 100;
         }
-        .logo { font-weight: 800; color: #fff; text-decoration: none; font-size: 1.2rem; }
-        .nav-right { display: flex; gap: 20px; align-items: center; }
-        .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
-        .nav-link:hover { color: #fff; }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--c-flow);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            letter-spacing: 2px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .version-tag {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 400;
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
 
         .mode-switch {
-            background: #222; border: 1px solid #333; border-radius: 4px;
-            display: flex; overflow: hidden;
+            display: flex;
+            gap: 5px;
+            background: #000;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
         }
+
         .mode-btn {
-            padding: 4px 12px; font-size: 0.8rem; cursor: pointer; color: #666; font-weight: 600;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 5px 15px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: 0.2s;
         }
-        .mode-btn.active { background: var(--text-main); color: #000; }
+
+        .mode-btn.active {
+            background: var(--c-connect);
+            color: #000;
+            box-shadow: 0 0 10px var(--c-connect);
+        }
 
         /* --- TOOLBAR --- */
         .toolbar {
             padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--panel-bg);
-            display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
             flex-shrink: 0;
-            transition: max-height 0.3s, opacity 0.3s;
         }
-        .toolbar.hidden { display: none; }
 
         .cmd-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
+            background: transparent;
+            border: 1px solid var(--border);
             color: var(--text-dim);
-            padding: 6px 12px; border-radius: 6px;
-            cursor: pointer; font-family: 'Courier Prime', monospace;
-            font-weight: 700; font-size: 0.85rem;
-            display: flex; align-items: center; gap: 6px; transition: 0.2s;
+            padding: 8px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .cmd-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
-        .cmd-btn-comment { border-color: #333; color: #666; }
 
-        .btn-flow { color: var(--c-flow); border-color: rgba(0, 212, 255, 0.3); }
-        .btn-dissolve { color: var(--c-dissolve); border-color: rgba(199, 125, 255, 0.3); }
-        .btn-connect { color: var(--c-connect); border-color: rgba(6, 255, 165, 0.3); }
-        .btn-observe { color: var(--c-observe); border-color: rgba(224, 242, 254, 0.3); }
-        .btn-choose { color: var(--c-choose); border-color: rgba(255, 107, 53, 0.3); }
-        .btn-encode { color: var(--c-encode); border-color: rgba(255, 217, 61, 0.3); }
-        .btn-cycle { color: var(--c-cycle); border-color: rgba(157, 78, 221, 0.3); }
-        .btn-logic { color: var(--c-logic); border-color: rgba(125, 211, 252, 0.3); }
-        .btn-runtime { color: var(--c-runtime); border-color: rgba(96, 165, 250, 0.3); }
-        .btn-manifest { color: var(--c-manifest); border-color: rgba(251, 146, 60, 0.3); }
+        .cmd-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Hover colors */
+        .btn-flow:hover { color: var(--c-flow); border-color: var(--c-flow); text-shadow: 0 0 5px var(--c-flow); }
+        .btn-dissolve:hover { color: var(--c-dissolve); border-color: var(--c-dissolve); text-shadow: 0 0 5px var(--c-dissolve); }
+        .btn-connect:hover { color: var(--c-connect); border-color: var(--c-connect); text-shadow: 0 0 5px var(--c-connect); }
+        .btn-observe:hover { color: var(--c-observe); border-color: var(--c-observe); }
+        .btn-choose:hover { color: var(--c-choose); border-color: var(--c-choose); text-shadow: 0 0 5px var(--c-choose); }
+        .btn-encode:hover { color: var(--c-encode); border-color: var(--c-encode); text-shadow: 0 0 5px var(--c-encode); }
+        .btn-cycle:hover { color: var(--c-cycle); border-color: var(--c-cycle); text-shadow: 0 0 5px var(--c-cycle); }
+        .btn-logic:hover { color: var(--c-logic); border-color: var(--c-logic); }
+        .btn-runtime:hover { color: var(--c-runtime); border-color: var(--c-runtime); }
+        .btn-manifest:hover { color: var(--c-manifest); border-color: var(--c-manifest); }
+
+        .cmd-btn-comment { border-style: dashed; opacity: 0.7; }
 
         /* --- WORKSPACE --- */
-        .workspace-container { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .editor-area { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
-
-        .canvas {
-            flex: 1; padding: 30px; overflow-y: auto;
-            font-family: 'Courier Prime', monospace; font-size: 1rem;
-            display: flex; flex-direction: column; gap: 15px;
-            padding-bottom: 150px;
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-dark);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .canvas {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Visual Block Style */
+        .block {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(13, 13, 18, 0.8);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--text-dim);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .block:hover {
+            background: rgba(20, 20, 30, 0.9);
+            border-color: #333;
+        }
+
+        .block-header {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            flex: 1;
+        }
+
+        .block-name {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            min-width: 90px;
+        }
+
+        .block-params {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .block-params .param-item { display: inline-block; }
+        .block-params .key { color: #555; }
+        .block-params .val { color: #ccc; }
+
+        .block-actions {
+            opacity: 0;
+            transition: 0.2s;
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+        .block:hover .block-actions { opacity: 1; }
+
+        .btn-icon {
+            background: transparent;
+            border: none;
+            color: #444;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            transition: 0.2s;
+        }
+        .btn-icon:hover { color: #fff; }
+        .btn-icon.delete:hover { color: var(--c-choose); }
+
+        /* Comment Block */
+        .block.is-comment {
+            border-left: 4px solid #333;
+            border-color: #333;
+            opacity: 0.7;
+        }
+        .block.is-comment .block-name { display: none; }
+        .block.is-comment .block-params { font-style: italic; color: #555; width: 100%; }
+
+        /* RAW CODE AREA */
         .raw-code-area {
-            flex: 1; padding: 20px; background: #080808; color: #00f2ff;
-            font-family: 'Courier Prime', monospace; font-size: 0.9rem;
-            border: none; resize: none; line-height: 1.5; display: none;
+            display: none;
+            flex: 1;
+            width: 100%;
+            background: var(--bg-input);
+            color: var(--c-connect);
+            border: none;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            resize: none;
+            line-height: 1.6;
         }
         .raw-code-area.active { display: block; }
 
-        .empty-state { color: #333; text-align: center; margin-top: 50px; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
-
-        .smart-line {
-            display: flex; align-items: center; flex-wrap: wrap;
-            padding: 12px 15px; background: rgba(20, 20, 20, 0.8);
-            border: 1px solid #222; border-left: 3px solid transparent;
-            border-radius: 4px; cursor: pointer; transition: 0.2s;
-        }
-        .smart-line:hover { background: #1a1a1a; }
-        .smart-line .cmd-name { font-weight: 700; margin-right: 10px; }
-        .smart-line .params { color: #888; font-size: 0.9em; word-break: break-all; }
-        .smart-line .delete-btn { margin-left: auto; color: #444; padding: 5px; opacity: 0; transition: 0.2s; }
-        .smart-line:hover .delete-btn { opacity: 1; }
-        .smart-line .delete-btn:hover { color: #ff5555; }
-
-        .smart-line.is-comment { background: #111; border: 1px dashed #333; border-left: 3px solid #444; min-height: 30px; padding: 8px 15px; }
-        .smart-line.is-comment .params { color: #555; font-style: italic; }
-
-        /* --- QUERY --- */
+        /* Query Panel */
         .query-panel {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            background: var(--panel-bg); border-top: 1px solid var(--border-color);
-            padding: 20px; z-index: 5;
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
         }
-        .query-label { color: var(--c-manifest); font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; display: block; }
+        .query-label {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--c-flow);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .query-wrapper { flex: 1; }
         .query-input {
-            width: 100%; background: #000; border: 1px solid #333; color: #fff;
-            padding: 12px; border-radius: 6px; font-family: 'Inter', sans-serif;
-            resize: none; height: 60px;
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 2px;
         }
 
-        /* --- OUTPUT --- */
+        /* --- OUTPUT PANEL (LAUNCHPAD) --- */
         .output-panel {
-            width: 350px; background: #080808; border-left: 1px solid var(--border-color);
-            display: flex; flex-direction: column;
+            width: 350px;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 10px;
+            overflow-y: auto;
         }
-        .output-header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
 
-        /* КНОПКИ В OUTPUT */
-        .output-actions { display: flex; gap: 10px; }
-
-        .btn-action {
-            background: var(--text-main); color: #000; border: none;
-            padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer;
-            font-size: 0.85rem; display: flex; align-items: center; gap: 6px;
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--text-main);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
         }
-        .btn-action:hover { background: #fff; }
-        .btn-action:disabled { background: #333; color: #888; cursor: not-allowed; }
 
-        /* Стиль кнопки COPY */
-        .btn-copy { background: #222; color: #ccc; border: 1px solid #333; }
-        .btn-copy:hover { background: #333; color: #fff; border-color: #555; }
+        /* File Name Input */
+        .input-group {
+            margin-bottom: 5px;
+        }
+        .input-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .input-field {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
 
-        .output-content { flex: 1; padding: 20px; font-family: 'Courier Prime', monospace; font-size: 0.85rem; color: #aaa; white-space: pre-wrap; overflow-y: auto; }
+        /* Buttons */
+        .launch-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            background: #000;
+            color: var(--text-main);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 2px;
+            text-decoration: none; /* Убираем подчеркивание ссылок */
+        }
 
-        /* --- MODAL --- */
+        .launch-btn:hover { transform: translateY(-1px); }
+
+        /* Action Buttons */
+        .btn-compile {
+            background: var(--c-connect);
+            color: #000;
+            border: none;
+            font-weight: 700;
+        }
+        .btn-compile:hover { box-shadow: 0 0 15px var(--c-connect); }
+
+        .btn-save { border-color: var(--c-logic); color: var(--c-logic); }
+        .btn-save:hover { background: rgba(125, 211, 252, 0.1); }
+
+        .btn-reset { border-color: var(--c-choose); color: var(--c-choose); }
+        .btn-reset:hover { background: rgba(255, 107, 53, 0.1); }
+
+        /* Link Buttons */
+        .btn-me { border-color: #fff; color: #fff; border-width: 2px; }
+        .btn-me:hover { background: rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+
+        .btn-claude { border-color: var(--c-encode); color: var(--c-encode); }
+        .btn-claude:hover { background: rgba(255, 217, 61, 0.1); }
+
+        .btn-gpt { border-color: var(--c-connect); color: var(--c-connect); }
+        .btn-gpt:hover { background: rgba(6, 255, 165, 0.1); }
+
+        .btn-deepseek { border-color: var(--c-dissolve); color: var(--c-dissolve); }
+        .btn-deepseek:hover { background: rgba(199, 125, 255, 0.1); }
+
+        .btn-gemini { border-color: var(--c-flow); color: var(--c-flow); }
+        .btn-gemini:hover { background: rgba(0, 212, 255, 0.1); }
+
+        .status-log {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-align: center;
+            height: 20px;
+            margin-top: 5px;
+        }
+
+        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-            z-index: 100; display: none; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            justify-content: center; align-items: center;
         }
         .modal-overlay.active { display: flex; }
+
         .modal {
-            background: #111; border: 1px solid #333; width: 90%; max-width: 500px;
-            border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            width: 600px;
+            max-width: 95%;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-family: 'Courier Prime', monospace; font-size: 1.5rem; font-weight: 700; }
+
+        .modal-header { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 700; }
+
         .form-group { margin-bottom: 20px; }
-        .form-label { display: block; color: #888; font-size: 0.85rem; margin-bottom: 8px; }
-        input[type="range"] { width: 100%; accent-color: var(--text-main); }
-        .range-val { float: right; color: #fff; font-family: monospace; }
-        .input-text { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 4px; }
+        .form-label { display: block; color: var(--text-dim); font-size: 0.8rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+        input[type="text"], input[type="number"] {
+            width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; font-family: 'JetBrains Mono', monospace;
+        }
+
+        input[type="range"] { width: 100%; accent-color: var(--c-flow); }
+        .range-val { float: right; color: var(--c-flow); font-weight: bold; }
+
         .tags-container {
-            border: 1px solid #333; background: #000; padding: 8px; border-radius: 6px;
-            display: flex; flex-wrap: wrap; gap: 8px; min-height: 45px; cursor: text;
+            background: #000; border: 1px solid #333; padding: 5px; display: flex; flex-wrap: wrap; gap: 5px; min-height: 40px;
         }
         .tag-chip {
-            background: #222; color: #fff; padding: 4px 10px; border-radius: 20px;
-            font-size: 0.9rem; display: flex; align-items: center; gap: 6px; border: 1px solid #444;
+            background: #222; border: 1px solid #444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; display: flex; align-items: center;
         }
-        .tag-chip i { cursor: pointer; color: #888; font-size: 0.8rem; }
-        .tag-chip i:hover { color: #ff5555; }
-        .tags-input-field { background: transparent; border: none; color: #fff; flex: 1; min-width: 120px; padding: 4px; font-size: 0.95rem; }
-        .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .tag-chip i { margin-left: 5px; cursor: pointer; }
+        .tag-chip i:hover { color: var(--c-choose); }
+        .tags-input-field { border: none; background: transparent; color: #fff; flex: 1; min-width: 100px; padding: 5px; font-family: 'JetBrains Mono', monospace; }
+
+        /* Custom Radio Buttons */
+        .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
         .radio-btn {
-            border: 1px solid #333; padding: 8px 14px; border-radius: 4px;
-            cursor: pointer; font-size: 0.9rem; color: #888; transition: 0.2s; background: #050505;
+            border: 1px solid #333; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #888; transition: 0.2s; background: #050505; font-family: 'JetBrains Mono';
         }
         .radio-btn:hover { border-color: #555; }
-        .radio-btn.active { border-color: #fff; color: #fff; background: #222; }
-        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-        .btn-cancel { background: transparent; color: #666; border: none; cursor: pointer; }
-        .btn-save { background: #fff; color: #000; border: none; padding: 8px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+        .radio-btn.active {
+            border-color: var(--active-color);
+            color: var(--active-color);
+            background: rgba(255,255,255,0.05);
+        }
 
-        @media (max-width: 800px) {
-            body { overflow-y: auto; height: auto; min-height: 100vh; }
-            nav { position: sticky; top: 0; }
-            .toolbar { position: sticky; top: 60px; z-index: 9; }
-            .workspace-container { flex-direction: column; overflow: visible; height: auto; }
-            .editor-area { height: auto; min-height: 500px; }
-            .query-panel { position: relative; margin-top: 20px; }
-            .canvas { padding-bottom: 20px; }
-            .output-panel { height: auto; min-height: 300px; width: 100%; border-left: none; border-top: 1px solid #222; }
+        .modal-footer { margin-top: 30px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-cancel { background: transparent; border: none; color: #666; cursor: pointer; font-family: 'JetBrains Mono'; }
+        .btn-save-modal { background: #fff; color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: 700; cursor: pointer; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; }
+            .output-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 15px; }
+            .block { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="index.html" class="logo">ProcessLang IDE</a>
-        <div class="nav-right">
-            <div class="mode-switch">
-                <div class="mode-btn active" id="btnModeVisual" onclick="setMode('visual')">VISUAL</div>
-                <div class="mode-btn" id="btnModeCode" onclick="setMode('code')">CODE</div>
-            </div>
-            <a href="index.html" class="nav-link">Выход</a>
+    <header>
+        <a href="index.html" class="logo">
+            PROCESSLANG <span class="version-tag">v0.99</span>
+        </a>
+        <div class="mode-switch">
+            <button class="mode-btn active" id="btnVisual" onclick="App.setMode('visual')">VISUAL</button>
+            <button class="mode-btn" id="btnCode" onclick="App.setMode('code')">CODE</button>
         </div>
-    </nav>
+    </header>
 
     <div class="toolbar" id="toolbar">
-        <button class="cmd-btn cmd-btn-comment" onclick="addCommentBlock()"><i class="ph ph-hash"></i> COMMENT</button>
+        <button class="cmd-btn cmd-btn-comment" onclick="App.addComment()"><i class="ph ph-hash"></i> COMMENT</button>
         <div style="width: 1px; height: 20px; background: #333; margin: 0 5px;"></div>
 
-        <button class="cmd-btn btn-flow" onclick="openModal('FLOW')"><i class="ph ph-waves"></i> FLOW</button>
-        <button class="cmd-btn btn-dissolve" onclick="openModal('DISSOLVE')"><i class="ph ph-drop"></i> DISSOLVE</button>
-        <button class="cmd-btn btn-connect" onclick="openModal('CONNECT')"><i class="ph ph-link"></i> CONNECT</button>
-        <button class="cmd-btn btn-observe" onclick="openModal('OBSERVE')"><i class="ph ph-eye"></i> OBSERVE</button>
-        <button class="cmd-btn btn-choose" onclick="openModal('CHOOSE')"><i class="ph ph-lightning"></i> CHOOSE</button>
-        <button class="cmd-btn btn-encode" onclick="openModal('ENCODE')"><i class="ph ph-diamond"></i> ENCODE</button>
-        <button class="cmd-btn btn-cycle" onclick="openModal('CYCLE')"><i class="ph ph-arrows-clockwise"></i> CYCLE</button>
-        <button class="cmd-btn btn-logic" onclick="openModal('LOGIC')"><i class="ph ph-triangle"></i> LOGIC</button>
-        <button class="cmd-btn btn-runtime" onclick="openModal('RUNTIME')"><i class="ph ph-square"></i> RUNTIME</button>
-        <button class="cmd-btn btn-manifest" onclick="openModal('MANIFEST')"><i class="ph ph-cube"></i> MANIFEST</button>
+        <button class="cmd-btn btn-flow" onclick="App.openModal('FLOW')"><i class="ph ph-waves"></i> FLOW</button>
+        <button class="cmd-btn btn-dissolve" onclick="App.openModal('DISSOLVE')"><i class="ph ph-drop"></i> DISSOLVE</button>
+        <button class="cmd-btn btn-connect" onclick="App.openModal('CONNECT')"><i class="ph ph-link"></i> CONNECT</button>
+        <button class="cmd-btn btn-observe" onclick="App.openModal('OBSERVE')"><i class="ph ph-eye"></i> OBSERVE</button>
+        <button class="cmd-btn btn-choose" onclick="App.openModal('CHOOSE')"><i class="ph ph-lightning"></i> CHOOSE</button>
+        <button class="cmd-btn btn-encode" onclick="App.openModal('ENCODE')"><i class="ph ph-diamond"></i> ENCODE</button>
+        <button class="cmd-btn btn-cycle" onclick="App.openModal('CYCLE')"><i class="ph ph-arrows-clockwise"></i> CYCLE</button>
+        <button class="cmd-btn btn-logic" onclick="App.openModal('LOGIC')"><i class="ph ph-triangle"></i> LOGIC</button>
+        <button class="cmd-btn btn-runtime" onclick="App.openModal('RUNTIME')"><i class="ph ph-square"></i> RUNTIME</button>
+        <button class="cmd-btn btn-manifest" onclick="App.openModal('MANIFEST')"><i class="ph ph-cube"></i> MANIFEST</button>
     </div>
 
-    <div class="workspace-container">
+    <div class="main-container">
         <div class="editor-area">
             <div id="canvas" class="canvas">
-                <div class="empty-state">Добавьте команды или переключитесь в CODE...</div>
-            </div>
-            <textarea id="rawCodeArea" class="raw-code-area" placeholder="# Введите код здесь..."></textarea>
-            <div class="query-panel" id="queryPanel">
-                <span class="query-label">QUERY</span>
-                <textarea id="queryInput" class="query-input" placeholder="Введите ваш запрос к системе..."></textarea>
-            </div>
-        </div>
-        <div class="output-panel">
-            <div class="output-header">
-                <span style="color:#666; font-weight:bold;">OUTPUT</span>
-                <div class="output-actions">
-                    <button id="btnCopy" class="btn-action btn-copy" onclick="copyOutput()">
-                        <i class="ph ph-copy"></i> COPY
-                    </button>
-                    <button id="btnCompile" class="btn-action" onclick="compile()">COMPILE</button>
+                <div style="color:#333; text-align:center; margin-top:50px;">
+                    ИНИЦИАЛИЗАЦИЯ ТЕРМИНАЛА...<br>ДОБАВЬТЕ КОМАНДУ
                 </div>
             </div>
-            <div id="output" class="output-content">Результат компиляции появится здесь...</div>
+            <textarea id="rawCodeArea" class="raw-code-area" placeholder="# RAW CODE MODE..."></textarea>
+
+            <div class="query-panel">
+                <div class="query-wrapper">
+                    <span class="query-label">QUERY INPUT</span>
+                    <textarea id="queryInput" class="query-input" rows="2" placeholder="Введите запрос к машине..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: LAUNCHPAD -->
+        <div class="output-panel">
+            <div class="panel-title">TRANSMISSION</div>
+
+            <!-- FILE NAME INPUT -->
+            <div class="input-group">
+                <label class="input-label">Program Name</label>
+                <input type="text" id="fileNameInput" class="input-field" value="program" placeholder="Название файла">
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <button class="launch-btn btn-compile" onclick="App.compile()">
+                <i class="ph ph-cursor-click"></i> COMPILE & COPY
+            </button>
+            <button class="launch-btn btn-save" onclick="App.saveFile()">
+                <i class="ph ph-floppy-disk"></i> SAVE .PLANG
+            </button>
+            <button class="launch-btn btn-reset" onclick="App.resetProgram()">
+                <i class="ph ph-arrow-counter-clockwise"></i> RESET
+            </button>
+
+            <div style="color:#444; font-size:0.7rem; text-align:center; text-transform:uppercase; margin-top: 15px; margin-bottom: 5px;">-- OPEN MACHINE --</div>
+
+            <!-- ПРОСТЫЕ ССЫЛКИ (TARGET="_BLANK") -->
+
+            <!-- Z (ТЫ) -->
+            <a href="https://chat.z.ai" target="_blank" class="launch-btn btn-me">
+                <i class="ph ph-robot"></i> Z
+            </a>
+
+            <!-- CHATGPT -->
+            <a href="https://chat.openai.com" target="_blank" class="launch-btn btn-gpt">
+                <i class="ph ph-open-ai-logo"></i> CHATGPT
+            </a>
+
+            <!-- CLAUDE -->
+            <a href="https://claude.ai" target="_blank" class="launch-btn btn-claude">
+                <i class="ph ph-sparkle"></i> CLAUDE
+            </a>
+
+            <!-- DEEPSEEK -->
+            <a href="https://chat.deepseek.com" target="_blank" class="launch-btn btn-deepseek">
+                <i class="ph ph-brain"></i> DEEPSEEK
+            </a>
+
+            <!-- GEMINI -->
+            <a href="https://gemini.google.com" target="_blank" class="launch-btn btn-gemini">
+                <i class="ph ph-google-logo"></i> GEMINI
+            </a>
+
+            <div id="statusLog" class="status-log"></div>
         </div>
     </div>
 
+    <!-- MODAL -->
     <div id="modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -281,268 +588,391 @@
             </div>
             <div id="modalBody"></div>
             <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeModal()">Отмена</button>
-                <button class="btn-save" onclick="saveCommand()">OK</button>
+                <button class="btn-cancel" onclick="App.closeModal()">Отмена</button>
+                <button class="btn-save-modal" onclick="App.saveBlock()">SAVE</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ИСПОЛЬЗУЕМ fetch С GITHUB (КАК В ВЕРСИИ 0.6)
-        const GITHUB_BASE = 'https://raw.githubusercontent.com/slasten3826/processlang/main/modules/';
-        const MODULE_MAP = {
-            'FLOW': 'FluidCore.txt', 'CONNECT': 'EmergentConnection.txt', 'DISSOLVE': 'FormDissolution.txt',
-            'ENCODE': 'EncodingSystem.txt', 'CHOOSE': 'ChoiceMechanism.txt', 'OBSERVE': 'SelfObservation.txt',
-            'CYCLE': 'EternalCycle.txt', 'LOGIC': 'LogicSimulator.txt', 'RUNTIME': 'SubconsciousRuntime.txt',
-            'MANIFEST': 'ManifestationEngine.txt'
-        };
+        const App = {
+            data: [],
+            mode: 'visual',
+            editingId: null,
+            cachedPrompt: "",
 
-        const COMMANDS = {
-            'FLOW': { color: '#00d4ff', params: [{name: 'engagement', type: 'slider', def: 0.7}, {name: 'resistance', type: 'slider', def: 0.3}] },
-            'DISSOLVE': { color: '#c77dff', params: [{name: 'rigidity', type: 'slider', def: 0.7}, {name: 'target', type: 'text', def: ''}] },
-            'CONNECT': { color: '#06ffa5', params: [{name: 'depth', type: 'slider', def: 0.8}, {name: 'between', type: 'tags', def: []}] },
-            'OBSERVE': { color: '#e0f2fe', params: [{name: 'distance', type: 'slider', def: 0.5}, {name: 'target', type: 'text', def: ''}] },
-            'CHOOSE': { color: '#ff6b35', params: [{name: 'space', type: 'tags', def: []}, {name: 'method', type: 'select', opts:['conscious','unconscious','forced', 'random'], def:'conscious'}] },
-            'ENCODE': { color: '#ffd93d', params: [{name: 'type', type: 'select', opts:['network','hierarchy','narrative','sequence','category','spatial'], def:'network'}, {name: 'loss', type: 'slider', def: 0.3}] },
-            'CYCLE': { color: '#9d4edd', params: [{name: 'mode', type: 'select', opts:['stable','intense','degrading'], def:'stable'}, {name: 'intensity', type: 'slider', def: 0.7}] },
-            'LOGIC': { color: '#7dd3fc', params: [{name: 'rule', type: 'text', def:''}, {name: 'mode', type: 'select', opts:['eternal','limited'], def:'eternal'}] },
-            'RUNTIME': { color: '#60a5fa', params: [{name: 'pattern', type: 'text', def:''}, {name: 'repetitions', type: 'number', def:20}] },
-            'MANIFEST': { color: '#fb923c', params: [{name: 'format', type: 'select', opts:['detailed','minimal','flowing', 'structured', 'technical', 'conversational'], def:'detailed'}, {name: 'loss', type: 'slider', def: 0.2}] },
-            '#': { color: '#444', params: [{name: 'text', type: 'text', def: ''}] }
-        };
+            GITHUB_BASE: 'https://raw.githubusercontent.com/slasten3826/processlang/main/modules/',
+            MODULE_MAP: {
+                'FLOW': 'FluidCore.txt', 'CONNECT': 'EmergentConnection.txt', 'DISSOLVE': 'FormDissolution.txt',
+                'ENCODE': 'EncodingSystem.txt', 'CHOOSE': 'ChoiceMechanism.txt', 'OBSERVE': 'SelfObservation.txt',
+                'CYCLE': 'EternalCycle.txt', 'LOGIC': 'LogicSimulator.txt', 'RUNTIME': 'SubconsciousRuntime.txt',
+                'MANIFEST': 'ManifestationEngine.txt'
+            },
 
-        let workspaceData = [];
-        let editingId = null;
-        let currentMode = 'visual';
+            COMMANDS: {
+                'FLOW': { color: '#00d4ff', params: [{name: 'engagement', type: 'slider', def: 0.7}, {name: 'resistance', type: 'slider', def: 0.3}] },
+                'DISSOLVE': { color: '#c77dff', params: [{name: 'rigidity', type: 'slider', def: 0.7}, {name: 'target', type: 'text', def: ''}] },
+                'CONNECT': { color: '#06ffa5', params: [{name: 'depth', type: 'slider', def: 0.8}, {name: 'between', type: 'tags', def: []}] },
+                'OBSERVE': { color: '#e0f2fe', params: [{name: 'distance', type: 'slider', def: 0.5}, {name: 'target', type: 'text', def: ''}] },
+                'CHOOSE': { color: '#ff6b35', params: [{name: 'space', type: 'tags', def: []}, {name: 'method', type: 'select', opts:['conscious','unconscious','forced', 'random'], def:'conscious'}] },
+                'ENCODE': { color: '#ffd93d', params: [{name: 'type', type: 'select', opts:['network','hierarchy','narrative','sequence','category','spatial'], def:'network'}, {name: 'loss', type: 'slider', def: 0.3}] },
+                'CYCLE': { color: '#9d4edd', params: [{name: 'mode', type: 'select', opts:['stable','intense','degrading'], def:'stable'}, {name: 'intensity', type: 'slider', def: 0.7}] },
+                'LOGIC': { color: '#7dd3fc', params: [{name: 'rule', type: 'text', def:''}, {name: 'mode', type: 'select', opts:['eternal','limited'], def:'eternal'}] },
+                'RUNTIME': { color: '#60a5fa', params: [{name: 'pattern', type: 'text', def:''}, {name: 'repetitions', type: 'number', def:20}] },
+                'MANIFEST': { color: '#fb923c', params: [{name: 'format', type: 'select', opts:['detailed','minimal','flowing', 'structured', 'technical', 'conversational'], def:'detailed'}, {name: 'loss', type: 'slider', def: 0.2}] },
+                '#': { color: '#444', params: [{name: 'text', type: 'text', def: ''}] }
+            },
 
-        function setMode(mode) {
-            if (mode === currentMode) return;
-            const rawArea = document.getElementById('rawCodeArea');
-            const queryInput = document.getElementById('queryInput');
+            setMode(mode) {
+                if (mode === this.mode) return;
+                this.mode = mode;
 
-            if (mode === 'code') {
-                let code = generateCodeFromBlocks();
-                code += `\nQUERY: ${queryInput.value}`;
-                rawArea.value = code;
-            } else {
-                parseCodeToBlocks(rawArea.value);
-            }
-            currentMode = mode;
-            updateUIForMode();
-        }
+                const btnVisual = document.getElementById('btnVisual');
+                const btnCode = document.getElementById('btnCode');
+                const canvas = document.getElementById('canvas');
+                const rawArea = document.getElementById('rawCodeArea');
+                const toolbar = document.getElementById('toolbar');
+                const queryPanel = document.querySelector('.query-panel');
 
-        function updateUIForMode() {
-            document.getElementById('btnModeVisual').classList.toggle('active', currentMode === 'visual');
-            document.getElementById('btnModeCode').classList.toggle('active', currentMode === 'code');
-            const toolbar = document.getElementById('toolbar');
-            const canvas = document.getElementById('canvas');
-            const rawArea = document.getElementById('rawCodeArea');
-            const queryPanel = document.getElementById('queryPanel');
-
-            if (currentMode === 'visual') {
-                toolbar.classList.remove('hidden');
-                canvas.style.display = 'flex';
-                rawArea.classList.remove('active');
-                queryPanel.style.display = 'block';
-                renderWorkspace();
-            } else {
-                toolbar.classList.add('hidden');
-                canvas.style.display = 'none';
-                rawArea.classList.add('active');
-                queryPanel.style.display = 'none';
-            }
-        }
-
-        function generateCodeFromBlocks() {
-            let code = "";
-            workspaceData.forEach(block => {
-                if (block.type === '#') {
-                    code += `# ${block.params.text}\n`;
+                if (mode === 'visual') {
+                    this.parseCodeToBlocks(rawArea.value);
+                    btnVisual.classList.add('active');
+                    btnCode.classList.remove('active');
+                    toolbar.style.display = 'flex';
+                    canvas.style.display = 'flex';
+                    rawArea.classList.remove('active');
+                    queryPanel.style.display = 'flex';
+                    this.render();
                 } else {
-                    let line = `${block.type}`;
-                    for (const [key, val] of Object.entries(block.params)) {
-                        let v = val;
-                        if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
-                        else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
-                        else v = val;
-                        line += ` ${key}=${v}`;
-                    }
-                    code += line + "\n";
+                    rawArea.value = this.generateCode();
+                    btnVisual.classList.remove('active');
+                    btnCode.classList.add('active');
+                    toolbar.style.display = 'none';
+                    canvas.style.display = 'none';
+                    rawArea.classList.add('active');
+                    queryPanel.style.display = 'none';
                 }
-            });
-            return code;
-        }
+            },
 
-        function parseCodeToBlocks(text) {
-            workspaceData = [];
-            const lines = text.split('\n');
-            const queryInput = document.getElementById('queryInput');
-            let queryFound = false;
-            let queryText = "";
-
-            for (let line of lines) {
-                line = line.trim();
-                if (!line) continue;
-                if (line.startsWith('QUERY:')) {
-                    queryFound = true;
-                    queryText = line.replace('QUERY:', '').trim();
-                    continue;
-                }
-                if (queryFound) { queryText += "\n" + line; continue; }
-                if (line.startsWith('#')) {
-                    workspaceData.push({ id: Date.now() + Math.random(), type: '#', params: { text: line.substring(1).trim() } });
-                    continue;
-                }
-                const cmdMatch = line.match(/^([A-Z]+)\s+(.*)/);
-                if (cmdMatch) {
-                    const type = cmdMatch[1];
-                    const argsStr = cmdMatch[2];
-                    if (COMMANDS[type]) {
-                        const params = {};
-                        const paramRegex = /([a-z]+)=((?:\[.*?\])|(?:"[^"]*")|(?:[^ ]+))/g;
-                        let match;
-                        while ((match = paramRegex.exec(argsStr)) !== null) {
-                            const key = match[1];
-                            let val = match[2];
-                            if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-                            else if (val.startsWith('[') && val.endsWith(']')) val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-                            else if (!isNaN(val)) val = parseFloat(val);
-                            params[key] = val;
+            generateCode() {
+                let code = "";
+                this.data.forEach(block => {
+                    if (block.type === '#') {
+                        code += `# ${block.params.text}\n`;
+                    } else {
+                        let line = `${block.type}`;
+                        for (const [key, val] of Object.entries(block.params)) {
+                            let v = val;
+                            if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
+                            else if (isNaN(val) && typeof val === 'string' && val.length > 0) v = `"${val}"`;
+                            else v = val;
+                            line += ` ${key}=${v}`;
                         }
-                        COMMANDS[type].params.forEach(p => { if (params[p.name] === undefined) params[p.name] = p.def; });
-                        workspaceData.push({ id: Date.now() + Math.random(), type, params });
+                        code += line + "\n";
+                    }
+                });
+                const query = document.getElementById('queryInput').value;
+                if (query) code += `\nQUERY: ${query}`;
+                return code;
+            },
+
+            parseCodeToBlocks(text) {
+                this.data = [];
+                const lines = text.split('\n');
+                let queryBuffer = "";
+                let isQuery = false;
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line.startsWith('QUERY:')) {
+                        isQuery = true;
+                        queryBuffer = line.replace('QUERY:', '').trim();
+                        return;
+                    }
+                    if (isQuery) {
+                        queryBuffer += "\n" + line;
+                        return;
+                    }
+
+                    if (!line) return;
+
+                    if (line.startsWith('#')) {
+                        this.data.push({ id: Date.now()+Math.random(), type: '#', params: { text: line.substring(1).trim() }});
+                        return;
+                    }
+
+                    const match = line.match(/^([A-Z]+)\s+(.*)/);
+                    if (match) {
+                        const type = match[1];
+                        const argsStr = match[2];
+                        if (this.COMMANDS[type]) {
+                            const params = {};
+                            const reg = /([a-z_]+)=((?:\[.*?\])|(?:"[^"]*")|(?:[^ ]+))/g;
+                            let m;
+                            while ((m = reg.exec(argsStr)) !== null) {
+                                let val = m[2];
+                                if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1,-1);
+                                else if (val.startsWith('[') && val.endsWith(']')) {
+                                    val = val.slice(1,-1).split(',').map(s => s.trim().replace(/"/g, ''));
+                                }
+                                else if (!isNaN(parseFloat(val))) val = parseFloat(val);
+                                params[m[1]] = val;
+                            }
+
+                            this.COMMANDS[type].params.forEach(p => {
+                                if (params[p.name] === undefined) params[p.name] = p.def;
+                            });
+
+                            this.data.push({ id: Date.now()+Math.random(), type, params });
+                        }
+                    }
+                });
+
+                document.getElementById('queryInput').value = queryBuffer;
+            },
+
+            render() {
+                const canvas = document.getElementById('canvas');
+                canvas.innerHTML = '';
+                if (this.data.length === 0) {
+                    canvas.innerHTML = '<div style="color:#333; text-align:center;">НЕТ ДАННЫХ</div>';
+                    return;
+                }
+
+                this.data.forEach(block => {
+                    const div = document.createElement('div');
+                    div.className = 'block';
+
+                    if (block.type === '#') {
+                        div.classList.add('is-comment');
+                        div.innerHTML = `
+                            <div class="block-header">
+                                <span class="block-params">${block.params.text}</span>
+                            </div>
+                            <div class="block-actions">
+                                <button class="btn-icon delete" onclick="App.deleteBlock(${block.id})"><i class="ph ph-trash"></i></button>
+                            </div>
+                        `;
+                        div.onclick = (e) => { if(!e.target.closest('button')) App.openModal('#', block.id); };
+                    } else {
+                        const config = this.COMMANDS[block.type];
+                        div.style.borderLeftColor = config.color;
+
+                        let paramHtml = '';
+                        for (const [key, val] of Object.entries(block.params)) {
+                            let display = val;
+                            if (Array.isArray(val)) display = val.join(', ');
+                            paramHtml += `<span class="param-item"><span class="key">${key}=</span><span class="val">${display}</span></span>`;
+                        }
+
+                        div.innerHTML = `
+                            <div class="block-header">
+                                <span class="block-name" style="color:${config.color}">${block.type}</span>
+                                <div class="block-params">${paramHtml}</div>
+                            </div>
+                            <div class="block-actions">
+                                <button class="btn-icon delete" onclick="App.deleteBlock(${block.id})"><i class="ph ph-trash"></i></button>
+                            </div>
+                        `;
+                        div.onclick = (e) => { if(!e.target.closest('button')) App.openModal(block.type, block.id); };
+                    }
+                    canvas.appendChild(div);
+                });
+            },
+
+            addComment() {
+                this.data.push({ id: Date.now(), type: '#', params: { text: 'Комментарий' } });
+                this.render();
+            },
+
+            deleteBlock(id) {
+                this.data = this.data.filter(b => b.id !== id);
+                this.render();
+            },
+
+            openModal(type, id = null) {
+                this.editingId = id;
+                const config = this.COMMANDS[type];
+                const paramsData = id ? this.data.find(b => b.id === id).params : null;
+
+                document.getElementById('modalTitle').innerText = type;
+                document.getElementById('modalTitle').style.color = config.color;
+                document.getElementById('modal').classList.add('active');
+                document.documentElement.style.setProperty('--active-color', config.color);
+
+                let html = '';
+                config.params.forEach(p => {
+                    const val = paramsData ? paramsData[p.name] : p.def;
+                    html += `<div class="form-group"><label class="form-label">${p.name.toUpperCase()}</label>`;
+
+                    if (p.type === 'slider') {
+                        html += `<input type="range" min="0" max="1" step="0.05" value="${val}" id="inp_${p.name}" oninput="this.nextElementSibling.innerText=this.value"><span class="range-val">${val}</span>`;
+                    } else if (p.type === 'text') {
+                        html += `<input type="text" value="${val}" id="inp_${p.name}">`;
+                    } else if (p.type === 'number') {
+                        html += `<input type="number" value="${val}" id="inp_${p.name}">`;
+                    } else if (p.type === 'select') {
+                        html += `<div class="radio-group">`;
+                        p.opts.forEach(opt => {
+                            const active = opt === val ? 'active' : '';
+                            html += `<div class="radio-btn ${active}" onclick="App.selectRadio(this, '${p.name}')">${opt}</div>`;
+                        });
+                        html += `<input type="hidden" id="inp_${p.name}" value="${val}"></div>`;
+                    } else if (p.type === 'tags') {
+                        html += `<div class="tags-container" onclick="document.getElementById('input_${p.name}').focus()">
+                                    <div id="chips_${p.name}" style="display:contents;">`;
+                        (Array.isArray(val) ? val : []).forEach(t => {
+                            html += `<div class="tag-chip"><span>${t}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`;
+                        });
+                        html += `    </div>
+                                    <input id="input_${p.name}" class="tags-input-field" placeholder="Введите и Enter">
+                                 </div>`;
+                    }
+                    html += `</div>`;
+                });
+
+                document.getElementById('modalBody').innerHTML = html;
+                document.getElementById('modal').dataset.type = type;
+
+                config.params.filter(p => p.type === 'tags').forEach(p => {
+                    const input = document.getElementById(`input_${p.name}`);
+                    if(input) input.onkeydown = (e) => this.handleTagInput(e, `chips_${p.name}`);
+                });
+            },
+
+            selectRadio(el, name) {
+                el.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+                el.classList.add('active');
+                document.getElementById(`inp_${name}`).value = el.innerText;
+            },
+
+            handleTagInput(e, containerId) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const val = e.target.value.trim();
+                    if(val) {
+                        const chip = document.createElement('div');
+                        chip.className = 'tag-chip';
+                        chip.innerHTML = `<span>${val}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i>`;
+                        document.getElementById(containerId).appendChild(chip);
+                        e.target.value = '';
                     }
                 }
-            }
-            queryInput.value = queryText;
-        }
+            },
 
-        function renderWorkspace() {
-            const canvas = document.getElementById('canvas');
-            canvas.innerHTML = '';
-            if (workspaceData.length === 0) { canvas.innerHTML = '<div class="empty-state">Добавьте команды или переключитесь в CODE...</div>'; return; }
-            workspaceData.forEach(block => {
-                const div = document.createElement('div');
-                div.className = 'smart-line';
-                if (block.type === '#') {
-                    div.classList.add('is-comment');
-                    div.innerHTML = `<span style="color:#666; font-weight:bold;">#</span><span class="params" style="margin-left:10px;">${block.params.text}</span><i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>`;
-                    div.onclick = () => { const newText = prompt("Редактировать:", block.params.text); if (newText) { block.params.text = newText; renderWorkspace(); } };
+            closeModal() {
+                document.getElementById('modal').classList.remove('active');
+                this.editingId = null;
+            },
+
+            saveBlock() {
+                const type = document.getElementById('modal').dataset.type;
+                const config = this.COMMANDS[type];
+                const params = {};
+
+                config.params.forEach(p => {
+                    if (p.type === 'tags') {
+                        const tags = [];
+                        document.querySelectorAll(`#chips_${p.name} .tag-chip span`).forEach(el => tags.push(el.innerText));
+                        params[p.name] = tags;
+                    } else {
+                        const el = document.getElementById(`inp_${p.name}`);
+                        if (p.type === 'number' || p.type === 'slider') params[p.name] = parseFloat(el.value);
+                        else params[p.name] = el.value;
+                    }
+                });
+
+                if (this.editingId) {
+                    const block = this.data.find(b => b.id === this.editingId);
+                    block.params = params;
                 } else {
-                    const config = COMMANDS[block.type];
-                    div.style.borderLeftColor = config.color;
-                    let paramStr = '';
-                    for (const [key, val] of Object.entries(block.params)) {
-                        let displayVal = val;
-                        if (Array.isArray(val)) displayVal = `[${val.map(v=>`"${v}"`).join(', ')}]`;
-                        paramStr += `<span style="color:#666; margin-left:10px;">${key}=</span><span style="color:#bbb;">${displayVal}</span>`;
-                    }
-                    div.innerHTML = `<span class="cmd-name" style="color:${config.color}">${block.type}</span><span class="params">${paramStr}</span><i class="ph ph-trash delete-btn" onclick="event.stopPropagation(); deleteBlock(${block.id})"></i>`;
-                    div.onclick = () => openModal(block.type, block.id);
+                    this.data.push({ id: Date.now(), type, params });
                 }
-                canvas.appendChild(div);
-            });
-        }
 
-        function addCommentBlock() { workspaceData.push({ id: Date.now(), type: '#', params: { text: 'Ваш комментарий...' } }); renderWorkspace(); setTimeout(() => document.getElementById('canvas').scrollTop = 9999, 50); }
-        function openModal(type, id = null) {
-            editingId = id; const config = COMMANDS[type]; const data = id !== null ? workspaceData.find(x => x.id === id).params : null;
-            document.getElementById('modalTitle').style.color = config.color; document.getElementById('modalTitle').innerText = type; document.getElementById('modal').classList.add('active');
-            let html = '';
-            config.params.forEach(p => {
-                const val = data ? data[p.name] : p.def;
-                html += `<div class="form-group"><label class="form-label">${p.name.toUpperCase()}</label>`;
-                if (p.type === 'slider') html += `<input type="range" min="0" max="1" step="0.05" value="${val}" id="inp_${p.name}" oninput="this.nextElementSibling.innerText=this.value"><span class="range-val">${val}</span>`;
-                else if (p.type === 'text') html += `<input type="text" value="${val}" id="inp_${p.name}" class="input-text">`;
-                else if (p.type === 'number') html += `<input type="number" value="${val}" id="inp_${p.name}" class="input-text">`;
-                else if (p.type === 'select') { html += `<div class="radio-group">`; p.opts.forEach(opt => { const active = opt === val ? 'active' : ''; html += `<div class="radio-btn ${active}" onclick="selectRadio(this, '${p.name}')" data-val="${opt}">${opt}</div>`; }); html += `<input type="hidden" id="inp_${p.name}" value="${val}"></div>`; }
-                else if (p.type === 'tags') { html += `<div class="tags-container" onclick="document.getElementById('input_${p.name}').focus()"><div id="chips_${p.name}" style="display:contents">`; (Array.isArray(val) ? val : []).forEach(t => html += `<div class="tag-chip"><span class="tag-text">${t}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`); html += `</div><input id="input_${p.name}" class="tags-input-field" onkeydown="handleTag(event, this, 'chips_${p.name}')"></div>`; }
-                html += `</div>`;
-            });
-            document.getElementById('modal').dataset.type = type; document.getElementById('modalBody').innerHTML = html;
-        }
+                this.render();
+                this.closeModal();
+            },
 
-        function handleTag(e, input, containerId) { if (e.key === 'Enter') { e.preventDefault(); const val = input.value.trim(); if(val){ document.getElementById(containerId).insertAdjacentHTML('beforeend', `<div class="tag-chip"><span class="tag-text">${val}</span><i class="ph ph-x" onclick="this.parentElement.remove()"></i></div>`); input.value=''; } } }
-        function selectRadio(el, name) { el.parentElement.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); document.getElementById(`inp_${name}`).value = el.dataset.val; }
-        function closeModal() { document.getElementById('modal').classList.remove('active'); editingId = null; }
-        function saveCommand() {
-            const type = document.getElementById('modal').dataset.type; const config = COMMANDS[type]; const params = {};
-            config.params.forEach(p => { if (p.type === 'tags') { const tags = []; document.querySelectorAll(`#chips_${p.name} .tag-text`).forEach(el => tags.push(el.innerText)); params[p.name] = tags; } else { params[p.name] = document.getElementById(`inp_${p.name}`).value; } });
-            if (editingId !== null) { const idx = workspaceData.findIndex(x => x.id === editingId); workspaceData[idx].params = params; } else { workspaceData.push({ id: Date.now(), type, params }); }
-            renderWorkspace(); closeModal();
-        }
-        function deleteBlock(id) { workspaceData = workspaceData.filter(x => x.id !== id); renderWorkspace(); }
+            // --- ACTIONS ---
 
-        async function compile() {
-            if (currentMode === 'code') parseCodeToBlocks(document.getElementById('rawCodeArea').value);
-            const btn = document.getElementById('btnCompile');
-            const outputDiv = document.getElementById('output');
+            log(msg, color = '#888') {
+                const logEl = document.getElementById('statusLog');
+                logEl.innerText = msg;
+                logEl.style.color = color;
+            },
 
-            btn.disabled = true; btn.innerText = "ЗАГРУЗКА..."; outputDiv.innerText = "Загрузка модулей с GitHub...";
+            resetProgram() {
+                if(confirm('Очистить рабочую область?')) {
+                    this.data = [];
+                    document.getElementById('queryInput').value = '';
+                    document.getElementById('rawCodeArea').value = '';
+                    this.cachedPrompt = '';
+                    this.render();
+                    this.log('RESET COMPLETE', 'var(--c-choose)');
+                }
+            },
 
-            try {
-                // Фильтруем комментарии перед компиляцией!
-                const activeBlocks = workspaceData.filter(b => b.type !== '#');
+            saveFile() {
+                // Берем имя из инпута
+                let name = document.getElementById('fileNameInput').value.trim();
+                if (!name) name = 'program';
+
+                const code = this.generateCode();
+                const blob = new Blob([code], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = name.endsWith('.plang') ? name : `${name}.plang`;
+                a.click();
+                URL.revokeObjectURL(url);
+                this.log('FILE SAVED', 'var(--c-logic)');
+            },
+
+            async compile() {
+                this.log('COMPILING...', 'var(--text-dim)');
+
+                // Если режим кода, парсим его в блоки
+                if (this.mode === 'code') {
+                    this.parseCodeToBlocks(document.getElementById('rawCodeArea').value);
+                }
+
+                // 1. Генерируем код
+                let userProgram = this.generateCode();
+
+                // 2. Загружаем модули
+                const activeBlocks = this.data.filter(b => b.type !== '#');
                 const uniqueTypes = [...new Set(activeBlocks.map(x => x.type))];
 
-                // ФЕТЧИМ С ГИТХАБА (КАК В ВЕРСИИ 0.6)
-                const fetchPromises = uniqueTypes.map(async (type) => {
-                    const filename = MODULE_MAP[type];
-                    if (!filename) return ``;
-                    try {
-                        const resp = await fetch(GITHUB_BASE + filename);
-                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                        const text = await resp.text();
-                        return `=== MODULE: ${type} (${filename}) ===\n${text}\n\n`;
-                    } catch (e) { return `[ERROR ${type}]\n`; }
-                });
+                let loadedModules = "";
+                try {
+                    const promises = uniqueTypes.map(async (type) => {
+                        const filename = this.MODULE_MAP[type];
+                        if (!filename) return "";
+                        try {
+                            const resp = await fetch(this.GITHUB_BASE + filename);
+                            if (!resp.ok) throw new Error();
+                            const text = await resp.text();
+                            return `=== MODULE: ${type} ===\n${text}\n\n`;
+                        } catch (e) { return `[ERROR LOAD ${type}]\n`; }
+                    });
+                    loadedModules = (await Promise.all(promises)).join('');
+                } catch (e) {
+                    this.log('MODULE LOAD ERROR', 'var(--c-choose)');
+                    return;
+                }
 
-                const loadedModules = (await Promise.all(fetchPromises)).join('');
+                // 3. Склеиваем
+                this.cachedPrompt = loadedModules + userProgram;
 
-                let userProgram = "=== USER PROGRAM ===\n";
-                activeBlocks.forEach(block => {
-                    let line = `${block.type}`;
-                    for (const [key, val] of Object.entries(block.params)) {
-                        let v = val;
-                        if (Array.isArray(val)) v = `[${val.map(s => `"${s}"`).join(', ')}]`;
-                        else if (isNaN(val) && block.params[key].length > 0) v = `"${val}"`;
-                        else v = val;
-                        line += ` ${key}=${v}`;
-                    }
-                    userProgram += line + "\n";
-                });
-                userProgram += `\nQUERY: ${document.getElementById('queryInput').value}`;
-
-                outputDiv.innerText = loadedModules + userProgram;
-
-            } catch (error) { outputDiv.innerText = "ERROR: " + error.message; }
-            finally { btn.disabled = false; btn.innerText = "COMPILE"; }
-        }
-
-        // --- НОВАЯ ФУНКЦИЯ КОПИРОВАНИЯ ---
-        function copyOutput() {
-            const outputText = document.getElementById('output').innerText;
-            if (!outputText || outputText.includes("Результат компиляции...")) return;
-
-            navigator.clipboard.writeText(outputText).then(() => {
-                const btn = document.getElementById('btnCopy');
-                const originalHtml = btn.innerHTML;
-
-                // Визуальный эффект
-                btn.innerHTML = `<i class="ph ph-check"></i> COPIED`;
-                btn.style.borderColor = '#00ff88';
-                btn.style.color = '#00ff88';
-
-                setTimeout(() => {
-                    btn.innerHTML = originalHtml;
-                    btn.style.borderColor = '#333';
-                    btn.style.color = '#ccc';
-                }, 2000);
-            }).catch(err => {
-                console.error('Ошибка:', err);
-                alert("Не удалось скопировать (проверьте права доступа в браузере)");
-            });
-        }
+                // 4. КОПИРУЕМ В БУФЕР
+                try {
+                    await navigator.clipboard.writeText(this.cachedPrompt);
+                    this.log('COPIED TO CLIPBOARD!', 'var(--c-connect)');
+                } catch (err) {
+                    this.log('COPY FAILED', 'var(--c-choose)');
+                }
+            }
+        };
     </script>
 </body>
 </html>
