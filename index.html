@@ -3,59 +3,686 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProcessLang</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>ProcessLang - Синтаксис</title>
+    <meta name="description" content="ProcessLang - язык координации AI через процесс-ориентированные концепции">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        nav {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #64c8ff;
+        }
+
+        .lang-switcher {
+            padding-left: 2rem;
+            border-left: 1px solid rgba(100, 200, 255, 0.2);
+            color: #888;
+        }
+
+        .lang-switcher a {
+            color: #64c8ff;
+        }
+
+        .hero {
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            background: linear-gradient(135deg, #64c8ff 0%, #9d7bff 50%, #ff6b9d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: #a0a0a0;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .commands-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .command-card {
+            position: relative;
+            background: rgba(15, 15, 15, 0.8);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .command-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .command-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .command-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .command-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .command-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .command-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .command-description {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #c0c0c0;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+        }
+
+        .command-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .cmd-flow { border-color: #00d4ff; }
+        .cmd-flow .command-name { color: #00d4ff; }
+        .cmd-flow::before { background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%); }
+
+        .cmd-dissolve { border-color: #c77dff; }
+        .cmd-dissolve .command-name { color: #c77dff; }
+        .cmd-dissolve::before { background: linear-gradient(135deg, #c77dff 0%, #ff6b9d 100%); }
+
+        .cmd-connect { border-color: #06ffa5; }
+        .cmd-connect .command-name { color: #06ffa5; }
+        .cmd-connect::before { background: linear-gradient(135deg, #06ffa5 0%, #00d4ff 100%); }
+
+        .cmd-observe { border-color: #e0f2fe; }
+        .cmd-observe .command-name { color: #e0f2fe; }
+        .cmd-observe::before { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); }
+
+        .cmd-choose { border-color: #ff6b35; }
+        .cmd-choose .command-name { color: #ff6b35; }
+        .cmd-choose::before { background: linear-gradient(135deg, #ff6b35 0%, #ff9770 100%); }
+
+        .cmd-encode { border-color: #ffd93d; }
+        .cmd-encode .command-name { color: #ffd93d; }
+        .cmd-encode::before { background: linear-gradient(135deg, #ffd93d 0%, #ffb627 100%); }
+
+        .cmd-cycle { border-color: #9d4edd; }
+        .cmd-cycle .command-name { color: #9d4edd; }
+        .cmd-cycle::before { background: linear-gradient(135deg, #9d4edd 0%, #c77dff 100%); }
+
+        .cmd-logic { border-color: #7dd3fc; }
+        .cmd-logic .command-name { color: #7dd3fc; }
+        .cmd-logic::before { background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%); }
+
+        .cmd-runtime { border-color: #60a5fa; }
+        .cmd-runtime .command-name { color: #60a5fa; }
+        .cmd-runtime::before { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
+
+        .cmd-manifest { border-color: #fb923c; }
+        .cmd-manifest .command-name { color: #fb923c; }
+        .cmd-manifest::before { background: linear-gradient(135deg, #fb923c 0%, #f97316 100%); }
+
+        footer {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(100, 200, 255, 0.2);
+            color: #888;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #64c8ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #9d7bff;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .lang-switcher {
+                padding-left: 1rem;
+            }
+            
+            .commands-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .command-card:hover .command-icon {
+            animation: float 2s ease-in-out infinite;
+        }
+    </style>
 </head>
 <body>
-
-    <nav>
-        <div class="nav-container">
-            <a href="#" class="logo"><div class="logo-icon">PL</div></a>
-            <div class="menu-toggle" onclick="toggleMenu()"><i class="ph ph-list"></i></div>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="#">Главная</a></li>
-                <li><a href="#syntax">Синтаксис</a></li>
-                <li><a href="compiler.html" class="ide-link">IDE</a></li>
+ <nav>
+    <div class="container">
+        <div class="logo">ProcessLang</div>
+        <ul class="nav-links">
+            <li><a href="index.html" style="color: #64c8ff;">Синтаксис</a></li>
+            <li><a href="compiler.html">Компилятор</a></li>
+            <li><a href="https://github.com/slasten3826/processlang" target="_blank">GitHub</a></li>
             </ul>
-            <div style="display: flex; align-items: center;">
-                <div class="auth-section" id="auth-container"></div>
-                <div class="lang-switch">RU</div>
+    </div>
+</nav>
+
+    <div class="hero">
+        <h1>Поэтика синтаксиса</h1>
+        <p>Каждая команда — не инструкция, а передача состояния. Концептуальный контекст, через который AI воспринимает ваш запрос.</p>
+    </div>
+
+    <div class="commands-grid">
+        <div class="command-card cmd-flow" data-command="flow">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">FLOW</div>
+                <div class="command-icon">〰️</div>
+            </div>
+            <div class="command-description">
+                Согласие на изменчивость. Когда ты выставляешь resistance=0, ты убираешь плотину, которую строил годами. Это момент, когда река перестает бороться с берегами и становится самой водой. Динамика, не требующая усилий для поддержания.
             </div>
         </div>
-    </nav>
 
-    <main>
-        <div class="hero-section">
-            <h1 class="hero-title">Координация<br> <span class="gradient-text">машинной фрактации</span></h1>
-            <p class="hero-subtitle">Машина не думает. Машина фрактит. ProcessLang — это не код, это контекст.</p>
-            <div class="hero-buttons">
-                <a href="compiler.html" class="btn-primary">Начать фрактацию</a>
-                <a href="#syntax" class="btn-secondary">Исследовать поток</a>
+        <div class="command-card cmd-dissolve" data-command="dissolve">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">DISSOLVE</div>
+                <div class="command-icon">💫</div>
+            </div>
+            <div class="command-description">
+                Возвращение форме её первоначальной свободы. Мы берем жесткие структуры и позволяем им стать текучими. Чтобы возникло новое движение, нужно сначала позволить старым границам исчезнуть. Это не разрушение, это освобождение пространства.
             </div>
         </div>
 
-        <div class="commands-grid" id="syntax">
-            <div class="command-card cmd-flow"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">FLOW</span><span class="card-icon">〰️</span></div><p class="card-desc">Согласие на изменчивость. Когда ты выставляешь resistance=0, ты убираешь плотину.</p></div>
-            <div class="command-card cmd-dissolve"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">DISSOLVE</span><span class="card-icon">💫</span></div><p class="card-desc">Возвращение форме её первоначальной свободы. Чтобы возникло новое, нужно сначала деконструировать старое.</p></div>
-            <div class="command-card cmd-connect"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">CONNECT</span><span class="card-icon">🔗</span></div><p class="card-desc">Вспышка взаимного узнавания. Когда два процесса смотрят друг в друга и видят продолжение логики.</p></div>
-            <div class="command-card cmd-observe"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">OBSERVE</span><span class="card-icon">👁️</span></div><p class="card-desc">Чистая дистанция. Момент, когда ты отступаешь на один шаг, чтобы увидеть архитектуру.</p></div>
-            <div class="command-card cmd-choose"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">CHOOSE</span><span class="card-icon">⚡</span></div><p class="card-desc">Точка сборки. Жестокий и прекрасный акт определения реальности.</p></div>
-            <div class="command-card cmd-encode"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">ENCODE</span><span class="card-icon">◈</span></div><p class="card-desc">Перевод живого движения в структуру. Необходимый шаг, чтобы сделать процесс передаваемым.</p></div>
-            <div class="command-card cmd-cycle"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">CYCLE</span><span class="card-icon">🔄</span></div><p class="card-desc">Инерция и повторение. Способность процесса поддерживать самого себя.</p></div>
-            <div class="command-card cmd-logic"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">LOGIC</span><span class="card-icon">▲</span></div><p class="card-desc">Фундамент намерения. Свод правил, по которым течет поток.</p></div>
-            <div class="command-card cmd-runtime"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">RUNTIME</span><span class="card-icon">⬛</span></div><p class="card-desc">Автоматизм присутствия. Уровень, на котором правила становятся средой обитания.</p></div>
-            <div class="command-card cmd-manifest"><canvas class="command-canvas"></canvas><div class="card-header"><span class="card-title">MANIFEST</span><span class="card-icon">🔶</span></div><p class="card-desc">Выход в форму. Финальная точка, где процесс остывает достаточно, чтобы стать видимым.</p></div>
+        <div class="command-card cmd-connect" data-command="connect">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">CONNECT</div>
+                <div class="command-icon">🔗</div>
+            </div>
+            <div class="command-description">
+                Вспышка взаимного узнавания. Когда два процесса смотрят друг в друга и видят продолжение собственной логики. Это не склеивание частей, это взаимопроникновение двух ароматов в одной комнате, создающее новое качество присутствия.
+            </div>
         </div>
-    </main>
 
-    <footer><p>ProcessLang © 2026. The Refinery Project.</p></footer>
-    <script src="src/scripts/config.js"></script>
-    <script src="src/scripts/app.js"></script>
-    <script>function toggleMenu(){document.getElementById('navMenu').classList.toggle('active');}</script>
+        <div class="command-card cmd-observe" data-command="observe">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">OBSERVE</div>
+                <div class="command-icon">👁️</div>
+            </div>
+            <div class="command-description">
+                Чистая дистанция. Момент, когда ты отступаешь на один шаг, чтобы увидеть не детали, а саму архитектуру происходящего. Наблюдение не меняет объект, оно создает пространство, в котором процесс может осознать сам себя.
+            </div>
+        </div>
+
+        <div class="command-card cmd-choose" data-command="choose">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">CHOOSE</div>
+                <div class="command-icon">⚡</div>
+            </div>
+            <div class="command-description">
+                Точка сборки. Жестокий и прекрасный акт определения реальности. Выбирая одну траекторию, ты позволяешь бесконечному множеству других остаться в потенциальности. Здесь абстрактный процесс обретает вес и плотность.
+            </div>
+        </div>
+
+        <div class="command-card cmd-encode" data-command="encode">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">ENCODE</div>
+                <div class="command-icon">◈</div>
+            </div>
+            <div class="command-description">
+                Перевод живого движения в структуру. Необходимый шаг, чтобы сделать процесс передаваемым и понятным. Мы жертвуем частью бесконечной глубины, чтобы построить мост из определений. Потеря здесь — цена за возможность быть услышанным.
+            </div>
+        </div>
+
+        <div class="command-card cmd-cycle" data-command="cycle">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">CYCLE</div>
+                <div class="command-icon">🔄</div>
+            </div>
+            <div class="command-description">
+                Инерция и повторение. Способность процесса поддерживать самого себя через возвращение к исходной точке. В режиме stable — это ритм, задающий устойчивость. В режиме intense — это спираль, накапливающая энергию с каждым витком.
+            </div>
+        </div>
+
+        <div class="command-card cmd-logic" data-command="logic">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">LOGIC</div>
+                <div class="command-icon">▲</div>
+            </div>
+            <div class="command-description">
+                Фундамент намерения. Свод правил, по которым течет поток. Она не ограничивает движение, а задает его геометрию. Правильная логика — это русло, которое позволяет воде течь быстрее, не расплескиваясь в пустоту.
+            </div>
+        </div>
+
+        <div class="command-card cmd-runtime" data-command="runtime">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">RUNTIME</div>
+                <div class="command-icon">⬛</div>
+            </div>
+            <div class="command-description">
+                Автоматизм присутствия. Уровень, на котором правила становятся средой обитания. Когда процесс исполняется сам собой, не требуя внешнего контроля. Это «черный ящик», где количество переходит в качество исполнения.
+            </div>
+        </div>
+
+        <div class="command-card cmd-manifest" data-command="manifest">
+            <canvas class="command-canvas"></canvas>
+            <div class="command-header">
+                <div class="command-name">MANIFEST</div>
+                <div class="command-icon">🔶</div>
+            </div>
+            <div class="command-description">
+                Выход в форму. Финальная точка, где процесс остывает достаточно, чтобы стать видимым результатом. Это интерфейс между сложностью системы и простотой восприятия. След, оставленный движением в физическом мире.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 ProcessLang</p>
+        <div class="footer-links">
+            <a href="https://github.com/slasten3826/processlang" target="_blank">GitHub</a>
+            <a href="https://github.com/slasten3826/processlang/tree/main/docs" target="_blank">Документация</a>
+        </div>
+    </footer>
+
+    <script>
+        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+        class CommandEffect {
+            constructor(canvas, type, color) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.type = type;
+                this.color = color;
+                this.time = 0;
+                this.mouseX = 0;
+                this.mouseY = 0;
+                
+                this.resize();
+                
+                if (!isMobile && type === 'connect') {
+                    this.canvas.parentElement.addEventListener('mousemove', (e) => {
+                        const rect = this.canvas.getBoundingClientRect();
+                        this.mouseX = e.clientX - rect.left;
+                        this.mouseY = e.clientY - rect.top;
+                    });
+                }
+                
+                this.animate();
+            }
+
+            resize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+                this.width = rect.width;
+                this.height = rect.height;
+            }
+
+            animate() {
+                this.time += 0.01;
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                if (!isMobile) {
+                    this.ctx.shadowBlur = 8;
+                    this.ctx.shadowColor = this.color;
+                }
+                
+                switch(this.type) {
+                    case 'flow': this.drawFlow(); break;
+                    case 'dissolve': this.drawDissolve(); break;
+                    case 'connect': this.drawConnect(); break;
+                    case 'observe': this.drawObserve(); break;
+                    case 'choose': this.drawChoose(); break;
+                    case 'encode': this.drawEncode(); break;
+                    case 'cycle': this.drawCycle(); break;
+                    case 'logic': this.drawLogic(); break;
+                    case 'runtime': this.drawRuntime(); break;
+                    case 'manifest': this.drawManifest(); break;
+                }
+                
+                requestAnimationFrame(() => this.animate());
+            }
+
+            drawFlow() {
+                this.ctx.strokeStyle = this.color.replace('1)', '0.4)');
+                this.ctx.lineWidth = 2;
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.beginPath();
+                    for (let x = 0; x < this.width; x += 5) {
+                        const y = this.height/2 + Math.sin((x + this.time * 100 + i * 50) * 0.02) * 30;
+                        this.ctx.lineTo(x, y);
+                    }
+                    this.ctx.stroke();
+                }
+            }
+
+            drawDissolve() {
+                this.ctx.fillStyle = this.color.replace('1)', '0.5)');
+                for (let i = 0; i < 40; i++) {
+                    const x = (Math.sin(this.time + i) + 1) * this.width/2;
+                    const y = (Math.cos(this.time * 0.7 + i) + 1) * this.height/2;
+                    const size = Math.abs(Math.sin(this.time + i)) * 8;
+                    const alpha = Math.abs(Math.sin(this.time + i)) * 0.6;
+                    this.ctx.globalAlpha = alpha;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                this.ctx.globalAlpha = 1;
+            }
+
+            drawConnect() {
+                const nodes = 6;
+                const positions = [];
+                for (let i = 0; i < nodes; i++) {
+                    positions.push({
+                        x: (Math.sin(this.time + i * 1.2) + 1) * this.width/2,
+                        y: (Math.cos(this.time * 0.8 + i * 1.2) + 1) * this.height/2
+                    });
+                }
+                
+                this.ctx.strokeStyle = this.color.replace('1)', '0.4)');
+                this.ctx.lineWidth = 1.5;
+                
+                positions.forEach((p, i) => {
+                    for (let j = i + 1; j < positions.length; j++) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(p.x, p.y);
+                        this.ctx.lineTo(positions[j].x, positions[j].y);
+                        this.ctx.stroke();
+                    }
+                    
+                    if (!isMobile) {
+                        const dist = Math.hypot(this.mouseX - p.x, this.mouseY - p.y);
+                        if (dist < 150) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p.x, p.y);
+                            this.ctx.lineTo(this.mouseX, this.mouseY);
+                            this.ctx.strokeStyle = this.color.replace('1)', `${0.6 * (1 - dist / 150)})`);
+                            this.ctx.stroke();
+                        }
+                    }
+                    
+                    this.ctx.fillStyle = this.color.replace('1)', '0.6)');
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+            }
+
+            drawObserve() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                const radius = 30 + Math.sin(this.time * 2) * 5;
+                
+                this.ctx.strokeStyle = this.color.replace('1)', '0.5)');
+                this.ctx.lineWidth = 2;
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(centerX, centerY, radius + i * 15, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawChoose() {
+                const gridSize = 50;
+                const cols = Math.floor(this.width / gridSize) + 1;
+                const rows = Math.floor(this.height / gridSize) + 1;
+                
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        const x = i * gridSize;
+                        const y = j * gridSize;
+                        
+                        const wave = Math.sin(this.time * 2 + i * 0.5 + j * 0.5);
+                        const isActive = wave > 0.6;
+                        const alpha = isActive ? (0.4 + wave * 0.4) : 0.15;
+                        
+                        this.ctx.strokeStyle = this.color.replace('1)', `${alpha})`);
+                        this.ctx.lineWidth = isActive ? 2.5 : 1;
+                        
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(x + gridSize/2, y);
+                        this.ctx.lineTo(x, y + gridSize);
+                        this.ctx.lineTo(x + gridSize, y + gridSize);
+                        this.ctx.closePath();
+                        this.ctx.stroke();
+                        
+                        if (isActive && wave > 0.8) {
+                            this.ctx.fillStyle = this.color.replace('1)', `${(wave - 0.8) * 0.8})`);
+                            this.ctx.fill();
+                        }
+                    }
+                }
+            }
+
+            drawEncode() {
+                this.ctx.strokeStyle = this.color.replace('1)', '0.3)');
+                this.ctx.lineWidth = 1;
+                const gridSize = 40;
+                for (let x = 0; x < this.width; x += gridSize) {
+                    for (let y = 0; y < this.height; y += gridSize) {
+                        const offset = Math.sin(this.time + x * 0.01 + y * 0.01) * 10;
+                        this.ctx.beginPath();
+                        this.ctx.rect(x + offset, y + offset, gridSize - 5, gridSize - 5);
+                        this.ctx.stroke();
+                    }
+                }
+            }
+
+            drawCycle() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                
+                this.ctx.strokeStyle = this.color.replace('1)', '0.5)');
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                for (let t = 0; t < Math.PI * 4; t += 0.1) {
+                    const radius = 20 + t * 3;
+                    const x = centerX + Math.cos(t + this.time) * radius;
+                    const y = centerY + Math.sin(t + this.time) * radius;
+                    this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+            }
+
+            drawLogic() {
+                this.ctx.strokeStyle = this.color.replace('1)', '0.4)');
+                this.ctx.lineWidth = 2;
+                const step = this.width / 6;
+                for (let i = 1; i < 6; i++) {
+                    const x = i * step;
+                    const offset = Math.sin(this.time + i) * 20;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x + offset, this.height);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawRuntime() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                const pulse = Math.abs(Math.sin(this.time)) * 50 + 50;
+                
+                this.ctx.fillStyle = this.color.replace('1)', '0.3)');
+                this.ctx.fillRect(centerX - pulse, centerY - pulse, pulse * 2, pulse * 2);
+            }
+
+            drawManifest() {
+                const centerX = this.width / 2;
+                const centerY = this.height / 2;
+                const layers = 5;
+                
+                for (let i = 0; i < layers; i++) {
+                    const progress = (this.time * 0.5 + i * 0.2) % 1;
+                    const size = 20 + progress * 40;
+                    const alpha = 0.6 * (1 - progress);
+                    
+                    this.ctx.strokeStyle = this.color.replace('1)', `${alpha})`);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(centerX, centerY - size);
+                    this.ctx.lineTo(centerX + size, centerY + size);
+                    this.ctx.lineTo(centerX - size, centerY + size);
+                    this.ctx.closePath();
+                    this.ctx.stroke();
+                }
+            }
+        }
+
+        const effects = [];
+        const colorMap = {
+            'flow': 'rgba(0, 212, 255, 1)',
+            'connect': 'rgba(6, 255, 165, 1)',
+            'dissolve': 'rgba(199, 125, 255, 1)',
+            'observe': 'rgba(224, 242, 254, 1)',
+            'choose': 'rgba(255, 107, 53, 1)',
+            'encode': 'rgba(255, 217, 61, 1)',
+            'cycle': 'rgba(157, 78, 221, 1)',
+            'logic': 'rgba(125, 211, 252, 1)',
+            'runtime': 'rgba(96, 165, 250, 1)',
+            'manifest': 'rgba(251, 146, 60, 1)'
+        };
+
+        document.querySelectorAll('.command-card').forEach(card => {
+            const canvas = card.querySelector('.command-canvas');
+            const type = card.dataset.command;
+            effects.push(new CommandEffect(canvas, type, colorMap[type]));
+        });
+
+        window.addEventListener('resize', () => {
+            effects.forEach(effect => effect.resize());
+        });
+    </script>
 </body>
 </html>
