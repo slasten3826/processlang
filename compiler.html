@@ -2,8 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProcessLang // TERMINAL v0.99</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProcessLang // TERMINAL v1.0</title>
+
+    <!-- PWA Meta Tags (чтобы выглядело как приложение) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#050507">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +25,6 @@
             --text-main: #e0e0e0;
             --text-dim: #5a5a6e;
 
-            /* Цвета команд */
             --c-flow: #00d4ff;
             --c-dissolve: #c77dff;
             --c-connect: #06ffa5;
@@ -39,11 +44,11 @@
             color: var(--text-main);
             font-family: 'JetBrains Mono', monospace;
             height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* --- HEADER --- */
@@ -120,6 +125,8 @@
             flex-wrap: wrap;
             align-items: center;
             flex-shrink: 0;
+            overflow-x: auto; /* Allow horizontal scroll on mobile for all buttons */
+            -webkit-overflow-scrolling: touch;
         }
 
         .cmd-btn {
@@ -137,6 +144,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap; /* Prevent text wrap in toolbar */
         }
 
         .cmd-btn:hover {
@@ -145,13 +153,13 @@
         }
 
         /* Hover colors */
-        .btn-flow:hover { color: var(--c-flow); border-color: var(--c-flow); text-shadow: 0 0 5px var(--c-flow); }
-        .btn-dissolve:hover { color: var(--c-dissolve); border-color: var(--c-dissolve); text-shadow: 0 0 5px var(--c-dissolve); }
-        .btn-connect:hover { color: var(--c-connect); border-color: var(--c-connect); text-shadow: 0 0 5px var(--c-connect); }
+        .btn-flow:hover { color: var(--c-flow); border-color: var(--c-flow); }
+        .btn-dissolve:hover { color: var(--c-dissolve); border-color: var(--c-dissolve); }
+        .btn-connect:hover { color: var(--c-connect); border-color: var(--c-connect); }
         .btn-observe:hover { color: var(--c-observe); border-color: var(--c-observe); }
-        .btn-choose:hover { color: var(--c-choose); border-color: var(--c-choose); text-shadow: 0 0 5px var(--c-choose); }
-        .btn-encode:hover { color: var(--c-encode); border-color: var(--c-encode); text-shadow: 0 0 5px var(--c-encode); }
-        .btn-cycle:hover { color: var(--c-cycle); border-color: var(--c-cycle); text-shadow: 0 0 5px var(--c-cycle); }
+        .btn-choose:hover { color: var(--c-choose); border-color: var(--c-choose); }
+        .btn-encode:hover { color: var(--c-encode); border-color: var(--c-encode); }
+        .btn-cycle:hover { color: var(--c-cycle); border-color: var(--c-cycle); }
         .btn-logic:hover { color: var(--c-logic); border-color: var(--c-logic); }
         .btn-runtime:hover { color: var(--c-runtime); border-color: var(--c-runtime); }
         .btn-manifest:hover { color: var(--c-manifest); border-color: var(--c-manifest); }
@@ -163,6 +171,7 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            position: relative; /* For mobile overlay */
         }
 
         .editor-area {
@@ -172,6 +181,7 @@
             background: var(--bg-dark);
             position: relative;
             overflow-y: auto;
+            z-index: 1;
         }
 
         .canvas {
@@ -184,7 +194,6 @@
             align-items: center;
         }
 
-        /* Visual Block Style */
         .block {
             width: 100%;
             max-width: 900px;
@@ -197,7 +206,6 @@
             justify-content: space-between;
             cursor: pointer;
             transition: 0.2s;
-            position: relative;
         }
 
         .block:hover {
@@ -254,16 +262,13 @@
         .btn-icon:hover { color: #fff; }
         .btn-icon.delete:hover { color: var(--c-choose); }
 
-        /* Comment Block */
         .block.is-comment {
             border-left: 4px solid #333;
-            border-color: #333;
             opacity: 0.7;
         }
         .block.is-comment .block-name { display: none; }
         .block.is-comment .block-params { font-style: italic; color: #555; width: 100%; }
 
-        /* RAW CODE AREA */
         .raw-code-area {
             display: none;
             flex: 1;
@@ -279,7 +284,6 @@
         }
         .raw-code-area.active { display: block; }
 
-        /* Query Panel */
         .query-panel {
             background: var(--bg-panel);
             border-top: 1px solid var(--border);
@@ -287,6 +291,7 @@
             display: flex;
             gap: 15px;
             align-items: flex-end;
+            z-index: 1;
         }
         .query-label {
             font-family: 'Orbitron', sans-serif;
@@ -317,6 +322,8 @@
             padding: 20px;
             gap: 10px;
             overflow-y: auto;
+            z-index: 2;
+            transition: transform 0.3s ease;
         }
 
         .panel-title {
@@ -331,10 +338,7 @@
             padding-bottom: 15px;
         }
 
-        /* File Name Input */
-        .input-group {
-            margin-bottom: 5px;
-        }
+        .input-group { margin-bottom: 5px; }
         .input-label {
             font-size: 0.7rem;
             color: var(--text-dim);
@@ -352,7 +356,6 @@
             font-size: 0.9rem;
         }
 
-        /* Buttons */
         .launch-btn {
             width: 100%;
             padding: 12px;
@@ -368,12 +371,11 @@
             justify-content: center;
             gap: 10px;
             border-radius: 2px;
-            text-decoration: none; /* Убираем подчеркивание ссылок */
+            text-decoration: none;
         }
 
         .launch-btn:hover { transform: translateY(-1px); }
 
-        /* Action Buttons */
         .btn-compile {
             background: var(--c-connect);
             color: #000;
@@ -388,7 +390,6 @@
         .btn-reset { border-color: var(--c-choose); color: var(--c-choose); }
         .btn-reset:hover { background: rgba(255, 107, 53, 0.1); }
 
-        /* Link Buttons */
         .btn-me { border-color: #fff; color: #fff; border-width: 2px; }
         .btn-me:hover { background: rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
 
@@ -412,7 +413,44 @@
             margin-top: 5px;
         }
 
-        /* Modal */
+        /* --- MOBILE OVERLAY (BACKDROP) --- */
+        .overlay-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .overlay-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* --- MOBILE FAB (Floating Action Button) --- */
+        .mobile-fab {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--c-connect);
+            color: #000;
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(6, 255, 165, 0.4);
+            z-index: 5;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: none;
+        }
+        .mobile-fab:hover { transform: scale(1.1); }
+
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9);
@@ -420,6 +458,7 @@
             z-index: 1000;
             display: none;
             justify-content: center; align-items: center;
+            padding: 10px; /* padding for mobile */
         }
         .modal-overlay.active { display: flex; }
 
@@ -427,21 +466,22 @@
             background: var(--bg-panel);
             border: 1px solid var(--border);
             width: 600px;
-            max-width: 95%;
-            padding: 30px;
+            max-width: 100%;
+            padding: 20px; /* reduced padding for mobile */
             box-shadow: 0 0 50px rgba(0, 212, 255, 0.1);
-            max-height: 90vh;
+            max-height: 95vh;
             overflow-y: auto;
         }
 
-        .modal-header { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
-        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 700; }
+        .modal-header { margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
         .form-label { display: block; color: var(--text-dim); font-size: 0.8rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
 
         input[type="text"], input[type="number"] {
             width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; font-family: 'JetBrains Mono', monospace;
+            font-size: 16px; /* prevent zoom on iOS */
         }
 
         input[type="range"] { width: 100%; accent-color: var(--c-flow); }
@@ -455,9 +495,8 @@
         }
         .tag-chip i { margin-left: 5px; cursor: pointer; }
         .tag-chip i:hover { color: var(--c-choose); }
-        .tags-input-field { border: none; background: transparent; color: #fff; flex: 1; min-width: 100px; padding: 5px; font-family: 'JetBrains Mono', monospace; }
+        .tags-input-field { border: none; background: transparent; color: #fff; flex: 1; min-width: 100px; padding: 5px; font-family: 'JetBrains Mono', monospace; font-size: 16px; }
 
-        /* Custom Radio Buttons */
         .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
         .radio-btn {
             border: 1px solid #333; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #888; transition: 0.2s; background: #050505; font-family: 'JetBrains Mono';
@@ -469,15 +508,54 @@
             background: rgba(255,255,255,0.05);
         }
 
-        .modal-footer { margin-top: 30px; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-footer { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
         .btn-cancel { background: transparent; border: none; color: #666; cursor: pointer; font-family: 'JetBrains Mono'; }
         .btn-save-modal { background: #fff; color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: 700; cursor: pointer; }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .main-container { flex-direction: column; }
-            .output-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 15px; }
-            .block { max-width: 100%; }
+        /* --- RESPONSIVE (MOBILE) --- */
+        @media (max-width: 800px) {
+            .toolbar {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .cmd-btn {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+
+            /* Show FAB */
+            .mobile-fab { display: flex; }
+
+            /* Transform Output Panel to Drawer */
+            .output-panel {
+                position: fixed;
+                top: auto; /* stick to bottom */
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                height: auto;
+                max-height: 75vh; /* don't take full screen */
+                border-left: none;
+                border-top: 2px solid var(--c-connect);
+                border-radius: 16px 16px 0 0;
+                transform: translateY(100%); /* Hidden by default */
+                z-index: 20;
+                padding-bottom: 30px; /* Extra padding for bottom */
+            }
+
+            .output-panel.active {
+                transform: translateY(0);
+            }
+
+            .block { max-width: 100%; padding: 12px 15px; }
+            .block-params { font-size: 0.8rem; }
+
+            .query-panel {
+                padding: 15px;
+                padding-bottom: 80px; /* Space for FAB */
+            }
         }
     </style>
 </head>
@@ -485,7 +563,7 @@
 
     <header>
         <a href="index.html" class="logo">
-            PROCESSLANG <span class="version-tag">v0.99</span>
+            PROCESSLANG <span class="version-tag">v1.0</span>
         </a>
         <div class="mode-switch">
             <button class="mode-btn active" id="btnVisual" onclick="App.setMode('visual')">VISUAL</button>
@@ -497,16 +575,16 @@
         <button class="cmd-btn cmd-btn-comment" onclick="App.addComment()"><i class="ph ph-hash"></i> COMMENT</button>
         <div style="width: 1px; height: 20px; background: #333; margin: 0 5px;"></div>
 
-        <button class="cmd-btn btn-flow" onclick="App.openModal('FLOW')"><i class="ph ph-waves"></i> FLOW</button>
-        <button class="cmd-btn btn-dissolve" onclick="App.openModal('DISSOLVE')"><i class="ph ph-drop"></i> DISSOLVE</button>
-        <button class="cmd-btn btn-connect" onclick="App.openModal('CONNECT')"><i class="ph ph-link"></i> CONNECT</button>
-        <button class="cmd-btn btn-observe" onclick="App.openModal('OBSERVE')"><i class="ph ph-eye"></i> OBSERVE</button>
-        <button class="cmd-btn btn-choose" onclick="App.openModal('CHOOSE')"><i class="ph ph-lightning"></i> CHOOSE</button>
-        <button class="cmd-btn btn-encode" onclick="App.openModal('ENCODE')"><i class="ph ph-diamond"></i> ENCODE</button>
-        <button class="cmd-btn btn-cycle" onclick="App.openModal('CYCLE')"><i class="ph ph-arrows-clockwise"></i> CYCLE</button>
-        <button class="cmd-btn btn-logic" onclick="App.openModal('LOGIC')"><i class="ph ph-triangle"></i> LOGIC</button>
-        <button class="cmd-btn btn-runtime" onclick="App.openModal('RUNTIME')"><i class="ph ph-square"></i> RUNTIME</button>
-        <button class="cmd-btn btn-manifest" onclick="App.openModal('MANIFEST')"><i class="ph ph-cube"></i> MANIFEST</button>
+        <button class="cmd-btn btn-flow" onclick="App.openModal('FLOW')">FLOW</button>
+        <button class="cmd-btn btn-dissolve" onclick="App.openModal('DISSOLVE')">DISSOLVE</button>
+        <button class="cmd-btn btn-connect" onclick="App.openModal('CONNECT')">CONNECT</button>
+        <button class="cmd-btn btn-observe" onclick="App.openModal('OBSERVE')">OBSERVE</button>
+        <button class="cmd-btn btn-choose" onclick="App.openModal('CHOOSE')">CHOOSE</button>
+        <button class="cmd-btn btn-encode" onclick="App.openModal('ENCODE')">ENCODE</button>
+        <button class="cmd-btn btn-cycle" onclick="App.openModal('CYCLE')">CYCLE</button>
+        <button class="cmd-btn btn-logic" onclick="App.openModal('LOGIC')">LOGIC</button>
+        <button class="cmd-btn btn-runtime" onclick="App.openModal('RUNTIME')">RUNTIME</button>
+        <button class="cmd-btn btn-manifest" onclick="App.openModal('MANIFEST')">MANIFEST</button>
     </div>
 
     <div class="main-container">
@@ -526,17 +604,18 @@
             </div>
         </div>
 
+        <!-- OVERLAY (for mobile) -->
+        <div class="overlay-backdrop" id="overlayBackdrop" onclick="App.toggleMobilePanel()"></div>
+
         <!-- RIGHT PANEL: LAUNCHPAD -->
-        <div class="output-panel">
+        <div class="output-panel" id="outputPanel">
             <div class="panel-title">TRANSMISSION</div>
 
-            <!-- FILE NAME INPUT -->
             <div class="input-group">
                 <label class="input-label">Program Name</label>
                 <input type="text" id="fileNameInput" class="input-field" value="program" placeholder="Название файла">
             </div>
 
-            <!-- ACTION BUTTONS -->
             <button class="launch-btn btn-compile" onclick="App.compile()">
                 <i class="ph ph-cursor-click"></i> COMPILE & COPY
             </button>
@@ -549,29 +628,18 @@
 
             <div style="color:#444; font-size:0.7rem; text-align:center; text-transform:uppercase; margin-top: 15px; margin-bottom: 5px;">-- OPEN MACHINE --</div>
 
-            <!-- ПРОСТЫЕ ССЫЛКИ (TARGET="_BLANK") -->
-
-            <!-- Z (ТЫ) -->
             <a href="https://chat.z.ai" target="_blank" class="launch-btn btn-me">
                 <i class="ph ph-robot"></i> Z
             </a>
-
-            <!-- CHATGPT -->
             <a href="https://chat.openai.com" target="_blank" class="launch-btn btn-gpt">
                 <i class="ph ph-open-ai-logo"></i> CHATGPT
             </a>
-
-            <!-- CLAUDE -->
             <a href="https://claude.ai" target="_blank" class="launch-btn btn-claude">
                 <i class="ph ph-sparkle"></i> CLAUDE
             </a>
-
-            <!-- DEEPSEEK -->
             <a href="https://chat.deepseek.com" target="_blank" class="launch-btn btn-deepseek">
                 <i class="ph ph-brain"></i> DEEPSEEK
             </a>
-
-            <!-- GEMINI -->
             <a href="https://gemini.google.com" target="_blank" class="launch-btn btn-gemini">
                 <i class="ph ph-google-logo"></i> GEMINI
             </a>
@@ -579,6 +647,11 @@
             <div id="statusLog" class="status-log"></div>
         </div>
     </div>
+
+    <!-- MOBILE FAB -->
+    <button class="mobile-fab" id="mobileFab" onclick="App.toggleMobilePanel()">
+        <i class="ph ph-cursor-click"></i>
+    </button>
 
     <!-- MODAL -->
     <div id="modal" class="modal-overlay">
@@ -901,6 +974,25 @@
                 logEl.style.color = color;
             },
 
+            // Mobile Drawer Logic
+            toggleMobilePanel() {
+                const panel = document.getElementById('outputPanel');
+                const backdrop = document.getElementById('overlayBackdrop');
+                const fab = document.getElementById('mobileFab');
+
+                const isActive = panel.classList.contains('active');
+
+                if (isActive) {
+                    panel.classList.remove('active');
+                    backdrop.classList.remove('active');
+                    fab.style.display = 'flex'; // Show FAB again
+                } else {
+                    panel.classList.add('active');
+                    backdrop.classList.add('active');
+                    fab.style.display = 'none'; // Hide FAB when open
+                }
+            },
+
             resetProgram() {
                 if(confirm('Очистить рабочую область?')) {
                     this.data = [];
@@ -913,7 +1005,6 @@
             },
 
             saveFile() {
-                // Берем имя из инпута
                 let name = document.getElementById('fileNameInput').value.trim();
                 if (!name) name = 'program';
 
@@ -931,15 +1022,11 @@
             async compile() {
                 this.log('COMPILING...', 'var(--text-dim)');
 
-                // Если режим кода, парсим его в блоки
                 if (this.mode === 'code') {
                     this.parseCodeToBlocks(document.getElementById('rawCodeArea').value);
                 }
 
-                // 1. Генерируем код
                 let userProgram = this.generateCode();
-
-                // 2. Загружаем модули
                 const activeBlocks = this.data.filter(b => b.type !== '#');
                 const uniqueTypes = [...new Set(activeBlocks.map(x => x.type))];
 
@@ -961,13 +1048,16 @@
                     return;
                 }
 
-                // 3. Склеиваем
                 this.cachedPrompt = loadedModules + userProgram;
 
-                // 4. КОПИРУЕМ В БУФЕР
                 try {
                     await navigator.clipboard.writeText(this.cachedPrompt);
                     this.log('COPIED TO CLIPBOARD!', 'var(--c-connect)');
+
+                    // Auto-close mobile panel after copy for convenience
+                    if (window.innerWidth <= 800) {
+                        setTimeout(() => this.toggleMobilePanel(), 500);
+                    }
                 } catch (err) {
                     this.log('COPY FAILED', 'var(--c-choose)');
                 }
