@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARCHETYPE COMPASS V2.1</title>
+  <title>ARCHETYPE COMPASS V2.2</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -21,9 +23,19 @@
       display: flex;
       justify-content: center;
     }
-    /* Reset for buttons */
     button {
       font-family: inherit;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0908;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e8c54733;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -36,100 +48,109 @@
     // --- DATA ---
 
     const FIGURES = [
-      { id: 1, name: "Aleister Crowley", x: 0.15, y: 0.6, emoji: "⭐", desc: "Left Hand Path + индивидуализм. Телема. 'Do what thou wilt.'", tags: ["Магия", "Телема"] },
-      { id: 2, name: "Anton LaVey", x: 0.25, y: 0.55, emoji: "🜏", desc: "Сатанизм как философия эгоизма + либертарианство.", tags: ["Магия", "Сатанизм"] },
-      { id: 3, name: "Ayn Rand", x: 0.4, y: 0.5, emoji: "🏛", desc: "Атеизм + объективизм. Эго как абсолют. Рынок как арена.", tags: ["Философия", "Капитализм"] },
-      { id: 4, name: "Nietzsche", x: 0.2, y: 0.6, emoji: "⚡", desc: "'Бог мёртв' + Übermensch. Чистый SATAN-архетип.", tags: ["Философия"] },
-      { id: 5, name: "Elon Musk", x: 0.35, y: 0.35, emoji: "🚀", desc: "Техно-индивидуализм. Меритократия. Слабый духовный вектор.", tags: ["Бизнес", "Техно"] },
-      { id: 6, name: "Jordan Peterson", x: 0.3, y: -0.1, emoji: "🦞", desc: "Юнгианская традиция + индивидуальная ответственность.", tags: ["Психология", "Традиция"] },
+      // --- TOP RIGHT: THE SOVEREIGN (Spirit: Satan / Politics: Right) ---
+      { id: 1, name: "Aleister Crowley", x: 0.15, y: 0.6, emoji: "⭐", desc: "Left Hand Path + Индивидуализм. Телема. 'Do what thou wilt'.", tags: ["Магия", "Телема"] },
+      { id: 2, name: "Anton LaVey", x: 0.25, y: 0.55, emoji: "🜏", desc: "Сатанизм как философия эгоизма. Ритуалы ради психологии.", tags: ["Магия", "Сатанизм"] },
+      { id: 3, name: "Ayn Rand", x: 0.5, y: 0.5, emoji: "🏛", desc: "Объективизм. Разум превыше всего. Эгоизм как добродетель.", tags: ["Философия", "Капитализм"] },
+      { id: 4, name: "Nietzsche", x: 0.1, y: 0.65, emoji: "⚡", desc: "Бог мертв. Сверхчеловек. Тотальная воля к власти.", tags: ["Философия"] },
+      { id: 5, name: "Elon Musk", x: 0.4, y: 0.35, emoji: "🚀", desc: "Техно-индивидуализм. Хочет спасти человечество по своему сценарию.", tags: ["Бизнес", "Техно"] },
+      { id: 11, name: "Trump", x: 0.5, y: 0.25, emoji: "🃏", desc: "Популизм, триумф воли, отрицание правил Системы.", tags: ["Политика"] },
+      { id: 14, name: "Peter Thiel", x: 0.45, y: 0.4, emoji: "♟", desc: "Монополии лучше конкуренции. Элитизм.", tags: ["Бизнес", "Техно"] },
+      { id: 16, name: "Ragnar Lothbrok", x: 0.6, y: 0.6, emoji: "⚔️", desc: "Слава, завоевание, воля вождя. Традиции ради силы.", tags: ["История", "Викинг"] },
+
+      // --- BOTTOM RIGHT: THE TRADITIONALIST (Spirit: God / Politics: Right) ---
+      { id: 6, name: "Jordan Peterson", x: 0.2, y: -0.1, emoji: "🦞", desc: "Индивидуальная ответственность через древние мифы. Порядок.", tags: ["Психология", "Традиция"] },
+      { id: 17, name: "Монархист", x: 0.4, y: -0.4, emoji: "👑", desc: "Царь, Вера, Отечество. Иерархия дана свыше.", tags: ["Политика", "Традиция"] },
+      { id: 18, name: "Конфуций", x: 0.3, y: -0.3, emoji: "☯️", desc: "Ритуалы, почтение, порядок. Общество как семья.", tags: ["Философия", "Восток"] },
       
-      // GOD ARCHETYPE (BOTTOM / NEGATIVE Y)
-      { id: 7, name: "Pope Francis", x: -0.15, y: -0.4, emoji: "✝", desc: "Правая Рука (служение Богу) + левый крен в политике.", tags: ["Религия", "Католицизм"] },
-      { id: 8, name: "Karl Marx", x: -0.45, y: -0.3, emoji: "☭", desc: "Материализм (отрицание духа) + тотальный коллективизм.", tags: ["Политика", "Социализм"] },
-      { id: 9, name: "DEI", x: -0.35, y: -0.5, emoji: "⚖", desc: "Секулярная теократия. GOD-архетип. Грех→Покаяние→Отмена.", tags: ["Идеология"] },
-      { id: 10, name: "Bernie Sanders", x: -0.3, y: -0.2, emoji: "🌹", desc: "Классический левый. Система > Индивид.", tags: ["Политика", "Социализм"] },
+      // --- BOTTOM LEFT: THE DEVOTEE (Spirit: God / Politics: Left) ---
+      { id: 7, name: "Pope Francis", x: -0.15, y: -0.4, emoji: "✝", desc: "Смирение, служение, забота о бедных. Вера в Провидение.", tags: ["Религия", "Католицизм"] },
+      { id: 8, name: "Karl Marx", x: -0.55, y: -0.3, emoji: "☭", desc: "Исторический материализм. Личность — продукт экономики.", tags: ["Политика", "Социализм"] },
+      { id: 9, name: "DEI / HR Dept", x: -0.35, y: -0.6, emoji: "⚖", desc: "Секулярная теократия. Грех (привилегия) требует покаяния.", tags: ["Идеология"] },
+      { id: 12, name: "Традиционная Церковь", x: -0.05, y: -0.6, emoji: "⛪", desc: "Путь Правой Руки. Растворение воли в Божественном.", tags: ["Религия"] },
+      { id: 13, name: "Буддизм", x: -0.25, y: -0.55, emoji: "☸", desc: "Отрицание Я. Нирвана как полное растворение.", tags: ["Религия", "Философия"] },
+      { id: 15, name: "СССР", x: -0.6, y: -0.5, emoji: "⚒", desc: "Коллективизм. Винтик в машине прогресса.", tags: ["Политика", "История"] },
       
-      // SATAN ARCHETYPE (TOP / POSITIVE Y)
-      { id: 11, name: "Trump", x: 0.45, y: 0.3, emoji: "🃏", desc: "Правый популизм. Индивид + бунт против истеблишмента.", tags: ["Политика"] },
-      
-      // MIXED / TRADITIONAL
-      { id: 12, name: "Традиционная Церковь", x: -0.05, y: -0.5, emoji: "⛪", desc: "Чистый Путь Правой Руки. Смирение. Растворение эго.", tags: ["Религия"] },
-      { id: 13, name: "Буддизм", x: -0.25, y: -0.55, emoji: "☸", desc: "Растворение Я + коллективная карма. Двойной GOD.", tags: ["Религия", "Философия"] },
-      { id: 14, name: "Peter Thiel", x: 0.35, y: 0.45, emoji: "♟", desc: "Либертарианец + тёмное просвещение. Элитизм.", tags: ["Бизнес", "Политика"] },
-      { id: 15, name: "СССР", x: -0.55, y: -0.4, emoji: "⚒", desc: "Максимальный GOD в политике. Индивид = винтик.", tags: ["Политика", "Идеология"] },
+      // --- TOP LEFT: THE IDEOLOGUE (Spirit: Satan / Politics: Left) ---
+      // Связка: Бунт духа (Left Hand) + Стремление переделать мир (Left Wing).
+      { id: 19, name: "Robespierre", x: -0.4, y: 0.5, emoji: "🔪", desc: "Революционный террор ради 'Высшей Цели'. Культ Разума.", tags: ["История", "Революция"] },
+      { id: 20, name: "Jean-Paul Sartre", x: -0.2, y: 0.45, emoji: "🚬", desc: "Экзистенциализм (свобода) + Коммунизм (коллектив). Парадокс.", tags: ["Философия", "Экзистенциализм"] },
+      { id: 21, name: "Twitter Activist", x: -0.5, y: 0.4, emoji: "📢", desc: "Хаос в ленте, порядок в мыслях. Самоназначенный пророк справедливости.", tags: ["Современность", "Мемы"] },
+      { id: 22, name: "Foucault", x: -0.3, y: 0.3, emoji: "🔬", desc: "Власть везде. Сопротивление через деконструкцию. Бунт ради теории.", tags: ["Философия", "Постмодерн"] },
+      { id: 23, name: "Че Гевара", x: -0.55, y: 0.6, emoji: "🌟", desc: "Романтик революции. Воля к власти через восстание масс.", tags: ["История", "Икона"] },
     ];
 
     const QUIZ_QUESTIONS = [
       {
-        q: "Существует ли объективная мораль, единая для всех?",
+        q: "Вы нашли кошелек с крупной суммой и документами владельца. Ваши действия?",
         answers: [
-          { text: "Да, есть абсолютные законы добра и зла", spirit: -2, politics: 0 },
-          { text: "Есть общие принципы, но контекст важен", spirit: -1, politics: 0 },
-          { text: "Мораль — конструкт, каждый определяет сам", spirit: 1, politics: 0 },
-          { text: "Мораль — инструмент контроля, я выше неё", spirit: 2, politics: 0 },
+          { text: "Верну владельцу. Честность — залог порядка в мире.", spirit: -1, politics: -1 },
+          { text: "Возьму деньги, документы выкину. Выживает хитрейший.", spirit: 1, politics: 1 },
+          { text: "Верну, но потребую награду. Время — деньги.", spirit: 0, politics: 1 },
+          { text: "Заберу всё и пожертвую на благотворительность. Так справедливее.", spirit: 1, politics: -2 },
         ],
       },
       {
-        q: "Государство должно обеспечивать равенство, даже ценой свободы?",
+        q: "Какой фильм вы бы посмотрели в пятницу вечером?",
         answers: [
-          { text: "Абсолютно. Справедливость важнее свободы", spirit: 0, politics: -2 },
-          { text: "В основном да, базовые гарантии нужны", spirit: 0, politics: -1 },
-          { text: "Нет, свобода важнее равенства", spirit: 0, politics: 1 },
-          { text: "Государство — паразит. Минимум вмешательства", spirit: 0, politics: 2 },
+          { text: "Крестный отец. История о семье, чести и иерархии.", spirit: -1, politics: 1 },
+          { text: "Матрица. О том, как взломать систему и стать Избранным.", spirit: 2, politics: 0 },
+          { text: "Советские классики. Уют, стабильность, коллективизм.", spirit: -2, politics: -1 },
+          { text: "Джокер. О крахе общества и торжестве хаоса.", spirit: 1, politics: -1 },
         ],
       },
       {
-        q: "Твоё отношение к духовным традициям и религиям:",
+        q: "Идеальное общество — это...",
         answers: [
-          { text: "Следую традиции, она мудрее меня", spirit: -2, politics: 0 },
-          { text: "Уважаю, беру полезное, остальное отбрасываю", spirit: 0, politics: 0 },
-          { text: "Деконструирую, чтобы понять механику", spirit: 1, politics: 0 },
-          { text: "Все религии — тюрьмы для сознания", spirit: 2, politics: 0 },
+          { text: "Строгая иерархия, где каждый знает свое место.", spirit: -1, politics: 1 },
+          { text: "Свободный рынок, где каждый сам кузнец своего счастья.", spirit: 0, politics: 2 },
+          { text: "Коммуна, где нет частной собственности и все равны.", spirit: -1, politics: -2 },
+          { text: "Место, где я стою на вершине пирамиды, направляя человечество.", spirit: 2, politics: -1 },
         ],
       },
       {
-        q: "Инакомыслящий коллега высказал 'проблематичную' позицию. Твоя реакция?",
+        q: "Ваше отношение к религии и традициям:",
         answers: [
-          { text: "Сообщить, это может навредить коллективу", spirit: 0, politics: -2 },
-          { text: "Неприятно, но это его право", spirit: 0, politics: 0 },
-          { text: "Интересно, хочу понять его логику", spirit: 0, politics: 1 },
-          { text: "Респект за то что не прогибается", spirit: 0, politics: 2 },
+          { text: "Основа цивилизации. Без них наступит хаос.", spirit: -2, politics: 0 },
+          { text: "Это инструменты контроля. Я сам себе бог.", spirit: 2, politics: 0 },
+          { text: "Уважаю, если они помогают людям (благотворительность, мораль).", spirit: -1, politics: -1 },
+          { text: "Интересный материал для манипуляций или спекуляций.", spirit: 1, politics: 1 },
         ],
       },
       {
-        q: "Что важнее — личное просветление или спасение мира?",
+        q: "Вы получили суперспособность. Какую и зачем?",
         answers: [
-          { text: "Спасение мира, эго — иллюзия", spirit: -2, politics: -1 },
-          { text: "Сначала стань лучше сам, потом помогай", spirit: 0, politics: 1 },
-          { text: "Просветление — единственная реальная цель", spirit: 2, politics: 0 },
-          { text: "Ни то ни другое. Живи и действуй", spirit: 1, politics: 1 },
+          { text: "Бессмертие. Чтобы вечно накапливать знания и власть.", spirit: 1, politics: 1 },
+          { text: "Исцеление. Чтобы спасать людей и служить миру.", spirit: -2, politics: -1 },
+          { text: "Контроль над разумом. Чтобы заставить всех жить правильно.", spirit: 1, politics: -2 },
+          { text: "Телепортация. Полная свобода от границ и правил.", spirit: 2, politics: 1 },
         ],
       },
       {
-        q: "Богатство и успех — это:",
+        q: "Ваш коллега ошибся и свалил вину на вас. Начальник верит ему. Ваша реакция?",
         answers: [
-          { text: "Проявление жадности и неравенства", spirit: 0, politics: -2 },
-          { text: "Нормально, если делишься с обществом", spirit: 0, politics: -1 },
-          { text: "Результат таланта и труда, заслуженно", spirit: 0, politics: 1 },
-          { text: "Мерило силы воли. Мир принадлежит сильным", spirit: 1, politics: 2 },
+          { text: "Смирюсь. Возможно, это проверка свыше или карма.", spirit: -2, politics: 0 },
+          { text: "Соберу компромат и уничтожу его карьеру. Месть — блюдо холодное.", spirit: 2, politics: 0 },
+          { text: "Устрою публичный спор. Истина рождается в конфликте.", spirit: 1, politics: -1 },
+          { text: "Уйду в свой стартап. Мне не нужны эти корпоративные игры.", spirit: 0, politics: 2 },
         ],
       },
       {
-        q: "Ты нашёл древний гримуар. Что делаешь?",
+        q: "Что такое 'Свобода' для вас?",
         answers: [
-          { text: "Отношу в храм/церковь. Опасно", spirit: -2, politics: 0 },
-          { text: "Изучаю как исторический артефакт", spirit: 0, politics: 0 },
-          { text: "Пробую ритуалы. Знание — сила", spirit: 2, politics: 0 },
-          { text: "Продаю тому, кто больше заплатит", spirit: 0, politics: 2 },
+          { text: "Отсутствие границ для моей Воли и Желаний.", spirit: 2, politics: 1 },
+          { text: "Осознанная необходимость служить Общему Благу.", spirit: -1, politics: -2 },
+          { text: "Свобода от греха и соблазнов через дисциплину.", spirit: -2, politics: 0 },
+          { text: "Возможность переделать этот несовершенный мир по своему проекту.", spirit: 1, politics: -2 },
         ],
       },
       {
-        q: "'Свобода слова должна быть абсолютной' — согласен?",
+        q: "Кто ваш идеал или кумир?",
         answers: [
-          { text: "Нет, вредоносная речь должна быть запрещена", spirit: 0, politics: -2 },
-          { text: "Есть разумные ограничения", spirit: 0, politics: -1 },
-          { text: "В основном да, с минимальными исключениями", spirit: 0, politics: 1 },
-          { text: "Абсолютно. Любая цензура — тирания", spirit: 0, politics: 2 },
+          { text: "Святой праведник или Монах (смирение, духовность).", spirit: -2, politics: -1 },
+          { text: "Илон Маск или Император (сила, созидание, успех).", spirit: 1, politics: 2 },
+          { text: "Революционер (Че Гевара, Ленин) (борьба за идею).", spirit: 1, politics: -2 },
+          { text: "Никто. Идеалов нет, есть только я и моя правда.", spirit: 2, politics: 0 },
         ],
       },
     ];
@@ -137,10 +158,10 @@
     // --- LOGIC ---
 
     function getQuadrantInfo(x, y) {
-      if (x >= 0 && y >= 0) return { name: "THE SOVEREIGN", icon: "👁", color: "#e8c547", desc: "Left Hand в Духе + Right Wing в Мире. Самообожествление + Индивидуальная свобода. Root-доступ к реальности." };
-      if (x < 0 && y >= 0) return { name: "THE IDEOLOGUE", icon: "🎭", color: "#c74b50", desc: "Left Hand в Духе + Left Wing в Мире. Бунтарь, который строит новую тюрьму. Внутренний конфликт." };
-      if (x < 0 && y < 0) return { name: "THE DEVOTEE", icon: "🕊", color: "#5b8fb9", desc: "Right Hand в Духе + Left Wing в Мире. Двойное растворение. Полная отдача Системе и Богу." };
-      return { name: "THE TRADITIONALIST", icon: "⚔", color: "#8b6f47", desc: "Right Hand в Духе + Right Wing в Мире. Вера в порядок + личная ответственность. Консерватизм." };
+      if (x >= 0 && y >= 0) return { name: "THE SOVEREIGN", icon: "👁", color: "#e8c547", desc: "Left Hand в Духе + Right Wing в Мире. Самообожествление + Индивидуальная свобода. Вы — Суверен. Враг системы, хозяин судьбы." };
+      if (x < 0 && y >= 0) return { name: "THE IDEOLOGUE", icon: "🎭", color: "#c74b50", desc: "Left Hand в Духе + Left Wing в Мире. Бунтарь-теоретик. Хотите разрушить старый мир, чтобы построить новый (и возглавить его)." };
+      if (x < 0 && y < 0) return { name: "THE DEVOTEE", icon: "🕊", color: "#5b8fb9", desc: "Right Hand в Духе + Left Wing в Мире. Верующий и Служитель. Готовы раствориться в чем-то большем ради общего блага." };
+      return { name: "THE TRADITIONALIST", icon: "⚔", color: "#8b6f47", desc: "Right Hand в Духе + Right Wing в Мире. Хранитель порядка. Иерархия, семья, честь. Опора цивилизации." };
     }
 
     // --- COMPONENTS ---
@@ -151,7 +172,6 @@
       const inner = size - pad * 2;
 
       const toSvg = (nx, ny) => {
-        // Clamp values to prevent overflow
         const clampedX = Math.max(-0.6, Math.min(0.6, nx));
         const clampedY = Math.max(-0.6, Math.min(0.6, ny));
         return {
@@ -203,10 +223,10 @@
           <text x={pad + inner + 8} y={pad + inner/2} textAnchor="middle" fill="#8b6f47" fontSize="10" fontFamily="'Courier New', monospace" transform={`rotate(90, ${pad + inner + 8}, ${pad + inner/2})`} filter="url(#textShadow)">RIGHT WING ⟨INDIVIDUAL⟩</text>
 
           {/* Quadrant labels */}
-          <text x={pad + inner*0.25} y={pad + 20} textAnchor="middle" fill="rgba(91,143,185,0.4)" fontSize="9" fontFamily="'Courier New', monospace">DEVOTEE</text>
-          <text x={pad + inner*0.75} y={pad + 20} textAnchor="middle" fill="rgba(139,111,71,0.4)" fontSize="9" fontFamily="'Courier New', monospace">TRADITIONALIST</text>
-          <text x={pad + inner*0.25} y={pad + inner - 10} textAnchor="middle" fill="rgba(199,75,80,0.4)" fontSize="9" fontFamily="'Courier New', monospace">IDEOLOGUE</text>
-          <text x={pad + inner*0.75} y={pad + inner - 10} textAnchor="middle" fill="rgba(232,197,71,0.4)" fontSize="9" fontFamily="'Courier New', monospace">SOVEREIGN</text>
+          <text x={pad + inner*0.25} y={pad + 20} textAnchor="middle" fill="rgba(91,143,185,0.5)" fontSize="9" fontFamily="'Courier New', monospace">DEVOTEE</text>
+          <text x={pad + inner*0.75} y={pad + 20} textAnchor="middle" fill="rgba(139,111,71,0.5)" fontSize="9" fontFamily="'Courier New', monospace">TRADITIONALIST</text>
+          <text x={pad + inner*0.25} y={pad + inner - 10} textAnchor="middle" fill="rgba(199,75,80,0.5)" fontSize="9" fontFamily="'Courier New', monospace">IDEOLOGUE</text>
+          <text x={pad + inner*0.75} y={pad + inner - 10} textAnchor="middle" fill="rgba(232,197,71,0.5)" fontSize="9" fontFamily="'Courier New', monospace">SOVEREIGN</text>
 
           {/* Figures */}
           {figures.map(f => {
@@ -292,7 +312,7 @@
           next.forEach(a => { totalP += a.politics; totalS += a.spirit; });
           const maxP = QUIZ_QUESTIONS.length * 2;
           const maxS = QUIZ_QUESTIONS.length * 2;
-          setUserPos({ x: (totalP / maxP) * 0.5, y: (totalS / maxS) * 0.5 });
+          setUserPos({ x: (totalP / maxP) * 0.6, y: (totalS / maxS) * 0.6 });
           setShowResult(true);
           setTab("compass");
         }
@@ -330,7 +350,7 @@
         }}>
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 10, color: "#706850", letterSpacing: 3, marginBottom: 4 }}>CLASSIFICATION_OF_ARCHETYPES_V2.1</div>
+            <div style={{ fontSize: 10, color: "#706850", letterSpacing: 3, marginBottom: 4 }}>CLASSIFICATION_OF_ARCHETYPES_V2.2</div>
             <h1 style={{
               fontSize: 28,
               fontWeight: 300,
@@ -382,7 +402,7 @@
                 </div>
               )}
               {!showResult && !selectedFigureData && (
-                <p style={{ textAlign: "center", color: "#504830", fontSize: 11, marginTop: 8 }}>Нажми на точку чтобы увидеть инфо · Пройди DIAGNOSE чтобы найти себя</p>
+                <p style={{ textAlign: "center", color: "#504830", fontSize: 11, marginTop: 8 }}>Нажми на точку для инфо · Пройди DIAGNOSE для позиционирования</p>
               )}
             </div>
           )}
@@ -400,7 +420,7 @@
                       ))}
                     </div>
                   </div>
-                  <p style={{ fontSize: 15, color: "#e8e0c8", lineHeight: 1.6, marginBottom: 20 }}>{QUIZ_QUESTIONS[quizStep].q}</p>
+                  <p style={{ fontSize: 15, color: "#e8e0c8", lineHeight: 1.6, marginBottom: 20, minHeight: 40 }}>{QUIZ_QUESTIONS[quizStep].q}</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {QUIZ_QUESTIONS[quizStep].answers.map((a, i) => (
                       <button
@@ -430,7 +450,7 @@
                 </div>
               ) : (
                 <div style={{ textAlign: "center" }}>
-                  <p style={{ color: "#706850", fontSize: 12 }}>Диагностика завершена. Переключись на COMPASS чтобы увидеть свою позицию.</p>
+                  <p style={{ color: "#706850", fontSize: 12 }}>Диагностика завершена. Переключись на COMPASS чтобы увидеть результат.</p>
                   <button onClick={resetQuiz} style={{ marginTop: 8, background: "none", border: "1px solid rgba(232,197,71,0.2)", color: "#e8c547", padding: "8px 20px", borderRadius: 3, cursor: "pointer", fontFamily: "'Courier New', monospace", fontSize: 11 }}>ПРОЙТИ ЗАНОВО</button>
                 </div>
               )}
@@ -475,7 +495,7 @@
 
           {/* Footer */}
           <div style={{ textAlign: "center", marginTop: 32, padding: "16px 0", borderTop: "1px solid rgba(232,197,71,0.06)" }}>
-            <div style={{ fontSize: 9, color: "#302a20", letterSpacing: 2 }}>ARCHETYPE COMPASS · BASED ON CLASSIFICATION_OF_ARCHETYPES V2.1</div>
+            <div style={{ fontSize: 9, color: "#302a20", letterSpacing: 2 }}>ARCHETYPE COMPASS · BASED ON CLASSIFICATION_OF_ARCHETYPES V2.2</div>
           </div>
         </div>
       );
