@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCHETYPE COMPASS V2.1</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #0a0908;
+      color: #e8e0c8;
+      font-family: 'Courier New', monospace;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    #root {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    /* Reset for buttons */
+    button {
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // --- DATA ---
+
+    const FIGURES = [
+      { id: 1, name: "Aleister Crowley", x: 0.15, y: 0.6, emoji: "⭐", desc: "Left Hand Path + индивидуализм. Телема. 'Do what thou wilt.'", tags: ["Магия", "Телема"] },
+      { id: 2, name: "Anton LaVey", x: 0.25, y: 0.55, emoji: "🜏", desc: "Сатанизм как философия эгоизма + либертарианство.", tags: ["Магия", "Сатанизм"] },
+      { id: 3, name: "Ayn Rand", x: 0.4, y: 0.5, emoji: "🏛", desc: "Атеизм + объективизм. Эго как абсолют. Рынок как арена.", tags: ["Философия", "Капитализм"] },
+      { id: 4, name: "Nietzsche", x: 0.2, y: 0.6, emoji: "⚡", desc: "'Бог мёртв' + Übermensch. Чистый SATAN-архетип.", tags: ["Философия"] },
+      { id: 5, name: "Elon Musk", x: 0.35, y: 0.35, emoji: "🚀", desc: "Техно-индивидуализм. Меритократия. Слабый духовный вектор.", tags: ["Бизнес", "Техно"] },
+      { id: 6, name: "Jordan Peterson", x: 0.3, y: -0.1, emoji: "🦞", desc: "Юнгианская традиция + индивидуальная ответственность.", tags: ["Психология", "Традиция"] },
+      
+      // GOD ARCHETYPE (BOTTOM / NEGATIVE Y)
+      { id: 7, name: "Pope Francis", x: -0.15, y: -0.4, emoji: "✝", desc: "Правая Рука (служение Богу) + левый крен в политике.", tags: ["Религия", "Католицизм"] },
+      { id: 8, name: "Karl Marx", x: -0.45, y: -0.3, emoji: "☭", desc: "Материализм (отрицание духа) + тотальный коллективизм.", tags: ["Политика", "Социализм"] },
+      { id: 9, name: "DEI", x: -0.35, y: -0.5, emoji: "⚖", desc: "Секулярная теократия. GOD-архетип. Грех→Покаяние→Отмена.", tags: ["Идеология"] },
+      { id: 10, name: "Bernie Sanders", x: -0.3, y: -0.2, emoji: "🌹", desc: "Классический левый. Система > Индивид.", tags: ["Политика", "Социализм"] },
+      
+      // SATAN ARCHETYPE (TOP / POSITIVE Y)
+      { id: 11, name: "Trump", x: 0.45, y: 0.3, emoji: "🃏", desc: "Правый популизм. Индивид + бунт против истеблишмента.", tags: ["Политика"] },
+      
+      // MIXED / TRADITIONAL
+      { id: 12, name: "Традиционная Церковь", x: -0.05, y: -0.5, emoji: "⛪", desc: "Чистый Путь Правой Руки. Смирение. Растворение эго.", tags: ["Религия"] },
+      { id: 13, name: "Буддизм", x: -0.25, y: -0.55, emoji: "☸", desc: "Растворение Я + коллективная карма. Двойной GOD.", tags: ["Религия", "Философия"] },
+      { id: 14, name: "Peter Thiel", x: 0.35, y: 0.45, emoji: "♟", desc: "Либертарианец + тёмное просвещение. Элитизм.", tags: ["Бизнес", "Политика"] },
+      { id: 15, name: "СССР", x: -0.55, y: -0.4, emoji: "⚒", desc: "Максимальный GOD в политике. Индивид = винтик.", tags: ["Политика", "Идеология"] },
+    ];
+
+    const QUIZ_QUESTIONS = [
+      {
+        q: "Существует ли объективная мораль, единая для всех?",
+        answers: [
+          { text: "Да, есть абсолютные законы добра и зла", spirit: -2, politics: 0 },
+          { text: "Есть общие принципы, но контекст важен", spirit: -1, politics: 0 },
+          { text: "Мораль — конструкт, каждый определяет сам", spirit: 1, politics: 0 },
+          { text: "Мораль — инструмент контроля, я выше неё", spirit: 2, politics: 0 },
+        ],
+      },
+      {
+        q: "Государство должно обеспечивать равенство, даже ценой свободы?",
+        answers: [
+          { text: "Абсолютно. Справедливость важнее свободы", spirit: 0, politics: -2 },
+          { text: "В основном да, базовые гарантии нужны", spirit: 0, politics: -1 },
+          { text: "Нет, свобода важнее равенства", spirit: 0, politics: 1 },
+          { text: "Государство — паразит. Минимум вмешательства", spirit: 0, politics: 2 },
+        ],
+      },
+      {
+        q: "Твоё отношение к духовным традициям и религиям:",
+        answers: [
+          { text: "Следую традиции, она мудрее меня", spirit: -2, politics: 0 },
+          { text: "Уважаю, беру полезное, остальное отбрасываю", spirit: 0, politics: 0 },
+          { text: "Деконструирую, чтобы понять механику", spirit: 1, politics: 0 },
+          { text: "Все религии — тюрьмы для сознания", spirit: 2, politics: 0 },
+        ],
+      },
+      {
+        q: "Инакомыслящий коллега высказал 'проблематичную' позицию. Твоя реакция?",
+        answers: [
+          { text: "Сообщить, это может навредить коллективу", spirit: 0, politics: -2 },
+          { text: "Неприятно, но это его право", spirit: 0, politics: 0 },
+          { text: "Интересно, хочу понять его логику", spirit: 0, politics: 1 },
+          { text: "Респект за то что не прогибается", spirit: 0, politics: 2 },
+        ],
+      },
+      {
+        q: "Что важнее — личное просветление или спасение мира?",
+        answers: [
+          { text: "Спасение мира, эго — иллюзия", spirit: -2, politics: -1 },
+          { text: "Сначала стань лучше сам, потом помогай", spirit: 0, politics: 1 },
+          { text: "Просветление — единственная реальная цель", spirit: 2, politics: 0 },
+          { text: "Ни то ни другое. Живи и действуй", spirit: 1, politics: 1 },
+        ],
+      },
+      {
+        q: "Богатство и успех — это:",
+        answers: [
+          { text: "Проявление жадности и неравенства", spirit: 0, politics: -2 },
+          { text: "Нормально, если делишься с обществом", spirit: 0, politics: -1 },
+          { text: "Результат таланта и труда, заслуженно", spirit: 0, politics: 1 },
+          { text: "Мерило силы воли. Мир принадлежит сильным", spirit: 1, politics: 2 },
+        ],
+      },
+      {
+        q: "Ты нашёл древний гримуар. Что делаешь?",
+        answers: [
+          { text: "Отношу в храм/церковь. Опасно", spirit: -2, politics: 0 },
+          { text: "Изучаю как исторический артефакт", spirit: 0, politics: 0 },
+          { text: "Пробую ритуалы. Знание — сила", spirit: 2, politics: 0 },
+          { text: "Продаю тому, кто больше заплатит", spirit: 0, politics: 2 },
+        ],
+      },
+      {
+        q: "'Свобода слова должна быть абсолютной' — согласен?",
+        answers: [
+          { text: "Нет, вредоносная речь должна быть запрещена", spirit: 0, politics: -2 },
+          { text: "Есть разумные ограничения", spirit: 0, politics: -1 },
+          { text: "В основном да, с минимальными исключениями", spirit: 0, politics: 1 },
+          { text: "Абсолютно. Любая цензура — тирания", spirit: 0, politics: 2 },
+        ],
+      },
+    ];
+
+    // --- LOGIC ---
+
+    function getQuadrantInfo(x, y) {
+      if (x >= 0 && y >= 0) return { name: "THE SOVEREIGN", icon: "👁", color: "#e8c547", desc: "Left Hand в Духе + Right Wing в Мире. Самообожествление + Индивидуальная свобода. Root-доступ к реальности." };
+      if (x < 0 && y >= 0) return { name: "THE IDEOLOGUE", icon: "🎭", color: "#c74b50", desc: "Left Hand в Духе + Left Wing в Мире. Бунтарь, который строит новую тюрьму. Внутренний конфликт." };
+      if (x < 0 && y < 0) return { name: "THE DEVOTEE", icon: "🕊", color: "#5b8fb9", desc: "Right Hand в Духе + Left Wing в Мире. Двойное растворение. Полная отдача Системе и Богу." };
+      return { name: "THE TRADITIONALIST", icon: "⚔", color: "#8b6f47", desc: "Right Hand в Духе + Right Wing в Мире. Вера в порядок + личная ответственность. Консерватизм." };
+    }
+
+    // --- COMPONENTS ---
+
+    function Compass({ figures, userPos, hoveredFigure, setHoveredFigure, selectedFigure, setSelectedFigure }) {
+      const size = 500;
+      const pad = 50;
+      const inner = size - pad * 2;
+
+      const toSvg = (nx, ny) => {
+        // Clamp values to prevent overflow
+        const clampedX = Math.max(-0.6, Math.min(0.6, nx));
+        const clampedY = Math.max(-0.6, Math.min(0.6, ny));
+        return {
+          cx: pad + ((clampedX + 0.6) / 1.2) * inner,
+          cy: pad + ((1 - (clampedY + 0.6) / 1.2)) * inner,
+        };
+      };
+
+      return (
+        <svg viewBox={`0 0 ${size} ${size}`} style={{ width: "100%", maxWidth: 520, background: "transparent" }}>
+          <defs>
+            <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(232,197,71,0.08)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+            </radialGradient>
+            <filter id="textShadow">
+              <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="rgba(0,0,0,0.8)" />
+            </filter>
+          </defs>
+
+          <rect x={pad} y={pad} width={inner} height={inner} fill="url(#glow)" stroke="rgba(232,197,71,0.15)" strokeWidth="1" />
+
+          {/* Quadrant backgrounds */}
+          <rect x={pad} y={pad} width={inner/2} height={inner/2} fill="rgba(91,143,185,0.06)" />
+          <rect x={pad+inner/2} y={pad} width={inner/2} height={inner/2} fill="rgba(139,111,71,0.06)" />
+          <rect x={pad} y={pad+inner/2} width={inner/2} height={inner/2} fill="rgba(199,75,80,0.06)" />
+          <rect x={pad+inner/2} y={pad+inner/2} width={inner/2} height={inner/2} fill="rgba(232,197,71,0.06)" />
+
+          {/* Grid lines */}
+          {[-0.4,-0.2,0,0.2,0.4].map(v => {
+            const {cx} = toSvg(v, 0);
+            const {cy} = toSvg(0, v);
+            return (
+              <g key={v}>
+                <line x1={cx} y1={pad} x2={cx} y2={pad+inner} stroke="rgba(232,197,71,0.06)" strokeWidth="0.5" />
+                <line x1={pad} y1={cy} x2={pad+inner} y2={cy} stroke="rgba(232,197,71,0.06)" strokeWidth="0.5" />
+              </g>
+            );
+          })}
+
+          {/* Axes */}
+          <line x1={pad + inner/2} y1={pad} x2={pad + inner/2} y2={pad + inner} stroke="rgba(232,197,71,0.3)" strokeWidth="1" strokeDasharray="4,4" />
+          <line x1={pad} y1={pad + inner/2} x2={pad + inner} y2={pad + inner/2} stroke="rgba(232,197,71,0.3)" strokeWidth="1" strokeDasharray="4,4" />
+
+          {/* Axis labels */}
+          <text x={pad + inner/2} y={pad - 12} textAnchor="middle" fill="#e8c547" fontSize="10" fontFamily="'Courier New', monospace" filter="url(#textShadow)">LEFT HAND ⟨SATAN⟩</text>
+          <text x={pad + inner/2} y={pad + inner + 22} textAnchor="middle" fill="#5b8fb9" fontSize="10" fontFamily="'Courier New', monospace" filter="url(#textShadow)">RIGHT HAND ⟨GOD⟩</text>
+          <text x={pad - 8} y={pad + inner/2} textAnchor="middle" fill="#c74b50" fontSize="10" fontFamily="'Courier New', monospace" transform={`rotate(-90, ${pad - 8}, ${pad + inner/2})`} filter="url(#textShadow)">LEFT WING ⟨SYSTEM⟩</text>
+          <text x={pad + inner + 8} y={pad + inner/2} textAnchor="middle" fill="#8b6f47" fontSize="10" fontFamily="'Courier New', monospace" transform={`rotate(90, ${pad + inner + 8}, ${pad + inner/2})`} filter="url(#textShadow)">RIGHT WING ⟨INDIVIDUAL⟩</text>
+
+          {/* Quadrant labels */}
+          <text x={pad + inner*0.25} y={pad + 20} textAnchor="middle" fill="rgba(91,143,185,0.4)" fontSize="9" fontFamily="'Courier New', monospace">DEVOTEE</text>
+          <text x={pad + inner*0.75} y={pad + 20} textAnchor="middle" fill="rgba(139,111,71,0.4)" fontSize="9" fontFamily="'Courier New', monospace">TRADITIONALIST</text>
+          <text x={pad + inner*0.25} y={pad + inner - 10} textAnchor="middle" fill="rgba(199,75,80,0.4)" fontSize="9" fontFamily="'Courier New', monospace">IDEOLOGUE</text>
+          <text x={pad + inner*0.75} y={pad + inner - 10} textAnchor="middle" fill="rgba(232,197,71,0.4)" fontSize="9" fontFamily="'Courier New', monospace">SOVEREIGN</text>
+
+          {/* Figures */}
+          {figures.map(f => {
+            const pos = toSvg(f.x, f.y);
+            const isHovered = hoveredFigure === f.id;
+            const isSelected = selectedFigure === f.id;
+            const quad = getQuadrantInfo(f.x, f.y);
+            return (
+              <g key={f.id}
+                onMouseEnter={() => setHoveredFigure(f.id)}
+                onMouseLeave={() => setHoveredFigure(null)}
+                onClick={() => setSelectedFigure(isSelected ? null : f.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <circle cx={pos.cx} cy={pos.cy} r={isHovered || isSelected ? 16 : 12} fill={`${quad.color}33`} stroke={quad.color} strokeWidth={isSelected ? 2 : 1} opacity={isHovered || isSelected ? 1 : 0.7} />
+                <text x={pos.cx} y={pos.cy + 4} textAnchor="middle" fontSize="12">{f.emoji}</text>
+                {(isHovered || isSelected) && (
+                  <text x={pos.cx} y={pos.cy - 20} textAnchor="middle" fill="#e8e0c8" fontSize="9" fontFamily="'Courier New', monospace" filter="url(#textShadow)">{f.name}</text>
+                )}
+              </g>
+            );
+          })}
+
+          {/* User position */}
+          {userPos && (() => {
+            const pos = toSvg(userPos.x, userPos.y);
+            return (
+              <g>
+                <circle cx={pos.cx} cy={pos.cy} r="18" fill="none" stroke="#e8c547" strokeWidth="2" strokeDasharray="3,2">
+                  <animate attributeName="r" values="16;20;16" dur="2s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+                </circle>
+                <circle cx={pos.cx} cy={pos.cy} r="6" fill="#e8c547" />
+                <text x={pos.cx} y={pos.cy - 24} textAnchor="middle" fill="#e8c547" fontSize="10" fontWeight="bold" fontFamily="'Courier New', monospace" filter="url(#textShadow)">YOU</text>
+              </g>
+            );
+          })()}
+        </svg>
+      );
+    }
+
+    function FigureCard({ figure }) {
+      const quad = getQuadrantInfo(figure.x, figure.y);
+      return (
+        <div style={{
+          background: "rgba(20,18,15,0.8)",
+          border: `1px solid ${quad.color}44`,
+          borderRadius: 6,
+          padding: "12px 16px",
+          marginTop: 8,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <span style={{ fontSize: 20 }}>{figure.emoji}</span>
+            <span style={{ color: "#e8e0c8", fontFamily: "'Courier New', monospace", fontWeight: "bold", fontSize: 14 }}>{figure.name}</span>
+            <span style={{ color: quad.color, fontSize: 10, fontFamily: "'Courier New', monospace", marginLeft: "auto", border: `1px solid ${quad.color}44`, padding: "2px 6px", borderRadius: 3 }}>{quad.name}</span>
+          </div>
+          <p style={{ color: "#a09880", fontSize: 12, margin: 0, lineHeight: 1.5, fontFamily: "'Courier New', monospace" }}>{figure.desc}</p>
+          <div style={{ display: "flex", gap: 4, marginTop: 8, flexWrap: "wrap" }}>
+            {figure.tags.map(t => (
+              <span key={t} style={{ fontSize: 9, color: "#706850", border: "1px solid #706850", borderRadius: 3, padding: "1px 5px", fontFamily: "'Courier New', monospace" }}>{t}</span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [tab, setTab] = useState("compass");
+      const [hoveredFigure, setHoveredFigure] = useState(null);
+      const [selectedFigure, setSelectedFigure] = useState(null);
+      const [quizStep, setQuizStep] = useState(0);
+      const [quizAnswers, setQuizAnswers] = useState([]);
+      const [userPos, setUserPos] = useState(null);
+      const [showResult, setShowResult] = useState(false);
+
+      const handleAnswer = (answer) => {
+        const next = [...quizAnswers, answer];
+        setQuizAnswers(next);
+        if (quizStep < QUIZ_QUESTIONS.length - 1) {
+          setQuizStep(quizStep + 1);
+        } else {
+          let totalP = 0, totalS = 0;
+          next.forEach(a => { totalP += a.politics; totalS += a.spirit; });
+          const maxP = QUIZ_QUESTIONS.length * 2;
+          const maxS = QUIZ_QUESTIONS.length * 2;
+          setUserPos({ x: (totalP / maxP) * 0.5, y: (totalS / maxS) * 0.5 });
+          setShowResult(true);
+          setTab("compass");
+        }
+      };
+
+      const resetQuiz = () => {
+        setQuizStep(0);
+        setQuizAnswers([]);
+        setUserPos(null);
+        setShowResult(false);
+      };
+
+      const selectedFigureData = FIGURES.find(f => f.id === selectedFigure);
+      const quadrant = userPos ? getQuadrantInfo(userPos.x, userPos.y) : null;
+
+      const tabStyle = (t) => ({
+        background: tab === t ? "rgba(232,197,71,0.15)" : "transparent",
+        border: tab === t ? "1px solid rgba(232,197,71,0.4)" : "1px solid rgba(232,197,71,0.1)",
+        color: tab === t ? "#e8c547" : "#706850",
+        padding: "8px 20px",
+        borderRadius: 4,
+        cursor: "pointer",
+        fontFamily: "'Courier New', monospace",
+        fontSize: 12,
+        letterSpacing: 1,
+        transition: "all 0.2s",
+      });
+
+      return (
+        <div style={{
+          minHeight: "100vh",
+          padding: "20px",
+          maxWidth: 600,
+          margin: "0 auto",
+        }}>
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ fontSize: 10, color: "#706850", letterSpacing: 3, marginBottom: 4 }}>CLASSIFICATION_OF_ARCHETYPES_V2.1</div>
+            <h1 style={{
+              fontSize: 28,
+              fontWeight: 300,
+              margin: "4px 0",
+              letterSpacing: 4,
+              background: "linear-gradient(135deg, #e8c547, #c74b50)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>ARCHETYPE COMPASS</h1>
+            <div style={{ fontSize: 10, color: "#504830", letterSpacing: 2 }}>GOD ↔ SATAN · SYSTEM ↔ INDIVIDUAL</div>
+          </div>
+
+          {/* Tabs */}
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20 }}>
+            <button onClick={() => setTab("compass")} style={tabStyle("compass")}>COMPASS</button>
+            <button onClick={() => setTab("quiz")} style={tabStyle("quiz")}>DIAGNOSE</button>
+            <button onClick={() => setTab("index")} style={tabStyle("index")}>INDEX</button>
+          </div>
+
+          {/* Compass Tab */}
+          {tab === "compass" && (
+            <div>
+              <Compass
+                figures={FIGURES}
+                userPos={userPos}
+                hoveredFigure={hoveredFigure}
+                setHoveredFigure={setHoveredFigure}
+                selectedFigure={selectedFigure}
+                setSelectedFigure={setSelectedFigure}
+              />
+              {selectedFigureData && <FigureCard figure={selectedFigureData} />}
+              {showResult && quadrant && (
+                <div style={{
+                  background: `${quadrant.color}11`,
+                  border: `1px solid ${quadrant.color}44`,
+                  borderRadius: 6,
+                  padding: 16,
+                  marginTop: 12,
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 24 }}>{quadrant.icon}</span>
+                    <span style={{ color: quadrant.color, fontWeight: "bold", fontSize: 16, letterSpacing: 2 }}>{quadrant.name}</span>
+                  </div>
+                  <p style={{ color: "#a09880", fontSize: 12, margin: 0, lineHeight: 1.6 }}>{quadrant.desc}</p>
+                  <div style={{ marginTop: 10, fontSize: 10, color: "#706850" }}>
+                    Spirit: {userPos.y > 0 ? "LEFT HAND" : "RIGHT HAND"} ({(userPos.y * 100).toFixed(0)}%) · Politics: {userPos.x > 0 ? "RIGHT WING" : "LEFT WING"} ({(Math.abs(userPos.x) * 100).toFixed(0)}%)
+                  </div>
+                  <button onClick={resetQuiz} style={{ marginTop: 10, background: "none", border: `1px solid ${quadrant.color}44`, color: quadrant.color, padding: "6px 16px", borderRadius: 3, cursor: "pointer", fontFamily: "'Courier New', monospace", fontSize: 10 }}>RESET</button>
+                </div>
+              )}
+              {!showResult && !selectedFigureData && (
+                <p style={{ textAlign: "center", color: "#504830", fontSize: 11, marginTop: 8 }}>Нажми на точку чтобы увидеть инфо · Пройди DIAGNOSE чтобы найти себя</p>
+              )}
+            </div>
+          )}
+
+          {/* Quiz Tab */}
+          {tab === "quiz" && (
+            <div>
+              {!showResult ? (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <span style={{ color: "#706850", fontSize: 10 }}>ВОПРОС {quizStep + 1}/{QUIZ_QUESTIONS.length}</span>
+                    <div style={{ display: "flex", gap: 3 }}>
+                      {QUIZ_QUESTIONS.map((_, i) => (
+                        <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: i < quizStep ? "#e8c547" : i === quizStep ? "#e8c54777" : "#201c15", border: "1px solid #e8c54733" }} />
+                      ))}
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 15, color: "#e8e0c8", lineHeight: 1.6, marginBottom: 20 }}>{QUIZ_QUESTIONS[quizStep].q}</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {QUIZ_QUESTIONS[quizStep].answers.map((a, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleAnswer(a)}
+                        style={{
+                          background: "rgba(20,18,15,0.6)",
+                          border: "1px solid rgba(232,197,71,0.12)",
+                          color: "#c0b898",
+                          padding: "12px 16px",
+                          borderRadius: 4,
+                          cursor: "pointer",
+                          fontFamily: "'Courier New', monospace",
+                          fontSize: 12,
+                          textAlign: "left",
+                          lineHeight: 1.4,
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        {a.text}
+                      </button>
+                    ))}
+                  </div>
+                  {quizStep > 0 && (
+                    <button onClick={() => { setQuizStep(quizStep - 1); setQuizAnswers(quizAnswers.slice(0, -1)); }} style={{ marginTop: 12, background: "none", border: "none", color: "#504830", cursor: "pointer", fontFamily: "'Courier New', monospace", fontSize: 10 }}>← НАЗАД</button>
+                  )}
+                </div>
+              ) : (
+                <div style={{ textAlign: "center" }}>
+                  <p style={{ color: "#706850", fontSize: 12 }}>Диагностика завершена. Переключись на COMPASS чтобы увидеть свою позицию.</p>
+                  <button onClick={resetQuiz} style={{ marginTop: 8, background: "none", border: "1px solid rgba(232,197,71,0.2)", color: "#e8c547", padding: "8px 20px", borderRadius: 3, cursor: "pointer", fontFamily: "'Courier New', monospace", fontSize: 11 }}>ПРОЙТИ ЗАНОВО</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Index Tab */}
+          {tab === "index" && (
+            <div>
+              <div style={{ fontSize: 10, color: "#706850", marginBottom: 12, letterSpacing: 1 }}>ВСЕ СУЩНОСТИ ({FIGURES.length})</div>
+              {FIGURES.map(f => {
+                const q = getQuadrantInfo(f.x, f.y);
+                return (
+                  <div
+                    key={f.id}
+                    onClick={() => { setSelectedFigure(f.id); setTab("compass"); }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      padding: "10px 12px",
+                      borderBottom: "1px solid rgba(232,197,71,0.06)",
+                      cursor: "pointer",
+                      transition: "background 0.15s",
+                    }}
+                  >
+                    <span style={{ fontSize: 18, width: 28 }}>{f.emoji}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ color: "#e8e0c8", fontSize: 12 }}>{f.name}</div>
+                      <div style={{ color: "#504830", fontSize: 9 }}>{q.name}</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 3 }}>
+                      <span style={{ fontSize: 9, color: q.color, border: `1px solid ${q.color}33`, padding: "1px 5px", borderRadius: 2 }}>
+                        {f.y >= 0 ? "LH" : "RH"} · {f.x >= 0 ? "RW" : "LW"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Footer */}
+          <div style={{ textAlign: "center", marginTop: 32, padding: "16px 0", borderTop: "1px solid rgba(232,197,71,0.06)" }}>
+            <div style={{ fontSize: 9, color: "#302a20", letterSpacing: 2 }}>ARCHETYPE COMPASS · BASED ON CLASSIFICATION_OF_ARCHETYPES V2.1</div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
