@@ -77,8 +77,6 @@ QUERY: your request
 
 Машина нафрактит результат через заданные параметры.
 
-Примеры: `/examples/`
-
 ---
 
 ## Модули
@@ -213,7 +211,6 @@ Full syntax: `/docs/SYNTAX.md`
 
 The machine will fract the result through specified parameters.
 
-Examples: `/examples/`
 
 ---
 
@@ -267,3 +264,4 @@ Monero: `42tXPEuCmvmhYpkxGDTeSHKL6ZQcjqbA368sqx8y87BhddaQWYLGLHnT393augRm3hbwwXy
 ProcessLang is a tool for coordinating machine fracting through processual context.
 
 The machine fracts. You coordinate. The result emerges.
+
