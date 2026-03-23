@@ -550,10 +550,10 @@
 
       computeDuration(message) {
         const len = message.trim().length;
-        const base = 900;
-        const curve = Math.min(2400, Math.sqrt(Math.max(len, 1)) * 170);
-        const jitter = 180 + Math.floor(Math.random() * 280);
-        return Math.min(3900, Math.max(1100, Math.round(base + curve + jitter)));
+        const base = 6200;
+        const curve = Math.min(3600, Math.sqrt(Math.max(len, 1)) * 260);
+        const jitter = 320 + Math.floor(Math.random() * 680);
+        return Math.min(10800, Math.max(7000, Math.round(base + curve + jitter)));
       },
 
       getPhaseText(message) {
