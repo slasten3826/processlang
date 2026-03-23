@@ -132,7 +132,7 @@
       margin-top: 14px;
       border: 1px dashed rgba(119, 224, 195, 0.28);
       border-radius: 16px;
-      min-height: 260px;
+      min-height: 300px;
       padding: 18px;
       background:
         radial-gradient(circle at center, rgba(119, 224, 195, 0.08), transparent 50%),
@@ -149,6 +149,56 @@
       background:
         radial-gradient(circle at var(--px, 50%) var(--py, 50%), rgba(212, 244, 138, 0.15), transparent 22%);
       pointer-events: none;
+    }
+
+    .ritual-zone::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border: 1px solid rgba(212, 244, 138, 0.08);
+      border-radius: 12px;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .gesture-hint {
+      position: absolute;
+      inset: 72px 20px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 22px;
+      border-radius: 14px;
+      border: 1px solid rgba(212, 244, 138, 0.12);
+      background: rgba(255, 255, 255, 0.025);
+      color: rgba(229, 239, 232, 0.9);
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease, border-color 160ms ease;
+    }
+
+    .gesture-hint strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 16px;
+    }
+
+    .gesture-hint span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 13px;
+    }
+
+    .ritual-zone.active .gesture-hint {
+      border-color: rgba(119, 224, 195, 0.24);
+      background: rgba(119, 224, 195, 0.05);
     }
 
     .pulse {
@@ -280,6 +330,9 @@
       .grid { grid-template-columns: 1fr; }
       .hex-wrap { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: 1fr 1fr; }
+      .ritual-zone { min-height: 360px; }
+      .gesture-hint strong { font-size: 18px; }
+      .gesture-hint span { font-size: 14px; }
     }
   </style>
 </head>
@@ -316,6 +369,12 @@
             <div class="metric"><span class="micro">Question Weight</span><strong id="messageWeight">0</strong></div>
             <div class="metric"><span class="micro">Pointer Events</span><strong id="pointerCount">0</strong></div>
             <div class="metric"><span class="micro">Noise Fragments</span><strong id="noiseCount">0</strong></div>
+          </div>
+          <div id="gestureHint" class="gesture-hint">
+            <div>
+              <strong>Води пальцем здесь</strong>
+              <span>На десктопе води курсором. На телефоне елозь пальцем внутри этой зоны после запуска ритуала.</span>
+            </div>
           </div>
         </div>
       </section>
@@ -443,6 +502,7 @@
       messageWeight: document.getElementById("messageWeight"),
       pointerCount: document.getElementById("pointerCount"),
       noiseCount: document.getElementById("noiseCount"),
+      gestureHint: document.getElementById("gestureHint"),
       result: document.getElementById("result"),
       hexLines: document.getElementById("hexLines"),
       hexName: document.getElementById("hexName"),
@@ -568,6 +628,7 @@
         els.progressBar.style.width = "0%";
         els.phaseLabel.textContent = "Режим ожидания";
         els.status.textContent = "Сигнал еще не захвачен. После старта двигай курсор или палец внутри зоны, чтобы собрать дополнительную энтропию.";
+        els.gestureHint.innerHTML = "<div><strong>Води пальцем здесь</strong><span>На десктопе води курсором. На телефоне елозь пальцем внутри этой зоны после запуска ритуала.</span></div>";
         els.ritualZone.classList.remove("active");
         els.result.classList.remove("visible");
         this.syncCounters();
@@ -589,6 +650,7 @@
         const phaseText = this.getPhaseText(message);
         els.phaseLabel.textContent = phaseText.label;
         els.status.textContent = phaseText.text;
+        els.gestureHint.innerHTML = "<div><strong>Собирай шум внутри зоны</strong><span>Продолжай движение пальцем или курсором прямо здесь, пока шкала не заполнится.</span></div>";
         els.ritualZone.classList.add("active");
 
         this.noiseFragments.push(`msglen:${message.length}`);
@@ -608,6 +670,7 @@
           els.progressBar.style.width = "100%";
           els.phaseLabel.textContent = "Коллапс";
           els.status.textContent = "Поток зафиксирован. Сжимаю шум в бинарную форму и поднимаю гексаграмму.";
+          els.gestureHint.innerHTML = "<div><strong>Поток зафиксирован</strong><span>Движение больше не нужно. Идет сборка гексаграммы.</span></div>";
           const result = await this.collapse(message);
           this.renderResult(result);
         }, this.duration);
@@ -676,6 +739,7 @@
         this.phase = "result";
         els.phaseLabel.textContent = "Гексаграмма зафиксирована";
         els.status.textContent = "Поток свернут. Ниже результат коллапса и трактовка из русской ProcessLang-деки.";
+        els.gestureHint.innerHTML = "<div><strong>Ритуал завершен</strong><span>Можешь задать новый вопрос и снова собрать шум в этой зоне.</span></div>";
         els.ritualZone.classList.remove("active");
 
         els.hexLines.innerHTML = "";
