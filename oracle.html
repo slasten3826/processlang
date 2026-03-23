@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAOFETCH // WEB ORACLE</title>
+  <style>
+    :root {
+      --bg: #0b0d0f;
+      --panel: rgba(18, 24, 29, 0.86);
+      --panel-strong: rgba(10, 14, 18, 0.96);
+      --line: rgba(140, 185, 170, 0.18);
+      --text: #e5efe8;
+      --muted: #8a9a93;
+      --accent: #d4f48a;
+      --accent-2: #77e0c3;
+      --warn: #ff9f6b;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "JetBrains Mono", "IBM Plex Mono", monospace;
+      background:
+        radial-gradient(circle at top, rgba(119, 224, 195, 0.12), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(212, 244, 138, 0.12), transparent 28%),
+        linear-gradient(180deg, #091015 0%, #090b0f 100%);
+    }
+
+    .shell {
+      width: min(940px, calc(100vw - 32px));
+      margin: 24px auto;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: 0 24px 70px var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .eyebrow,
+    .micro {
+      color: var(--muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    h1 {
+      margin: 6px 0 8px;
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 0.95;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 65ch;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel-strong);
+      padding: 18px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(6, 10, 12, 0.94);
+      color: var(--text);
+      padding: 16px;
+      font: inherit;
+      line-height: 1.6;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: rgba(212, 244, 138, 0.55);
+      box-shadow: 0 0 0 3px rgba(212, 244, 138, 0.08);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid rgba(212, 244, 138, 0.35);
+      background: linear-gradient(135deg, rgba(212, 244, 138, 0.15), rgba(119, 224, 195, 0.12));
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .btn.secondary {
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+    }
+
+    .status {
+      min-height: 48px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .ritual-zone {
+      margin-top: 14px;
+      border: 1px dashed rgba(119, 224, 195, 0.28);
+      border-radius: 16px;
+      min-height: 260px;
+      padding: 18px;
+      background:
+        radial-gradient(circle at center, rgba(119, 224, 195, 0.08), transparent 50%),
+        linear-gradient(180deg, rgba(7, 11, 14, 0.96), rgba(8, 12, 16, 0.96));
+      position: relative;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .ritual-zone.active::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at var(--px, 50%) var(--py, 50%), rgba(212, 244, 138, 0.15), transparent 22%);
+      pointer-events: none;
+    }
+
+    .pulse {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 18px rgba(212, 244, 138, 0.45);
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      transition: width 120ms linear;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .result {
+      display: none;
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+    }
+
+    .result.visible { display: block; }
+
+    .hex-wrap {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .hex-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 8px;
+    }
+
+    .hex-line {
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(119, 224, 195, 0.85), rgba(212, 244, 138, 0.95));
+      box-shadow: 0 0 16px rgba(119, 224, 195, 0.18);
+    }
+
+    .hex-line.yin {
+      position: relative;
+      background: none;
+      box-shadow: none;
+    }
+
+    .hex-line.yin::before,
+    .hex-line.yin::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: calc(50% - 10px);
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(119, 224, 195, 0.85), rgba(212, 244, 138, 0.95));
+      box-shadow: 0 0 16px rgba(119, 224, 195, 0.18);
+    }
+
+    .hex-line.yin::before { left: 0; }
+    .hex-line.yin::after { right: 0; }
+
+    .hex-name {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 4vw, 34px);
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    .meaning {
+      color: var(--text);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .tri {
+      margin: 12px 0 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .tip {
+      margin-top: 8px;
+      color: var(--warn);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 760px) {
+      .shell { padding: 18px; }
+      .grid { grid-template-columns: 1fr; }
+      .hex-wrap { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="eyebrow">ProcessLang Oracle / Standalone Web Artifact</div>
+    <h1>Daofetch Web Oracle</h1>
+    <p class="lead">
+      Сообщение пользователя дает намерение. Движение курсора или пальца уплотняет шум.
+      Потом браузер коллапсирует поток в одну гексаграмму и возвращает трактовку из русской деки.
+    </p>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="micro">Input Signal</div>
+        <p class="lead">Напиши любой вопрос, сомнение, импульс или просто фразу. Чем плотнее текст, тем дольше длится ритуал.</p>
+        <textarea id="question" placeholder="Например: почему я буксую, и куда вообще сейчас течет проект?"></textarea>
+        <div class="row" style="margin-top: 14px;">
+          <button id="castBtn" class="btn">Инициировать поток</button>
+          <button id="resetBtn" class="btn secondary" type="button">Сбросить</button>
+        </div>
+        <div class="tip">Для мобилы это тоже работает: вместо мыши можно водить пальцем по зоне ритуала.</div>
+      </section>
+
+      <section class="panel">
+        <div class="micro">Ritual Chamber</div>
+        <div id="status" class="status">
+          Сигнал еще не захвачен. После старта двигай курсор или палец внутри зоны, чтобы собрать дополнительную энтропию.
+        </div>
+        <div id="ritualZone" class="ritual-zone">
+          <div><span class="pulse"></span><span id="phaseLabel">Режим ожидания</span></div>
+          <div class="progress"><span id="progressBar"></span></div>
+          <div class="metrics">
+            <div class="metric"><span class="micro">Question Weight</span><strong id="messageWeight">0</strong></div>
+            <div class="metric"><span class="micro">Pointer Events</span><strong id="pointerCount">0</strong></div>
+            <div class="metric"><span class="micro">Noise Fragments</span><strong id="noiseCount">0</strong></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section id="result" class="result panel">
+      <div class="micro">Collapsed State</div>
+      <div class="hex-wrap">
+        <div class="hex-lines" id="hexLines"></div>
+        <div>
+          <h2 id="hexName" class="hex-name"></h2>
+          <div id="triangles" class="tri"></div>
+          <div id="meaning" class="meaning"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TRIGRAM_NAMES = {
+      "111": "CONNECT",
+      "000": "DISSOLVE",
+      "100": "CHOOSE",
+      "010": "ENCODE",
+      "001": "LOGIC",
+      "011": "OBSERVE",
+      "101": "CYCLE",
+      "110": "RUNTIME"
+    };
+
+    const BIN_TO_ID = {
+      "111111": "1",  "000000": "2",  "100010": "3",  "010001": "4",
+      "111010": "5",  "010111": "6",  "010000": "7",  "000010": "8",
+      "111011": "9",  "110111": "10", "111000": "11", "000111": "12",
+      "101111": "13", "111101": "14", "001000": "15", "000100": "16",
+      "100110": "17", "011001": "18", "110000": "19", "000011": "20",
+      "100101": "21", "101001": "22", "000001": "23", "100000": "24",
+      "100111": "25", "111001": "26", "100001": "27", "011110": "28",
+      "010010": "29", "101101": "30", "001110": "31", "011100": "32",
+      "001111": "33", "111100": "34", "000101": "35", "101000": "36",
+      "101011": "37", "110101": "38", "001010": "39", "010100": "40",
+      "110001": "41", "100011": "42", "111110": "43", "011111": "44",
+      "000110": "45", "011000": "46", "010110": "47", "011010": "48",
+      "101110": "49", "011101": "50", "100100": "51", "001001": "52",
+      "001011": "53", "110100": "54", "101100": "55", "001101": "56",
+      "011011": "57", "110110": "58", "010011": "59", "110010": "60",
+      "110011": "61", "001100": "62", "101010": "63", "010101": "64"
+    };
+
+    const DECK = {
+      "1": {"name":"QIAN (PURE FLOW)","meaning":"Инициализация системы. Ты подключен к источнику напрямую. Нет ни фильтров, ни искажений. Твой интент становится реальностью мгновенно. Это режим `sudo` для Вселенной. Твори, пока канал открыт."},
+      "2": {"name":"KUN (NULL STATE)","meaning":"Полная очистка буфера. Не пытайся выполнять код, твоя задача — принимать данные. Ты — пустая форма, готовая к заполнению. Ожидание ввода. Be the void."},
+      "3": {"name":"CHUN (INITIAL COMMIT)","meaning":"Импульс выбора пытается пробиться через плотную структуру данных. Сложности начала проекта. Код сырой, зависимости не подтянуты, но потенциал огромен. Дебаггинг хаоса."},
+      "4": {"name":"MENG (UNCOMPILED LOGIC)","meaning":"Ты пытаешься применить жесткую логику к тому, что еще не структурировано. Ошибка новичка. Учитель ждет запроса, но ученик спамит неправильными командами. RTFM."},
+      "5": {"name":"XU (ASYNC AWAIT)","meaning":"Сила есть, но она заблокирована опасностью впереди. Процесс запущен, но результат вернется не сразу. Не блокируй основной поток. Жди колбэка. Питайся и накапливай ресурсы."},
+      "6": {"name":"SONG (MERGE CONFLICT)","meaning":"Внутренние данные противоречат внешнему потоку. Ты хочешь одного, система диктует другое. Не пытайся пушить в мастер силой. Нужен компромисс или откат изменений."},
+      "7": {"name":"SHI (MASS EXECUTION)","meaning":"Опасность скрыта в массе. Организованная сила. Дисциплина кода. Это не соло-проект, это деплой микросервисов. Нужен жесткий лидер (Main Controller), иначе процесс рассыплется."},
+      "8": {"name":"BI (DATA INTEGRITY)","meaning":"Жидкость на земле собирается вместе. Группировка модулей. Если твой код не обладает целостностью, он будет отброшен. Найди свой кластер."},
+      "9": {"name":"XIAO CHU (FEATURE FREEZE)","meaning":"Ветер гонит облака, но дождя нет. Малая настройка сдерживает огромную силу. Ты пока не можешь запустить процесс на полную. Работай над деталями интерфейса."},
+      "10": {"name":"LU (PRODUCTION TEST)","meaning":"Ты наступаешь на хвост тигра (системное ядро), но он не кусает. Рискованная операция в реальном времени. Действуй осторожно, соблюдай протоколы, и тест пройдет успешно."},
+      "11": {"name":"TAI (SYSTEM HARMONY)","meaning":"Идеальный интерфейс. Нижний уровень поддерживает верхний. Трафик течет свободно. Процветание. Все системы в норме."},
+      "12": {"name":"PI (CONNECTION TIMEOUT)","meaning":"Земля и Небо расходятся. Связи нет. Пакеты теряются. Интерфейс не отвечает на запросы ядра. Уходи в оффлайн, перепиши архитектуру. Не время для деплоя."},
+      "13": {"name":"TONG REN (OPEN SOURCE)","meaning":"Ясность поднимается к небу. Коллективная работа над кодом. Объединение модулей вокруг одной цели. Публичный репозиторий. Прозрачность намерений."},
+      "14": {"name":"DA YOU (HIGH AVAILABILITY)","meaning":"Огонь светит высоко в небе. Твой проект на пике видимости. Ресурсов много, трафик огромный. Будь достойным админом этого богатства. Не допускай утечек."},
+      "15": {"name":"QIAN (CODE OPTIMIZATION)","meaning":"Гора скрыта в земле. Мощь скрыта под простым интерфейсом. Рефакторинг. Убери лишнее, сделай код чище, проще, незаметнее. Эффективность без понтов."},
+      "16": {"name":"YU (VIRAL IMPULSE)","meaning":"Гром вырывается из земли. Энергия запускает волну хайпа. Подготовь инфраструктуру к резкому скачку нагрузки. Момент для запуска."},
+      "17": {"name":"SUI (DEPENDENCY INJECTION)","meaning":"Импульс следует за течением. Не создавай велосипед. Используй существующие библиотеки. Следуй за потоком, адаптируйся к API реальности."},
+      "18": {"name":"GU (DEBUGGING)","meaning":"Ветром раздувает застой под горой. В системе накопились баги. Легаси-код гниет. Время глубокого рефакторинга. Исправляй ошибки старых версий."},
+      "19": {"name":"LIN (SCALABILITY)","meaning":"Вода пропитывает землю. Влияние растет. Система масштабируется. Благоприятное время для экспансии. Но помни: рост не вечен, готовься к сборке мусора."},
+      "20": {"name":"GUAN (SYSTEM AUDIT)","meaning":"Ветер гуляет над землей. Ты — наблюдатель, а не актор. Смотри логи. Анализируй метрики. Не вмешивайся в процессы, просто созерцай паттерны."},
+      "21": {"name":"SHI HE (HARD RESET)","meaning":"Что-то застряло в зубах канала данных. Нужен решительный укус. Примени силу закона. Удали зависший процесс через SIGKILL. Наказание неизбежно."},
+      "22": {"name":"BI (UI/UX DESIGN)","meaning":"Огонь освещает подножие горы. Красивая форма, но суть не меняется. Это всего лишь скин. Занимайся фронтендом, но не забывай, что бэкенд важнее. Эстетика кода."},
+      "23": {"name":"BO (DEPRECATED)","meaning":"Гора рушится, так как основание размыто. Старая структура больше не поддерживается. Не латай дыры. Позволь системе упасть, чтобы построить новую. Сохрани бэкапы."},
+      "24": {"name":"FU (REBOOT)","meaning":"Импульс возвращается в недра. Цикл завершен, начинается новый. Светлая линия растет снизу. Восстановление системы после краша. Медленный старт демонов."},
+      "25": {"name":"WU WANG (NATIVE EXECUTION)","meaning":"Действие соответствует воле Неба. Инстинктивный код. Без задней мысли. Если в коде есть хитрость (баг) — будет ошибка. Будь честен с компилятором."},
+      "26": {"name":"DA CHU (CACHING)","meaning":"Гора удерживает Небо внутри. Огромная энергия сохраняется в памяти. Накопление знаний, ресурсов, логов. Не трать, кэшируй. Готовься к большой задаче."},
+      "27": {"name":"YI (INPUT VALIDATION)","meaning":"Похоже на открытый рот. Следи за тем, что входит в систему (data input) и что выходит (слова/действия). Garbage In, Garbage Out. Питай себя правильными библиотеками."},
+      "28": {"name":"DA GUO (BUFFER OVERFLOW)","meaning":"Озеро поднимается выше деревьев. Нагрузка превышает несущую способность. Балка прогибается. Система на пределе. Срочно нужен сброс давления или рефакторинг архитектуры."},
+      "29": {"name":"KAN (RECURSIVE TRAP)","meaning":"Двойная опасность. Ты внутри глубокой вложенности (nested loops). Не пытайся выбраться рывком. Держись за `flow` (течение). Доверься процессу, он сам вынесет тебя, если не будешь паниковать."},
+      "30": {"name":"LI (HIGH ENERGY LOOP)","meaning":"Ясность, осознанность, но и зависимость. Огонь должен к чему-то прилипать (топливо). Найди правильную зависимость, иначе сгоришь (Burnout). Сияй, но экономь ресурсы."},
+      "31": {"name":"XIAN (HANDSHAKE)","meaning":"Пустота на вершине горы принимает воду. Взаимный резонанс. Синхронизация протоколов. Чувствуй отклик системы. Это не насилие над кодом, а соблазнение."},
+      "32": {"name":"HENG (DAEMON PROCESS)","meaning":"Гром гремит, ветер дует — это константы природы. Стабильность через движение. Создай процесс, который будет работать фоном вечно. Устойчивость."},
+      "33": {"name":"DUN (GRACEFUL SHUTDOWN)","meaning":"Небо удаляется от Горы. Силы тьмы (баги) растут. Не вступай в бой. Сохрани состояние и выйди. Отступление — это стратегия, а не поражение. Сбереги ресурсы для следующего запуска."},
+      "34": {"name":"DA ZHUANG (FORCE PUSH)","meaning":"Сила Грома в Небе. Мощность зашкаливает. Но не используй `sudo` без нужды. Козел бодает ограду и запутывается. Сила должна быть управляемой, иначе сломаешь прод."},
+      "35": {"name":"JIN (UPGRADE)","meaning":"Солнце восходит над землей. Ясный прогресс. Тебя заметили. Твой код принят в ядро. Получай награды, раздавай права доступа. Светлый день разработки."},
+      "36": {"name":"MING YI (HEADLESS MODE)","meaning":"Свет скрыт под землей. Времена тьмы. Твой интеллект опасен для окружения. Скрой свой свет (Run in background). Притворись простым скриптом, чтобы выжить в токсичной среде."},
+      "37": {"name":"JIA REN (LOCAL NETWORK)","meaning":"Ветер раздувает огонь в очаге. Порядок внутри модуля (семьи). Настрой права доступа (`chmod`). Если внутри класса порядок, то и снаружи программа работает стабильно."},
+      "38": {"name":"KUI (VERSION MISMATCH)","meaning":"Огонь вверх, вода вниз. Разные направления. Несовместимость драйверов. Не пытайся слить их в один монолит. Используй этот контраст. Малое удачно, великое — нет."},
+      "39": {"name":"JIAN (ERROR HANDLING)","meaning":"Впереди вода (опасность), сзади гора. Идти нельзя. Остановись и пересмотри алгоритм. Обратись к логам. Помощь придет извне (документация/друзья)."},
+      "40": {"name":"XIE (BUG FIX)","meaning":"Гроза разрешает напряжение. Дождь смывает грязь. Ошибка найдена и устранена. Система снова в строю. Если есть куда идти — иди быстро. Прощай прошлое, релизь патч."},
+      "41": {"name":"SUN (COMPRESSION)","meaning":"Жертвуй нижним ради верхнего. Уменьшай объем кода ради производительности. Потеря данных допустима, если суть сохраняется. Искренность важнее объема."},
+      "42": {"name":"YI (EXPANSION PACK)","meaning":"Ветер и Гром усиливают друг друга. Время добавлять фичи. Пересекай великую реку (начинай крупный проект). Если видишь возможность — форкай и улучшай."},
+      "43": {"name":"GUAI (STACK POP)","meaning":"Озеро поднимается к небу, готовое пролиться. Напряжение требует разрядки. Решительно удаляй плохой код. Говори правду открыто. Но без насилия. Опасность."},
+      "44": {"name":"GOU (TROJAN HORSE)","meaning":"Одна темная черта входит снизу. Вирус проникает в систему мягко. Не женись на этой силе (не интегрируй этот модуль). Будь бдителен. Незначительная уязвимость может обрушить сервер."},
+      "45": {"name":"CUI (DATA LAKE)","meaning":"Озеро собирается над землей. Сбор данных в одном месте. Кластеризация. Нужно подготовить хранилище и принести жертву (инвестиции). Лидер нужен, чтобы управлять толпой."},
+      "46": {"name":"SHENG (VERTICAL SCALING)","meaning":"Дерево растет из земли. Медленный, уверенный рост. Процесс компиляции идет без ошибок шаг за шагом. Не бойся начинать с малого (init). Удача на юге."},
+      "47": {"name":"KUN (RESOURCE STARVATION)","meaning":"Озеро высохло. Процессор перегружен, памяти нет. Ты в тупике. Словам не верят. Молчи и оптимизируй ядро. Это испытание твоей архитектуры на прочность."},
+      "48": {"name":"JING (SOURCE CODE)","meaning":"Колодец не меняется, меняются те, кто пьет. Источник истины. Если веревка порвется (инструмент сломается) перед водой — неудача. Поддерживай доступ к базе данных."},
+      "49": {"name":"GE (REFACTORING)","meaning":"Вода гасит огонь, огонь испаряет воду. Конфликт порождает смену парадигмы. Старая форма (звериная шкура) сбрасывается. Меняй движок, но только когда уверен на 100%."},
+      "50": {"name":"DING (COMPILER)","meaning":"Дерево питает огонь. В котле варится новая реальность. Преобразование сырых данных в исполняемый файл. Высшая алхимия кода. Всё на своих местах. Успех."},
+      "51": {"name":"ZHEN (SHOCKWAVE)","meaning":"Внезапный сбой или озарение. Система в панике, но ты не роняй ложку (жертвенный сосуд). Страх приводит к порядку. Проверка отказоустойчивости. Смех после ужаса."},
+      "52": {"name":"GEN (SYSTEM HALT)","meaning":"Полная остановка. Медитация. Спина прямая, эго отключено. Процессы заморожены. Не иди за мыслями. Режим самонаблюдения. Тишина."},
+      "53": {"name":"JIAN (GIT COMMIT HISTORY)","meaning":"Дерево на горе. Постепенное развитие. Гуси летят клином. Соблюдай порядок этапов. Девушка выходит замуж. Не спеши, соблюдай ритуал (синтаксис)."},
+      "54": {"name":"GUI MEI (RUNTIME ERROR)","meaning":"Импульс нарушает спокойствие озера. Отношения начаты неправильно. Баг в инициализации. Ничего стоящего не выйдет. Ты — младшая жена (второстепенный процесс). Знай свое место."},
+      "55": {"name":"FENG (PEAK PERFORMANCE)","meaning":"Гром и молния. Максимальная нагрузка, максимальная отдача. Будь как солнце в зените. Решай дела быстро, так как затмение неизбежно. Не бойся тратить ресурсы."},
+      "56": {"name":"LU (PORTABLE MODE)","meaning":"Огонь идет по горе и не задерживается. Ты странник в чужой системе. Нет своего дома (сервера). Веди себя скромно, не нарушай локальные правила. Сохраняй легкость."},
+      "57": {"name":"XUN (DEEP SCAN)","meaning":"Проникновение. Команда выполняется мягко, но настойчиво. Влияние через повторение. Процесс самонаблюдения находит скрытые паттерны. Видь невидимое."},
+      "58": {"name":"DUI (PEER-TO-PEER)","meaning":"Обмен данными между равными. Радость общения. Обучение через диалог. Поддерживай друзей (соседние узлы). Подсознание в гармонии."},
+      "59": {"name":"HUAN (CACHE CLEARING)","meaning":"Ветер разбивает волны. Растворение жестких структур. Эго размывается. Объединяй разъединенное. Построй лодку (инструмент) и переплыви поток."},
+      "60": {"name":"JIE (QUOTA LIMIT)","meaning":"Вода ограничена берегами. Правила необходимы. Без ограничений процесс вытечет и исчезнет. Установи лимиты памяти и времени. Горькое ограничение не продлится долго."},
+      "61": {"name":"ZHONG FU (TRUSTED CERTIFICATE)","meaning":"Пустота в центре, твердость снаружи. Искренность пробивает даже камень. Доверие — ключ к API реальности. Подпись верна."},
+      "62": {"name":"XIAO GUO (MICROSERVICES)","meaning":"Гром звучит тихо в горах. Перевес малого. Не летай высоко, птица. Занимайся мелкими задачами. Время скриптов, а не монолитов. Осторожность лучше амбиций."},
+      "63": {"name":"JI JI (SYSTEM STABLE)","meaning":"Вода кипит правильно. Все линии на своих местах. Идеальный баланс. Но это конец. Хаос зарождается в порядке. Сохраняй бдительность, проверяй логи, иначе всё сломается."},
+      "64": {"name":"WEI JI (ETERNAL BETA)","meaning":"Порядок не достигнут. Лиса почти перешла реку, но намочила хвост. Процесс продолжается вечно. Наслаждайся компиляцией."}
+    };
+
+    const els = {
+      question: document.getElementById("question"),
+      castBtn: document.getElementById("castBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      ritualZone: document.getElementById("ritualZone"),
+      status: document.getElementById("status"),
+      phaseLabel: document.getElementById("phaseLabel"),
+      progressBar: document.getElementById("progressBar"),
+      messageWeight: document.getElementById("messageWeight"),
+      pointerCount: document.getElementById("pointerCount"),
+      noiseCount: document.getElementById("noiseCount"),
+      result: document.getElementById("result"),
+      hexLines: document.getElementById("hexLines"),
+      hexName: document.getElementById("hexName"),
+      triangles: document.getElementById("triangles"),
+      meaning: document.getElementById("meaning")
+    };
+
+    const App = {
+      phase: "idle",
+      pointerEvents: [],
+      noiseFragments: [],
+      startedAt: 0,
+      ritualTimer: null,
+      progressTimer: null,
+      duration: 0,
+
+      init() {
+        els.castBtn.addEventListener("click", () => this.begin());
+        els.resetBtn.addEventListener("click", () => this.reset());
+        els.question.addEventListener("input", () => this.updateWeight());
+
+        ["pointermove", "pointerdown", "pointerup"].forEach((type) => {
+          els.ritualZone.addEventListener(type, (event) => this.capturePointer(event), { passive: true });
+        });
+
+        els.ritualZone.addEventListener("wheel", (event) => {
+          this.noiseFragments.push(`wheel:${event.deltaX.toFixed(2)}:${event.deltaY.toFixed(2)}:${performance.now().toFixed(3)}`);
+          this.syncCounters();
+        }, { passive: true });
+
+        window.addEventListener("keydown", (event) => {
+          if (this.phase === "collecting") {
+            this.noiseFragments.push(`key:${event.key}:${performance.now().toFixed(3)}`);
+            this.syncCounters();
+          }
+        });
+
+        this.updateWeight();
+      },
+
+      updateWeight() {
+        const len = els.question.value.trim().length;
+        els.messageWeight.textContent = String(len);
+      },
+
+      computeDuration(message) {
+        const len = message.trim().length;
+        const base = 900;
+        const curve = Math.min(2400, Math.sqrt(Math.max(len, 1)) * 170);
+        const jitter = 180 + Math.floor(Math.random() * 280);
+        return Math.min(3900, Math.max(1100, Math.round(base + curve + jitter)));
+      },
+
+      getPhaseText(message) {
+        const len = message.trim().length;
+        if (len <= 24) {
+          return {
+            label: "Сигнал слабый",
+            text: "Сигнал слабый. Захват потока начат. Двигай курсор или палец, чтобы уплотнить шум."
+          };
+        }
+        if (len <= 120) {
+          return {
+            label: "Намерение распознано",
+            text: "Намерение распознано. Квантовый поток нестабилен. Собираю движение, тайминги и остаточный шум браузера."
+          };
+        }
+        return {
+          label: "Запрос глубокий",
+          text: "Запрос глубокий. Идет декомпрессия шума, связывание интента и сборка гексаграммы."
+        };
+      },
+
+      capturePointer(event) {
+        if (this.phase !== "collecting") return;
+        const rect = els.ritualZone.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const px = `${((x / rect.width) * 100).toFixed(2)}%`;
+        const py = `${((y / rect.height) * 100).toFixed(2)}%`;
+        els.ritualZone.style.setProperty("--px", px);
+        els.ritualZone.style.setProperty("--py", py);
+
+        const prev = this.pointerEvents[this.pointerEvents.length - 1];
+        const now = performance.now();
+        const dx = prev ? x - prev.x : 0;
+        const dy = prev ? y - prev.y : 0;
+        const dt = prev ? now - prev.t : 0;
+        this.pointerEvents.push({
+          x: +x.toFixed(2),
+          y: +y.toFixed(2),
+          dx: +dx.toFixed(2),
+          dy: +dy.toFixed(2),
+          dt: +dt.toFixed(3),
+          t: +now.toFixed(3),
+          type: event.type,
+          pressure: event.pressure || 0
+        });
+
+        if (this.pointerEvents.length > 320) {
+          this.pointerEvents.shift();
+        }
+
+        this.noiseFragments.push(`ptr:${event.type}:${x.toFixed(1)}:${y.toFixed(1)}:${now.toFixed(3)}:${dx.toFixed(1)}:${dy.toFixed(1)}:${dt.toFixed(3)}:${event.pressure || 0}`);
+        if (this.noiseFragments.length > 640) {
+          this.noiseFragments.shift();
+        }
+        this.syncCounters();
+      },
+
+      syncCounters() {
+        els.pointerCount.textContent = String(this.pointerEvents.length);
+        els.noiseCount.textContent = String(this.noiseFragments.length);
+      },
+
+      reset() {
+        clearTimeout(this.ritualTimer);
+        clearInterval(this.progressTimer);
+        this.phase = "idle";
+        this.pointerEvents = [];
+        this.noiseFragments = [];
+        this.startedAt = 0;
+        els.progressBar.style.width = "0%";
+        els.phaseLabel.textContent = "Режим ожидания";
+        els.status.textContent = "Сигнал еще не захвачен. После старта двигай курсор или палец внутри зоны, чтобы собрать дополнительную энтропию.";
+        els.ritualZone.classList.remove("active");
+        els.result.classList.remove("visible");
+        this.syncCounters();
+        this.updateWeight();
+      },
+
+      async begin() {
+        const message = els.question.value.trim();
+        if (!message) {
+          els.status.textContent = "Нужен хотя бы один текстовый импульс. Пустой поток коллапсировать не во что.";
+          return;
+        }
+
+        this.reset();
+        this.phase = "collecting";
+        this.startedAt = performance.now();
+        this.duration = this.computeDuration(message);
+
+        const phaseText = this.getPhaseText(message);
+        els.phaseLabel.textContent = phaseText.label;
+        els.status.textContent = phaseText.text;
+        els.ritualZone.classList.add("active");
+
+        this.noiseFragments.push(`msglen:${message.length}`);
+        this.noiseFragments.push(`start:${Date.now()}:${performance.now().toFixed(3)}`);
+        this.noiseFragments.push(`screen:${window.innerWidth}x${window.innerHeight}:${window.devicePixelRatio || 1}`);
+        this.noiseFragments.push(`tz:${Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown"}`);
+        this.syncCounters();
+
+        this.progressTimer = setInterval(() => {
+          const elapsed = performance.now() - this.startedAt;
+          const percent = Math.min(100, (elapsed / this.duration) * 100);
+          els.progressBar.style.width = `${percent}%`;
+        }, 70);
+
+        this.ritualTimer = setTimeout(async () => {
+          clearInterval(this.progressTimer);
+          els.progressBar.style.width = "100%";
+          els.phaseLabel.textContent = "Коллапс";
+          els.status.textContent = "Поток зафиксирован. Сжимаю шум в бинарную форму и поднимаю гексаграмму.";
+          const result = await this.collapse(message);
+          this.renderResult(result);
+        }, this.duration);
+      },
+
+      async collapse(message) {
+        const cryptoNoise = new Uint32Array(8);
+        if (window.crypto && window.crypto.getRandomValues) {
+          window.crypto.getRandomValues(cryptoNoise);
+        }
+
+        const payload = [
+          `message:${message}`,
+          `message_length:${message.length}`,
+          `pointer_count:${this.pointerEvents.length}`,
+          `noise_count:${this.noiseFragments.length}`,
+          `duration:${this.duration}`,
+          `user_agent:${navigator.userAgent}`,
+          `lang:${navigator.language}`,
+          `platform:${navigator.platform || "unknown"}`,
+          `timestamp:${Date.now()}`,
+          `perf:${performance.now().toFixed(3)}`,
+          `crypto:${Array.from(cryptoNoise).join(",")}`,
+          `pointer:${this.pointerEvents.map((p) => `${p.type}:${p.x}:${p.y}:${p.dx}:${p.dy}:${p.dt}:${p.pressure}`).join("|")}`,
+          `noise:${this.noiseFragments.join("|")}`
+        ].join("\n");
+
+        const hashBytes = await this.sha256(payload);
+        const lines = [];
+        for (let i = 0; i < 6; i += 1) {
+          const byte = hashBytes[i] ^ hashBytes[i + 6] ^ hashBytes[i + 12];
+          lines.push(byte % 2);
+        }
+
+        const binary = [...lines].reverse().join("");
+        const id = BIN_TO_ID[binary] || "?";
+        const upper = TRIGRAM_NAMES[lines.slice(3, 6).join("")] || "UNK";
+        const lower = TRIGRAM_NAMES[lines.slice(0, 3).join("")] || "UNK";
+        const hex = DECK[id] || { name: "UNKNOWN", meaning: "Толкование не найдено." };
+        return { id, lines, upper, lower, hex };
+      },
+
+      async sha256(input) {
+        const data = new TextEncoder().encode(input);
+        if (window.crypto && window.crypto.subtle) {
+          const digest = await window.crypto.subtle.digest("SHA-256", data);
+          return new Uint8Array(digest);
+        }
+
+        let h1 = 0x811c9dc5;
+        let h2 = 0x811c9dc5;
+        for (const byte of data) {
+          h1 ^= byte;
+          h1 = Math.imul(h1, 0x01000193);
+          h2 ^= byte + 17;
+          h2 = Math.imul(h2, 0x01000197);
+        }
+        const out = new Uint8Array(32);
+        for (let i = 0; i < 32; i += 1) {
+          out[i] = ((i % 2 === 0 ? h1 : h2) >>> ((i % 4) * 8)) & 255;
+        }
+        return out;
+      },
+
+      renderResult(result) {
+        this.phase = "result";
+        els.phaseLabel.textContent = "Гексаграмма зафиксирована";
+        els.status.textContent = "Поток свернут. Ниже результат коллапса и трактовка из русской ProcessLang-деки.";
+        els.ritualZone.classList.remove("active");
+
+        els.hexLines.innerHTML = "";
+        for (let i = 5; i >= 0; i -= 1) {
+          const line = document.createElement("div");
+          line.className = result.lines[i] === 1 ? "hex-line yang" : "hex-line yin";
+          els.hexLines.appendChild(line);
+        }
+
+        els.hexName.textContent = `#${result.id} ${result.hex.name}`;
+        els.triangles.innerHTML = `Верх: <strong>${result.upper}</strong><br>Низ: <strong>${result.lower}</strong>`;
+        els.meaning.textContent = result.hex.meaning;
+        els.result.classList.add("visible");
+        els.result.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
+
+    App.init();
+  </script>
+</body>
+</html>
