@@ -65,7 +65,9 @@ QUERY: your request
 **RUNTIME** — какие паттерны усиливать  
 **MANIFEST** — форма финального вывода  
 
-Полный синтаксис: `/docs/SYNTAX.md`
+Полный синтаксис:
+- RU: [`docs/SYNTAX_v2_ru.md`](docs/SYNTAX_v2_ru.md)
+- EN: [`docs/SYNTAX_v2_en.md`](docs/SYNTAX_v2_en.md)
 
 ---
 
@@ -76,6 +78,19 @@ QUERY: your request
 3. Передайте машине
 
 Машина нафрактит результат через заданные параметры.
+
+---
+
+## Структура репозитория
+
+Активные части репозитория:
+
+- `index.html` — заглавная страница сайта с синтаксисом и описанием языка
+- `compiler.html` — браузерный IDE/компоновщик ProcessLang
+- `compiler.py` — локальный prompt assembler для `.txt` программ
+- `modules/` — текстовые модули, которые подключает компилятор
+- `docs/` — двуязычная спецификация синтаксиса
+- `oracle.html`, `compass.html`, `vibe.html` — отдельные standalone-страницы/эксперименты, оставленные в корне как публичные entrypoint'ы
 
 ---
 
@@ -199,7 +214,9 @@ Most often 2-3 commands are enough. Using all 10 modules in one program is exces
 **RUNTIME** — which patterns to reinforce  
 **MANIFEST** — form of final output  
 
-Full syntax: `/docs/SYNTAX.md`
+Full syntax:
+- RU: [`docs/SYNTAX_v2_ru.md`](docs/SYNTAX_v2_ru.md)
+- EN: [`docs/SYNTAX_v2_en.md`](docs/SYNTAX_v2_en.md)
 
 ---
 
@@ -211,6 +228,19 @@ Full syntax: `/docs/SYNTAX.md`
 
 The machine will fract the result through specified parameters.
 
+
+---
+
+## Repository layout
+
+Active parts of the repository:
+
+- `index.html` — main site landing page with syntax and language overview
+- `compiler.html` — browser IDE / ProcessLang assembler
+- `compiler.py` — local prompt assembler for `.txt` programs
+- `modules/` — text modules loaded by the compiler
+- `docs/` — bilingual syntax specification
+- `oracle.html`, `compass.html`, `vibe.html` — standalone pages / experiments still kept at the root as public entrypoints
 
 ---
 
