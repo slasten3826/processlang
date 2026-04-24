@@ -367,77 +367,6 @@
   }
   .layer-cell .layer-ops span { color: var(--fg); margin-right: 0.25em; }
 
-  /* —— Operator cards —— */
-  .operators {
-    max-width: 1400px; margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.2rem;
-  }
-  .op-card {
-    position: relative;
-    border: 1px solid color-mix(in oklab, var(--op-color, var(--fg)) 38%, transparent);
-    padding: 1.8rem;
-    background: color-mix(in oklab, var(--bg) 82%, black 18%);
-    overflow: hidden;
-    min-height: 240px;
-    display: flex; flex-direction: column; gap: 0.9rem;
-    cursor: pointer;
-    transition: transform .4s cubic-bezier(.4,0,.2,1), border-color .3s;
-  }
-  .op-card:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in oklab, var(--op-color, var(--fg)) 70%, transparent);
-  }
-  .op-card canvas {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    opacity: 0.32;
-    pointer-events: none;
-  }
-  .op-card-head {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-    position: relative; z-index: 1;
-  }
-  .op-card-name {
-    font-family: var(--mono);
-    font-size: 1.3rem;
-    letter-spacing: 0.04em;
-    color: var(--op-color, var(--fg));
-  }
-  .op-card-glyph {
-    font-size: 1.6rem;
-    color: var(--op-color, var(--fg));
-    text-shadow: 0 0 14px color-mix(in oklab, var(--op-color, var(--fg)) 60%, transparent);
-  }
-  .op-card-nano {
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    color: var(--dim);
-    letter-spacing: 0.03em;
-    position: relative; z-index: 1;
-  }
-  .op-card-desc {
-    font-family: var(--mono);
-    font-size: 0.84rem;
-    line-height: 1.65;
-    color: color-mix(in oklab, var(--fg) 82%, var(--dim));
-    position: relative; z-index: 1;
-    text-wrap: pretty;
-  }
-  .op-card-layers {
-    margin-top: auto;
-    display: flex; align-items: center; gap: 0.6rem;
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
-    color: var(--dim);
-    position: relative; z-index: 1;
-  }
-  .op-card-layers .glyph-layer {
-    color: var(--fg);
-    margin-right: 0.25em;
-  }
 
   /* —— Artifact & manifestation lists —— */
   .artifact-list, .manifest-list {
@@ -558,7 +487,6 @@
   </div>
   <div style="color:var(--fg);">ProcessLang</div>
   <nav class="nav">
-    <a href="#operators">операторы</a>
     <a href="#artifacts">артефакты</a>
     <a href="#manifestations">манифестации</a>
     <a href="https://github.com/slasten3826/processlang" target="_blank" rel="noopener">github</a>
@@ -628,20 +556,6 @@
   <div id="layers-grid" class="layers"><!-- filled by JS --></div>
 </section>
 
-<!-- OPERATORS -->
-<section id="operators">
-  <div class="section-head">
-    <div>
-      <div class="eyebrow">▽ ☰ ☷ ☵ ☳ ☴ ☶ ☲ ☱ △ · десять</div>
-      <h2>Операторы</h2>
-    </div>
-    <div class="lede">
-      Каждая карточка — не дефиниция, а передача состояния. Наведи, открой панель, смотри смежные переходы.
-    </div>
-  </div>
-  <div id="operators-grid" class="operators"><!-- filled by JS --></div>
-</section>
-
 <!-- ARTIFACTS -->
 <section id="artifacts">
   <div class="section-head">
@@ -685,23 +599,7 @@
   <div class="inspector-body" id="inspector-body"></div>
 </div>
 
-<!-- Tweaks panel (design-system switcher) -->
-<div id="tweaks" class="tweaks">
-  <h5>палитра</h5>
-  <label><input type="radio" name="pl-theme" value="layers"><span>по слою (layered)</span></label>
-  <label><input type="radio" name="pl-theme" value="harmonised"><span>гармонизированная (10 hue)</span></label>
-  <label><input type="radio" name="pl-theme" value="mono"><span>моно + акцент</span></label>
-  <h5 style="margin-top:1rem;">анимации</h5>
-  <label><input type="checkbox" id="tw-anim" checked><span>canvas-эффекты</span></label>
-</div>
 
-<!-- ——— Tweakable defaults block — host rewrites this on change ——— -->
-<script>
-  window.PL_TWEAKS = /*EDITMODE-BEGIN*/{
-    "theme": "harmonised",
-    "animations": true
-  }/*EDITMODE-END*/;
-</script>
 
 <script>
 // ProcessLang operators — single source of truth.
@@ -876,147 +774,74 @@ window.PL_MANIFESTATIONS = [
 
 </script>
 <script>
-// Color systems for ProcessLang.
-// Three themes, selectable via Tweaks. Each returns, for a given operator,
-// an 'rgba(r,g,b,1)' string used both as CSS accent and as canvas stroke/fill.
+// ProcessLang · Canonical Color System v1
+// One palette. No switching. Colors follow the operator canon.
 //
-// Themes:
-//   layers          — cvet = layer of abstraction (chaos/table/crystall/manifest)
-//                     operators inside the same layer vary by hue, L/C fixed.
-//   harmonised-10   — 10 distinct hues on the same oklch(L,C) so none dominate.
-//   mono            — bone-white on black, no per-operator color; active operator
-//                     lights up in a single accent.
+// ▽ FLOW     turquoise     oklch(0.78 0.14 195)
+// ☰ CONNECT  signal yellow oklch(0.85 0.16  90)
+// ☷ DISSOLVE amethyst      oklch(0.72 0.16 295)
+// ☵ ENCODE   cold blue     oklch(0.72 0.14 240)
+// ☳ CHOOSE   red           oklch(0.72 0.16  25)
+// ☴ OBSERVE  white         oklch(0.94 0.01 240)
+// ☶ LOGIC    grid green    oklch(0.78 0.14 150)
+// ☲ CYCLE    loop orange   oklch(0.78 0.16  55)
+// ☱ RUNTIME  black-metal   oklch(0.48 0.02 240)
+// △ MANIFEST warm gold     oklch(0.82 0.14  75)
 
 (function () {
-  // Helper: convert oklch() to rgba via a canvas 2d context.
-  // Setting fillStyle to any CSS color string and reading it back returns a
-  // normalised rgb()/#hex form — this works with oklch() even in browsers that
-  // don't expose converted values via getComputedStyle.
-  const _canvas = document.createElement('canvas');
-  const _ctx = _canvas.getContext('2d');
-  const oklchToRgba = (L, C, H) => {
+  // Convert oklch via canvas fillStyle (works even where getComputedStyle fails).
+  const _cv = document.createElement('canvas');
+  const _cx = _cv.getContext('2d');
+  const o2r = (L, C, H) => {
     try {
-      _ctx.fillStyle = '#000';
-      _ctx.fillStyle = `oklch(${L} ${C} ${H})`;
-      const v = _ctx.fillStyle; // e.g. "#aabbcc" or "rgb(r, g, b)"
+      _cx.fillStyle = '#000';
+      _cx.fillStyle = `oklch(${L} ${C} ${H})`;
+      const v = _cx.fillStyle;
       if (v.startsWith('#')) {
-        const hex = v.slice(1);
-        const r = parseInt(hex.slice(0, 2), 16);
-        const g = parseInt(hex.slice(2, 4), 16);
-        const b = parseInt(hex.slice(4, 6), 16);
-        return `rgba(${r},${g},${b},1)`;
+        const h = v.slice(1);
+        return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},1)`;
       }
       const m = v.match(/\d+/g);
       if (m && m.length >= 3) return `rgba(${m[0]},${m[1]},${m[2]},1)`;
-    } catch (_) {}
-    // fallback — warm bone
+    } catch(_) {}
     return 'rgba(220,220,200,1)';
   };
 
-  const OPS = ['FLOW','CONNECT','DISSOLVE','ENCODE','CHOOSE','OBSERVE','LOGIC','CYCLE','RUNTIME','MANIFEST'];
-
-  // --- theme: layers ---
-  // Each operator's primary layer defines its hue band.
-  // Deepest layer (chaos) if operator spans multiple.
-  const primaryLayer = {
-    FLOW: 'chaos', CONNECT: 'chaos', DISSOLVE: 'chaos',
-    ENCODE: 'table', OBSERVE: 'table', CHOOSE: 'table',
-    LOGIC: 'crystall', CYCLE: 'crystall', RUNTIME: 'crystall',
-    MANIFEST: 'manifest',
-  };
-  const layerHue = { chaos: 280, table: 200, crystall: 40, manifest: 70 }; // violet / cyan / amber / ivory
-  const layerHueJitter = {
-    FLOW: -12, CONNECT: 0, DISSOLVE: 12,
-    ENCODE: -10, OBSERVE: 0, CHOOSE: 10,
-    LOGIC: -14, CYCLE: 0, RUNTIME: 14,
-    MANIFEST: 0,
-  };
-  const themeLayers = {};
-  OPS.forEach(op => {
-    const L = op === 'MANIFEST' ? 0.95 : 0.78;
-    const C = op === 'MANIFEST' ? 0.02 : 0.14;
-    const H = layerHue[primaryLayer[op]] + (layerHueJitter[op] || 0);
-    themeLayers[op] = oklchToRgba(L, C, H);
-  });
-
-  // --- theme: harmonised-10 ---
-  // 10 hues evenly spaced around the wheel, same L/C.
-  const themeHarmonised = {};
-  OPS.forEach((op, i) => {
-    const H = (i * 36 + 200) % 360;
-    themeHarmonised[op] = oklchToRgba(0.78, 0.15, H);
-  });
-
-  // --- theme: mono ---
-  // All operators share the same bone-white; the active operator uses accent.
-  const bone = oklchToRgba(0.92, 0.01, 90);
-  const accent = oklchToRgba(0.82, 0.14, 70);
-  const themeMono = {};
-  OPS.forEach(op => { themeMono[op] = bone; });
-  // active swap happens at render time via getOperatorColor()
-
-  const themes = {
-    layers: {
-      colors: themeLayers,
-      bg: '#07080a',
-      fg: oklchToRgba(0.92, 0.008, 240),
-      dim: oklchToRgba(0.55, 0.01, 240),
-      rule: 'rgba(140,160,180,0.14)',
-      accent: oklchToRgba(0.85, 0.14, 70),
-    },
-    harmonised: {
-      colors: themeHarmonised,
-      bg: '#07080a',
-      fg: oklchToRgba(0.92, 0.008, 240),
-      dim: oklchToRgba(0.55, 0.01, 240),
-      rule: 'rgba(140,160,180,0.14)',
-      accent: oklchToRgba(0.85, 0.14, 70),
-    },
-    mono: {
-      colors: themeMono,
-      bg: '#050507',
-      fg: bone,
-      dim: 'rgba(200,200,200,0.42)',
-      rule: 'rgba(220,220,220,0.10)',
-      accent,
-    },
+  const CANON = {
+    FLOW:     o2r(0.78, 0.14, 195),
+    CONNECT:  o2r(0.85, 0.16,  90),
+    DISSOLVE: o2r(0.72, 0.16, 295),
+    ENCODE:   o2r(0.72, 0.14, 240),
+    CHOOSE:   o2r(0.72, 0.16,  25),
+    OBSERVE:  o2r(0.94, 0.01, 240),
+    LOGIC:    o2r(0.78, 0.14, 150),
+    CYCLE:    o2r(0.78, 0.16,  55),
+    RUNTIME:  o2r(0.48, 0.02, 240),
+    MANIFEST: o2r(0.82, 0.14,  75),
   };
 
-  let current = 'layers';
-  let activeOp = null;
+  const FG     = o2r(0.92, 0.008, 240);
+  const DIM    = o2r(0.55, 0.01,  240);
+  const ACCENT = CANON.MANIFEST; // gold as global accent
 
-  function applyTheme(id) {
-    current = id in themes ? id : 'layers';
-    const t = themes[current];
-    document.documentElement.style.setProperty('--bg', t.bg);
-    document.documentElement.style.setProperty('--fg', t.fg);
-    document.documentElement.style.setProperty('--dim', t.dim);
-    document.documentElement.style.setProperty('--rule', t.rule);
-    document.documentElement.style.setProperty('--accent', t.accent);
-    // expose per-operator color as CSS vars
-    Object.entries(t.colors).forEach(([op, rgba]) => {
+  function apply() {
+    document.documentElement.style.setProperty('--bg', '#07080a');
+    document.documentElement.style.setProperty('--fg', FG);
+    document.documentElement.style.setProperty('--dim', DIM);
+    document.documentElement.style.setProperty('--rule', 'rgba(140,160,180,0.14)');
+    document.documentElement.style.setProperty('--accent', ACCENT);
+    Object.entries(CANON).forEach(([op, rgba]) => {
       document.documentElement.style.setProperty(`--c-${op.toLowerCase()}`, rgba);
     });
-    document.documentElement.dataset.theme = current;
   }
 
-  function getOperatorColor(opName) {
-    const t = themes[current];
-    if (current === 'mono' && activeOp === opName) return t.accent;
-    return t.colors[opName] || t.fg;
+  function color(opName) {
+    return CANON[opName] || FG;
   }
 
-  window.PLTheme = {
-    apply: applyTheme,
-    color: getOperatorColor,
-    setActive(op) { activeOp = op; },
-    current: () => current,
-    list: () => Object.keys(themes),
-  };
-
-  _canvas.remove && _canvas.remove();
+  window.PLTheme = { apply, color };
+  _cv.remove && _cv.remove();
 })();
-
 </script>
 <script>
 // Canvas animations for each operator card.
@@ -1390,16 +1215,10 @@ window.PL_MANIFESTATIONS = [
 
   // ——— theme ———
   const PL = window.PLTheme;
-  function setTheme(id) {
-    PL.apply(id);
-    // push per-card color vars
+  function applyColors() {
     document.querySelectorAll('[data-op]').forEach(el => {
-      const op = el.dataset.op;
-      el.style.setProperty('--op-color', PL.color(op));
+      el.style.setProperty('--op-color', PL.color(el.dataset.op));
     });
-    // update tweak inputs
-    const r = document.querySelector(`input[name="pl-theme"][value="${id}"]`);
-    if (r) r.checked = true;
   }
 
   // ——— rendering ———
@@ -1416,19 +1235,13 @@ window.PL_MANIFESTATIONS = [
       cell.addEventListener('mouseenter', () => setActiveGlyph(cell.dataset.op));
       cell.addEventListener('mouseleave', () => setActiveGlyph(null));
     });
+    applyColors();
   }
 
   function setActiveGlyph(name) {
     document.querySelectorAll('#constellation .glyph-cell').forEach(c => {
       c.classList.toggle('is-active', c.dataset.op === name);
     });
-    if (PL.current() === 'mono') {
-      PL.setActive(name);
-      // re-push colors so mono theme swaps accent on hover
-      document.querySelectorAll('[data-op]').forEach(el => {
-        el.style.setProperty('--op-color', PL.color(el.dataset.op));
-      });
-    }
   }
 
   function renderLayers() {
@@ -1445,37 +1258,6 @@ window.PL_MANIFESTATIONS = [
         </div>
       `;
     }).join('');
-  }
-
-  function renderOperators() {
-    const grid = document.getElementById('operators-grid');
-    grid.innerHTML = ops.map(op => `
-      <div class="op-card" data-op="${op.name}" style="--op-color:${PL.color(op.name)}">
-        <canvas class="op-canvas"></canvas>
-        <div class="op-card-head">
-          <div class="op-card-name">${op.name}</div>
-          <div class="op-card-glyph">${op.glyph}</div>
-        </div>
-        <div class="op-card-nano">${op.nano}</div>
-        <div class="op-card-desc">${op.poetics}</div>
-        <div class="op-card-layers">
-          ${op.layers.map(l => {
-            const layer = layers.find(x => x.id === l);
-            return `<span class="glyph-layer" title="${layer.title}">${layer.glyph}</span>${layer.id}`;
-          }).join(' · ')}
-        </div>
-      </div>
-    `).join('');
-
-    // wire canvas effects
-    grid.querySelectorAll('.op-card').forEach(card => {
-      const name = card.dataset.op;
-      const op = opByName[name];
-      const canvas = card.querySelector('.op-canvas');
-      const eff = new window.OperatorEffect(canvas, op.kind, () => PL.color(name));
-      effects.push({ canvas, eff });
-      card.addEventListener('click', () => openInspector(name));
-    });
   }
 
   function renderArtifacts() {
@@ -1685,52 +1467,17 @@ window.PL_MANIFESTATIONS = [
     });
   });
 
-  // ——— tweaks (edit-mode panel) ———
-  const tweaksEl = document.getElementById('tweaks');
-  document.querySelectorAll('input[name="pl-theme"]').forEach(r => {
-    r.addEventListener('change', () => {
-      setTheme(r.value);
-      window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { theme: r.value } }, '*');
-    });
-  });
-  const animToggle = document.getElementById('tw-anim');
-  animToggle.addEventListener('change', () => {
-    document.querySelectorAll('.op-canvas').forEach(c => { c.style.display = animToggle.checked ? '' : 'none'; });
-    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { animations: animToggle.checked } }, '*');
-  });
-
-  // listen BEFORE announcing availability — order matters per tweaks contract
-  window.addEventListener('message', (ev) => {
-    const d = ev.data;
-    if (!d || typeof d !== 'object') return;
-    if (d.type === '__activate_edit_mode') tweaksEl.classList.add('is-open');
-    if (d.type === '__deactivate_edit_mode') tweaksEl.classList.remove('is-open');
-  });
-  try {
-    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
-  } catch (_) {}
-
   // ——— boot ———
-  const initial = (window.PL_TWEAKS && window.PL_TWEAKS.theme) || 'layers';
-  PL.apply(initial);
+  PL.apply();
   renderConstellation();
   renderLayers();
-  renderOperators();
   renderArtifacts();
   renderManifestations();
-  setTheme(initial);
+  applyColors();
 
   // hero background field
   const heroBg = document.getElementById('hero-bg');
-  let heroField = null;
-  if (heroBg) heroField = new window.HeroField(heroBg);
-
-  if (window.PL_TWEAKS && window.PL_TWEAKS.animations === false) {
-    animToggle.checked = false;
-    document.querySelectorAll('.op-canvas').forEach(c => { c.style.display = 'none'; });
-    if (heroBg) heroBg.style.display = 'none';
-    if (heroField) heroField.alive = false;
-  }
+  if (heroBg) new window.HeroField(heroBg);
 
   // greet
   say('введи <em>help</em> — и получишь контур.', 'ok');
